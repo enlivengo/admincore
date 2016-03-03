@@ -686,7 +686,7 @@ func (context *Context) AllowedActions(actions []*Action, mode string, records .
 	var allowedActions []*Action
 	for _, action := range actions {
 		for _, m := range action.Modes {
-			if m == mode && action.HasPermission(roles.Update, context.Context, records...) {
+			if m == mode && action.HasPermission(roles.Update, context, records...) {
 				allowedActions = append(allowedActions, action)
 				break
 			}

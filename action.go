@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
 )
@@ -14,6 +13,15 @@ func (res *Resource) Action(action *Action) {
 	if action.Label == "" {
 		action.Label = utils.HumanizeString(action.Name)
 	}
+
+	if action.Method == "" {
+		if action.URL != nil {
+			action.Method = "GET"
+		} else {
+			action.Method = "PUT"
+		}
+	}
+
 	res.Actions = append(res.Actions, action)
 }
 
@@ -28,8 +36,10 @@ type ActionArgument struct {
 type Action struct {
 	Name       string
 	Label      string
+	Method     string
+	URL        func(record interface{}, context *Context) string
+	Visible    func(record interface{}, context *Context) bool
 	Handle     func(argument *ActionArgument) error
-	Visible    func(record interface{}) bool
 	Modes      []string
 	Resource   *Resource
 	Permission *roles.Permission
@@ -41,10 +51,10 @@ func (action Action) ToParam() string {
 }
 
 // HasPermission check if current user has permission for the action
-func (action Action) HasPermission(mode roles.PermissionMode, context *qor.Context, records ...interface{}) bool {
+func (action Action) HasPermission(mode roles.PermissionMode, context *Context, records ...interface{}) bool {
 	if action.Visible != nil {
 		for _, record := range records {
-			if !action.Visible(record) {
+			if !action.Visible(record, context) {
 				return false
 			}
 		}
