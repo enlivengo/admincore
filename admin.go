@@ -143,13 +143,9 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 	return res
 }
 
-// AddSearchResource make a resource searchable from search center
-func (admin *Admin) AddSearchResource(resources ...*Resource) {
-	admin.searchResources = append(admin.searchResources, resources...)
-}
-
-func (admin *Admin) EnabledSearchCenter() bool {
-	return len(admin.searchResources) > 0
+// GetResources get defined resources from admin
+func (admin *Admin) GetResources() []*Resource {
+	return admin.resources
 }
 
 // GetResource get resource with name
@@ -163,9 +159,14 @@ func (admin *Admin) GetResource(name string) *Resource {
 	return nil
 }
 
-// GetResources get defined resources from admin
-func (admin *Admin) GetResources() []*Resource {
-	return admin.resources
+// AddSearchResource make a resource searchable from search center
+func (admin *Admin) AddSearchResource(resources ...*Resource) {
+	admin.searchResources = append(admin.searchResources, resources...)
+}
+
+// GetSearchResources get defined search resources from admin
+func (admin *Admin) GetSearchResources() []*Resource {
+	return admin.searchResources
 }
 
 // I18n define admin's i18n interface

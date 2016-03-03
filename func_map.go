@@ -324,18 +324,21 @@ type menu struct {
 }
 
 func (context *Context) getMenus() (menus []*menu) {
-	var globalMenu = &menu{}
-	var mostMatchedMenu *menu
-	var mostMatchedLength int
+	var (
+		globalMenu        = &menu{}
+		mostMatchedMenu   *menu
+		mostMatchedLength int
+		addMenu           func(*menu, []*Menu)
+	)
 
-	var addMenu func(parent *menu, menus []*Menu)
 	addMenu = func(parent *menu, menus []*Menu) {
 		for _, m := range menus {
-			menu := &menu{Menu: m}
-			if strings.Contains(context.Request.URL.Path, m.Link) && len(m.Link) > mostMatchedLength {
+			var menu = &menu{Menu: m}
+			if strings.HasPrefix(context.Request.URL.Path, m.Link) && len(m.Link) > mostMatchedLength {
 				mostMatchedMenu = menu
 				mostMatchedLength = len(m.Link)
 			}
+
 			addMenu(menu, menu.GetSubMenus())
 			parent.SubMenus = append(parent.SubMenus, menu)
 		}
