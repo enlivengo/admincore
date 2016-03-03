@@ -682,15 +682,13 @@ func (context *Context) getFormattedErrors() (formatedErrors []formatedError) {
 }
 
 // AllowedActions return allowed actions based on context
-func (context *Context) AllowedActions(actions []*Action, mode string) []*Action {
+func (context *Context) AllowedActions(actions []*Action, mode string, records ...interface{}) []*Action {
 	var allowedActions []*Action
 	for _, action := range actions {
-		if action.HasPermission(roles.Update, context.Context) {
-			for _, visible := range action.Visibles {
-				if visible == mode {
-					allowedActions = append(allowedActions, action)
-					break
-				}
+		for _, m := range action.Modes {
+			if m == mode && action.HasPermission(roles.Update, context.Context, records...) {
+				allowedActions = append(allowedActions, action)
+				break
 			}
 		}
 	}

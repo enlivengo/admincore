@@ -28,10 +28,11 @@ type ActionArgument struct {
 type Action struct {
 	Name       string
 	Label      string
-	Handle     func(arg *ActionArgument) error
+	Handle     func(argument *ActionArgument) error
+	Visible    func(record interface{}) bool
+	Modes      []string
 	Resource   *Resource
 	Permission *roles.Permission
-	Visibles   []string
 }
 
 // ToParam used to register routes for actions
@@ -40,10 +41,19 @@ func (action Action) ToParam() string {
 }
 
 // HasPermission check if current user has permission for the action
-func (action Action) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
+func (action Action) HasPermission(mode roles.PermissionMode, context *qor.Context, records ...interface{}) bool {
+	if action.Visible != nil {
+		for _, record := range records {
+			if !action.Visible(record) {
+				return false
+			}
+		}
+	}
+
 	if action.Permission == nil {
 		return true
 	}
+
 	return action.Permission.HasPermission(mode, context.Roles...)
 }
 

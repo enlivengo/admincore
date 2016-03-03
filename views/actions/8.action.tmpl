@@ -1,5 +1,5 @@
 {{$context := .}}
-{{$allowed_actions := (allowed_actions $context.Resource.Actions $context.Action)}}
+{{$allowed_actions := (allowed_actions $context.Resource.Actions $context.Action .Result)}}
 {{$resource := .Resource}}
 {{$result := .Result}}
 

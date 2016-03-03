@@ -203,7 +203,6 @@ func (ac *controller) Action(context *Context) {
 			}).Respond(context.Request)
 		} else {
 			message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
-			context.Writer.WriteHeader(HTTPUnprocessableEntity)
 			context.JSON("OK", map[string]string{"error": message, "status": "error"})
 		}
 	}
