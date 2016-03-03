@@ -346,7 +346,7 @@ func (context *Context) getMenus() (menus []*menu) {
 
 	addMenu(globalMenu, context.Admin.GetMenus())
 
-	if mostMatchedMenu != nil {
+	if context.Action != "search_center" && mostMatchedMenu != nil {
 		mostMatchedMenu.Active = true
 	}
 
@@ -698,12 +698,18 @@ func (context *Context) AllowedActions(actions []*Action, mode string) []*Action
 }
 
 func (context *Context) pageTitle() template.HTML {
+	if context.Action == "search_center" {
+		return context.t("qor_admin.search_center.title", "Search Center")
+	}
+
 	if context.Resource == nil {
 		return context.t("qor_admin.layout.title", "Admin")
 	}
+
 	if context.Action == "action" {
 		return context.t(fmt.Sprintf("%v.actions.%v", context.Resource.ToParam(), context.Result.(*Action).Label), context.Result.(*Action).Label)
 	}
+
 	var value string
 	var resourceKey, resourceName string
 	titleKey := fmt.Sprintf("qor_admin.form.%v_title", context.Action)
