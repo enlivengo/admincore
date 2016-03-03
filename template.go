@@ -24,7 +24,7 @@ func init() {
 	}
 
 	registerViewPath(path.Join(root, "app/views/qor"))
-	RegisterViewPath("github.com/qor/qor/admin/views")
+	RegisterViewPath("github.com/qor/admin/views")
 }
 
 // RegisterViewPath register views directory

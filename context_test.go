@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/qor/qor"
-	"github.com/qor/qor/admin"
+	"github.com/qor/admin"
 
 	_ "github.com/mattn/go-sqlite3"
 )
