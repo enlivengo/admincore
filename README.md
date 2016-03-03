@@ -1,4 +1,4 @@
-## Qor Service
+## Qor Admin
 
 Instantly create a beautiful, cross platform, configurable Admin Interface and API for managing your data in minutes.
 
@@ -25,7 +25,7 @@ import (
     "github.com/jinzhu/gorm"
     _ "github.com/mattn/go-sqlite3"
     "github.com/qor/qor"
-    "github.com/qor/service"
+    "github.com/qor/admin"
 )
 
 // Create a GORM-backend model
@@ -46,7 +46,7 @@ func main() {
   DB.AutoMigrate(&User{}, &Product{})
 
   // Initalize
-  Admin := service.New(&qor.Config{DB: &DB})
+  Admin := admin.New(&qor.Config{DB: &DB})
 
   // Create resources from GORM-backend model
   Admin.AddResource(&User{})
@@ -149,11 +149,11 @@ Admin.AddMenu(&admin.Menu{Name: "menu", Link: "/link", Ancestors: []string{"Dash
 ```go
 Admin.AddResource(&User{})
 
-Admin.AddResource(&Product{}, &service.Config{Menu: []string{"Product Management"}})
-Admin.AddResource(&Color{}, &service.Config{Menu: []string{"Product Management"}})
-Admin.AddResource(&Size{}, &service.Config{Menu: []string{"Product Management"}})
+Admin.AddResource(&Product{}, &admin.Config{Menu: []string{"Product Management"}})
+Admin.AddResource(&Color{}, &admin.Config{Menu: []string{"Product Management"}})
+Admin.AddResource(&Size{}, &admin.Config{Menu: []string{"Product Management"}})
 
-Admin.AddResource(&Order{}, &service.Config{Menu: []string{"Order Management"}})
+Admin.AddResource(&Order{}, &admin.Config{Menu: []string{"Order Management"}})
 ```
 
 If you don't want resource to be displayed in navigation, pass Invisible option in like this
@@ -170,7 +170,7 @@ To translate your admin interface to a new language, you could use the `i18n` [h
 
 Every Qor Resource need a [GORM-backend](https://github.com/jinzhu/gorm) model, so you need to define the model first, after that you could create qor resource with `Admin.AddResource(&Product{})`
 
-After add resource to admin, qor service will generate the admin interface to manage the resource, and also it will generate a JSON based RESTFul API.
+After add resource to admin, qor admin will generate the admin interface to manage the resource, and also it will generate a JSON based RESTFul API.
 
 So for above example, you could visit `localhost:9000/admin/products` to manage `Product` in HTML interface, or use the RESTFul JSON api `localhost:9000/admin/products.json` to any CRUD work
 
@@ -248,7 +248,7 @@ order.Scope(&admin.Scope{Name: "Shipped", Group: "State", Handle: func(db *gorm.
 
 ### Actions
 
-Qor Service provide four kinds of actions:
+Qor Admin provide four kinds of actions:
 
 * Bulk actions
 * Edit form action
@@ -292,7 +292,7 @@ type trackingNumberArgument struct {
 
 ### Customizing the Form
 
-When Qor Service generating the admin interface, if will get your resource's data type and relations, based on those information, create `Meta` for your registered resource.
+When Qor Admin generating the admin interface, if will get your resource's data type and relations, based on those information, create `Meta` for your registered resource.
 
 Then when render the index/show/new/edit pages, will generate it based on the resource's Meta definition.
 
@@ -300,22 +300,22 @@ If you want to change those defaults, you need to change the resource's `Meta` d
 
 ```go
 // Qor has defined many meta's types by default, including `string`, `password`, `date`, `rich_editor`, `select_one` and so on
-user.Meta(&service.Meta{Name: "Password", Type: "password"}) // change resource user's Password field's type from `string` to `password`
+user.Meta(&admin.Meta{Name: "Password", Type: "password"}) // change resource user's Password field's type from `string` to `password`
 
 // Change resource user's Gender field's to be a select, options are `M`, `F`
-user.Meta(&service.Meta{Name: "Gender", Type: "select_one", Collection: []string{"M", "F"}})
+user.Meta(&admin.Meta{Name: "Gender", Type: "select_one", Collection: []string{"M", "F"}})
 ```
 
 ### Permission
 
-Qor Service is using [https://github.com/qor/roles](https://github.com/qor/roles) for permission management, refer it for how to define roles, permissions
+Qor Admin is using [https://github.com/qor/roles](https://github.com/qor/roles) for permission management, refer it for how to define roles, permissions
 
 ```go
 // CURD permission for admin users, deny create permission for manager
-user := Admin.AddResource(&User{}, &service.Config{Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
+user := Admin.AddResource(&User{}, &admin.Config{Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
 
 // For user's Email field, allow CURD for admin users, deny update for manager
-user.Meta(&service.Meta{Name: "Email", Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
+user.Meta(&admin.Meta{Name: "Email", Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
 ```
 
 ### RESTFul JSON API
@@ -330,11 +330,11 @@ If your model has defined below two methods, it will be call when registing
 
 ```go
 func ConfigureQorResourceBeforeInitialize(resource) {
-  // resource.(*service.Resource)
+  // resource.(*admin.Resource)
 }
 
 func ConfigureQorResource(resource) {
-  // resource.(*service.Resource)
+  // resource.(*admin.Resource)
 }
 ```
 
@@ -344,11 +344,11 @@ If your field's type has defined below two methods, it will be call when registi
 
 ```go
 func ConfigureQorMetaBeforeInitialize(meta) {
-  // resource.(*service.Meta)
+  // resource.(*admin.Meta)
 }
 
 func ConfigureMetaInterface(meta) {
-  // resource.(*service.Meta)
+  // resource.(*admin.Meta)
 }
 ```
 
@@ -362,7 +362,7 @@ product.UseTheme("fancy")
 
 #### Customize Views
 
-When rendering pages, qor will look up templates from qor view paths, and use them to render the page, qor has registered `{current path}/app/views/qor` for your to allow you extend your application from there. If you want to customize your views from other places, you could register new path with `service.RegisterViewPath`
+When rendering pages, qor will look up templates from qor view paths, and use them to render the page, qor has registered `{current path}/app/views/qor` for your to allow you extend your application from there. If you want to customize your views from other places, you could register new path with `admin.RegisterViewPath`
 
 Customize Views Rules:
 
