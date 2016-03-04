@@ -607,14 +607,24 @@ func (context *Context) loadActions(action string) template.HTML {
 
 	var result = bytes.NewBufferString("")
 	for _, key := range actionKeys {
+		defer func() {
+			if r := recover(); r != nil {
+				err := fmt.Sprintf("Get error when render action %v: %v", key, r)
+				utils.ExitWithMsg(err)
+				result.WriteString(err)
+			}
+		}()
+
 		base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(key, "")
 		file := actions[base]
 		if tmpl, err := template.New(filepath.Base(file)).Funcs(context.FuncMap()).ParseFiles(file); err == nil {
 			if err := tmpl.Execute(result, context); err != nil {
-				panic(err)
+				utils.ExitWithMsg(err)
+				result.WriteString(err.Error())
 			}
 		}
 	}
+
 	return template.HTML(strings.TrimSpace(result.String()))
 }
 

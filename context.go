@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -118,7 +119,16 @@ func (context *Context) FindTemplate(layouts ...string) (string, error) {
 
 // Render render template based on context
 func (context *Context) Render(name string, results ...interface{}) template.HTML {
+	var err error
+
 	if file, err := context.FindTemplate(name + ".tmpl"); err == nil {
+		defer func() {
+			if r := recover(); r != nil {
+				err = errors.New(fmt.Sprintf("Get error when render file %v: %v", file, r))
+				utils.ExitWithMsg(err)
+			}
+		}()
+
 		var clone = context.clone()
 		var result = bytes.NewBufferString("")
 
@@ -127,16 +137,13 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 		}
 
 		if tmpl, err := template.New(filepath.Base(file)).Funcs(clone.FuncMap()).ParseFiles(file); err == nil {
-			if err := tmpl.Execute(result, clone); err != nil {
-				utils.ExitWithMsg(err)
+			if err = tmpl.Execute(result, clone); err == nil {
+				return template.HTML(result.String())
 			}
-		} else {
-			utils.ExitWithMsg(err)
 		}
-		return template.HTML(result.String())
 	}
 
-	return ""
+	return template.HTML(err.Error())
 }
 
 // Execute execute template with layout
