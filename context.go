@@ -114,21 +114,24 @@ func (context *Context) FindTemplate(layouts ...string) (string, error) {
 			}
 		}
 	}
-	return "", errors.New("template not found")
+	return "", fmt.Errorf("template not found: %v", layouts)
 }
 
 // Render render template based on context
 func (context *Context) Render(name string, results ...interface{}) template.HTML {
-	var err error
+	var (
+		err  error
+		file = name
+	)
 
-	if file, err := context.FindTemplate(name + ".tmpl"); err == nil {
-		defer func() {
-			if r := recover(); r != nil {
-				err = errors.New(fmt.Sprintf("Get error when render file %v: %v", file, r))
-				utils.ExitWithMsg(err)
-			}
-		}()
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("Get error when render file %v: %v", file, r))
+			utils.ExitWithMsg(err)
+		}
+	}()
 
+	if file, err = context.FindTemplate(name + ".tmpl"); err == nil {
 		var clone = context.clone()
 		var result = bytes.NewBufferString("")
 
