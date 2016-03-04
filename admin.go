@@ -169,14 +169,21 @@ func (admin *Admin) GetResources() []*Resource {
 }
 
 // GetResource get resource with name
-func (admin *Admin) GetResource(name string) *Resource {
+func (admin *Admin) GetResource(name string) (resource *Resource) {
 	for _, res := range admin.resources {
-		var typeName = reflect.Indirect(reflect.ValueOf(res.Value)).Type().String()
-		if res.ToParam() == name || res.Name == name || typeName == name {
+		modelType := utils.ModelType(res.Value)
+		// find with defined name first
+		if res.ToParam() == name || res.Name == name || modelType.String() == name {
 			return res
 		}
+
+		// if failed to find, use its model name
+		if modelType.Name() == name {
+			resource = res
+		}
 	}
-	return nil
+
+	return
 }
 
 // AddSearchResource make a resource searchable from search center
