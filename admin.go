@@ -137,6 +137,26 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 
 		menu := &Menu{rawPath: res.ToParam(), Name: menuName}
 		admin.menus = appendMenu(admin.menus, res.Config.Menu, menu)
+
+		res.Action(&Action{
+			Name:   "Edit",
+			Method: "Get",
+			URL: func(record interface{}, context *Context) string {
+				return context.URLFor(record, res)
+			},
+			Permission: res.Config.Permission,
+			Modes:      []string{"menu_item"},
+		})
+
+		res.Action(&Action{
+			Name:   "Delete",
+			Method: "DELETE",
+			URL: func(record interface{}, context *Context) string {
+				return context.URLFor(record, res)
+			},
+			Permission: res.Config.Permission,
+			Modes:      []string{"menu_item"},
+		})
 	}
 
 	admin.resources = append(admin.resources, res)
