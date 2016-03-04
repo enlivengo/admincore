@@ -68,7 +68,7 @@ func main() {
 
 ### Site Name
 
-Use `SetSiteName` to set admin's HTML title, it will not only set title, but also will auto load javascripts, stylesheets files according to your name, so it could be used to customize the admin interface.
+Use `SetSiteName` to set admin's HTML title, not only set the title, but it will also auto load javascripts, stylesheets files based on the name, you could use that to customize the admin interface.
 
 For example, if you named it as `Qor Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customize-views), and load them if found
 
@@ -78,9 +78,9 @@ Admin.SetSiteName("Qor DEMO")
 
 ### Dashboard
 
-Qor provide a default dashboard page with some dummary text, if you want to overwrite it, you could create a file named as `dashboard.tmpl` in [QOR view paths](#customize-views), Qor will load it as golang templates when render dashboard
+Qor provides a default dashboard page with some dummy text, if you want to overwrite it, you could create a file `dashboard.tmpl` in [QOR view paths](#customize-views), Qor will load it as golang templates when rendering dashboard
 
-If you want to disable the dashboard, you could redirect the dashboard page to some other page, for example:
+If you want to disable the dashboard, you could redirect the it to some other page, for example:
 
 ```go
 Admin.GetRouter().Get("/", func(c *admin.Context) {
