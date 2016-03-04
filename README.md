@@ -80,7 +80,7 @@ Admin.SetSiteName("Qor DEMO")
 
 Qor provides a default dashboard page with some dummy text, if you want to overwrite it, you could create a file `dashboard.tmpl` in [QOR view paths](#customize-views), Qor will load it as golang templates when rendering dashboard
 
-If you want to disable the dashboard, you could redirect the it to some other page, for example:
+If you want to disable the dashboard, you could redirect it to some other page, for example:
 
 ```go
 Admin.GetRouter().Get("/", func(c *admin.Context) {
@@ -90,9 +90,9 @@ Admin.GetRouter().Get("/", func(c *admin.Context) {
 
 ### Authentication
 
-Qor provides pretty flexable authorization solution, with it, you could integrate admin with your current authorization method.
+Qor provides pretty flexable authorization solution, with it, you could integrate with your current authorization method.
 
-What you need to do is implement below `Auth` interface, and set it to the admin
+What you need to do is implement an `Auth` interface like below, and set it to the admin
 
 ```go
 type Auth interface {
@@ -102,7 +102,7 @@ type Auth interface {
 }
 ```
 
-Here is an example
+Here is an example:
 
 ```go
 type Auth struct{}
@@ -144,7 +144,7 @@ Admin.AddMenu(&admin.Menu{Name: "Dashboard", Link: "/admin"})
 Admin.AddMenu(&admin.Menu{Name: "menu", Link: "/link", Ancestors: []string{"Dashboard"}})
 ```
 
-#### Add resource to menu
+#### Add Resource to menu
 
 ```go
 Admin.AddResource(&User{})
@@ -164,29 +164,28 @@ Admin.AddResource(&User{}, &admin.Config{Invisible: true})
 
 ### Internationalization
 
-To translate your admin interface to a new language, you could use the `i18n` [https://github.com/qor/i18n](https://github.com/qor/i18n)
+To translate admin interface to a new language, you could use `i18n` [https://github.com/qor/i18n](https://github.com/qor/i18n)
 
 ## Working with Resource
 
 Every Qor Resource need a [GORM-backend](https://github.com/jinzhu/gorm) model, so you need to define the model first, after that you could create qor resource with `Admin.AddResource(&Product{})`
 
-After add resource to admin, qor admin will generate the admin interface to manage the resource, and also it will generate a JSON based RESTFul API.
+When added a resource to admin, qor admin will generate the admin interface to manage it, including a RESTFul JSON API.
 
-So for above example, you could visit `localhost:9000/admin/products` to manage `Product` in HTML interface, or use the RESTFul JSON api `localhost:9000/admin/products.json` to any CRUD work
+So for above example, you could visit `localhost:9000/admin/products` to manage `Product` in the HTML admin interface, or use the RESTFul JSON api `localhost:9000/admin/products.json` to do CRUD
 
 ### Customizing CURD pages
 
 ```go
 // Set attributes will be shown in the index page
-
-// show given attributes in the index page
+// show given attributes
 order.IndexAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
-// show all attributes except `State` in the index page
+// show all attributes except `State`
 order.IndexAttrs("-State")
 
 // Set attributes will be shown in the new page
 order.NewAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
-// show all attributes except `State` in the new page
+// show all attributes except `State`
 order.NewAttrs("-State")
 // Structure the new form to make it tidy and clean with `Section`
 product.NewAttrs(
@@ -217,7 +216,7 @@ order.ShowAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "S
 
 ### Search
 
-Use `SearchAttrs` to set search attributes, when search resources, will use those columns to search, it aslo support search nested relations
+Use `SearchAttrs` to set search attributes, when search the resource, will use those columns to search, aslo supporting nested relations
 
 ```go
 // Search products with its name, code, category's name, brand's name
@@ -234,28 +233,27 @@ order.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
 
 #### Search Center
 
-You might want to search everything you want in one place, then `Search Center` is for you, you could add resources that you want to search to admin's search center, like this:
+You might want to search everything you want in one place, then `Search Center` is for you, you could add resources that you want to search to the admin's search center, like this:
 
 ```go
 // add resource `product`, `user`, `order` to search resources
 Admin.AddSearchResource(product, user, order)
 ```
 
-Then Qor Admin will generate a `Search Center` menu for you to search everything about `product`, `user`, `order` there.
-
-[Search Center Demo](http://demo.getqor.com/admin/!search)
+[Search Center Online Demo](http://demo.getqor.com/admin/!search)
 
 ### Scopes
 
-Define a scope that show all active users
+Define scope to filter data with given conditions
 
 ```go
+// Only show actived users
 user.Scope(&admin.Scope{Name: "Active", Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
   return db.Where("active = ?", true)
 }})
 ```
 
-Group Scopes
+#### Group Scopes
 
 ```go
 order.Scope(&admin.Scope{Name: "Paid", Group: "State", Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
@@ -267,16 +265,18 @@ order.Scope(&admin.Scope{Name: "Shipped", Group: "State", Handle: func(db *gorm.
 }})
 ```
 
+[Scopes Online Demo](http://demo.getqor.com/admin/products)
+
 ### Actions
 
-Qor Admin has defined four modes of actions:
+Qor Admin has defined four modes actions:
 
 * Bulk actions (will be shown in index page as bulk actions)
 * Edit form action (will be shown in edit page)
 * Show page action (will be shown in show page)
 * Menu item action (will be shown in table's menu)
 
-They could be registered with the `Action`, and using `Modes` to contol where to show them
+They could be registered with method `Action`, and using `Modes` to contol where to show them
 
 ```go
 product.Action(&admin.Action{
@@ -336,7 +336,7 @@ Qor Admin will get your resource fields's data type and relations, based on that
 
 It usually works enough for your application, but If you want to change some defaults settings, you could do that by overwritting `Meta`'s definition.
 
-There are many Meta's types has been defined, including `string`, `password`, `date`, `datetime`, `rich_editor`, `select_one`, `select_many` and so on, QOR will auto select a type for the Meta based on the data type, for example, if a field's type is `time.Time`, Qor will pick up `datetime` for its `Meta`'s `Type` then.
+There are some Meta's types has been predefined, including `string`, `password`, `date`, `datetime`, `rich_editor`, `select_one`, `select_many` and so on, QOR will auto select a type for `Meta` based on its data type, for example, if a field's type is `time.Time`, Qor will pick up `datetime` as the type
 
 ```go
 // Change user's field `Password`'s Meta type from default value `string` to `password`
@@ -358,15 +358,15 @@ user := Admin.AddResource(&User{}, &admin.Config{Permission: roles.Allow(roles.C
 user.Meta(&admin.Meta{Name: "Email", Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
 ```
 
-### RESTFul JSON API
+### RESTFul API
 
-The RESTFul JSON shared same configuration with your admin interface, including actions, permission, so after you configured your admin interface, you will get an API for free!
+RESTFul API shared same configuration with your admin interface, including actions, permission, so after you configured your admin interface, you will get an API for free!
 
 ## Extendable
 
 #### Configure Qor Resources Automatically
 
-If your model has defined below two methods, it will be call when registing
+If your model has defined below two methods, it will be called when registering
 
 ```go
 func ConfigureQorResourceBeforeInitialize(resource) {
@@ -380,7 +380,7 @@ func ConfigureQorResource(resource) {
 
 #### Configure Qor Meta Automatically
 
-If your field's type has defined below two methods, it will be call when registing
+If your field's type has defined below two methods, it will be called when registering
 
 ```go
 func ConfigureQorMetaBeforeInitialize(meta) {
