@@ -161,11 +161,11 @@ func (s *Searcher) parseContext() *qor.Context {
 
 	searcher.callScopes(context)
 
-	// pagination
 	db := context.GetDB()
-	paginationDB := db.Select("count(*) total").Model(s.Resource.Value).Set("gorm:query_destination", &s.Pagination)
-	context.SetDB(paginationDB)
-	s.Resource.CallFindMany(s.Resource.Value, context)
+
+	// pagination
+	context.SetDB(db.Model(s.Resource.Value).Set("qor:getting_total_count", true))
+	s.Resource.CallFindMany(&s.Pagination.Total, context)
 
 	if s.Pagination.CurrentPage == 0 {
 		if s.Context.Request != nil {
