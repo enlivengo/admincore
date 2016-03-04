@@ -224,6 +224,27 @@ Use `SearchAttrs` to set search attributes, when search resources, will use thos
 product.SearchAttrs("Name", "Code", "Category.Name", "Brand.Name")
 ```
 
+If you want to fully customize the search function, you could set the `SearchHandler`
+
+```go
+order.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
+  // search orders
+}
+```
+
+#### Search Center
+
+You might want to search everything you want in one place, then `Search Center` is for you, you could add resources that you want to search to admin's search center, like this:
+
+```go
+// add resource `product`, `user`, `order` to search resources
+Admin.AddSearchResource(product, user, order)
+```
+
+Then Qor Admin will generate a `Search Center` menu for you to search everything about `product`, `user`, `order` there.
+
+[Search Center Demo](http://demo.getqor.com/admin/!search)
+
 ### Scopes
 
 Define a scope that show all active users
@@ -311,17 +332,17 @@ order.Action(&admin.Action{
 
 ### Customizing the Form
 
-When Qor Admin generating the admin interface, if will get your resource's data type and relations, based on those information, create `Meta` for your registered resource.
+Qor Admin will get your resource fields's data type and relations, based on that information to render the management pages.
 
-Then when render the index/show/new/edit pages, will generate it based on the resource's Meta definition.
+It usually works enough for your application, but If you want to change some defaults settings, you could do that by overwritting `Meta`'s definition.
 
-If you want to change those defaults, you need to change the resource's `Meta` definition.
+There are many Meta's types has been defined, including `string`, `password`, `date`, `datetime`, `rich_editor`, `select_one`, `select_many` and so on, QOR will auto select a type for the Meta based on the data type, for example, if a field's type is `time.Time`, Qor will pick up `datetime` for its `Meta`'s `Type` then.
 
 ```go
-// Qor has defined many meta's types by default, including `string`, `password`, `date`, `rich_editor`, `select_one` and so on
-user.Meta(&admin.Meta{Name: "Password", Type: "password"}) // change resource user's Password field's type from `string` to `password`
+// Change user's field `Password`'s Meta type from default value `string` to `password`
+user.Meta(&admin.Meta{Name: "Password", Type: "password"})
 
-// Change resource user's Gender field's to be a select, options are `M`, `F`
+// Change user's field `Gender`'s Meta type from default value `string` to `select_one`, options are `M`, `F`
 user.Meta(&admin.Meta{Name: "Gender", Type: "select_one", Collection: []string{"M", "F"}})
 ```
 
