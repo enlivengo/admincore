@@ -27,7 +27,6 @@
 }
 
 [qor-icon-name="Edit"]{
-  border-bottom: 1px solid unquote("rgba(#{$color-black}, 0.12)") ;
   > a::before{
     content: "\e254";
   }
