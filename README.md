@@ -1,4 +1,4 @@
-## Qor Admin
+## QOR Admin
 
 Instantly create a beautiful, cross platform, configurable Admin Interface and API for managing your data in minutes.
 
@@ -68,17 +68,17 @@ func main() {
 
 ### Site Name
 
-Use `SetSiteName` to set admin's HTML title, the name will also be used to auto-load javascripts and stylesheet files that you can provide for customizing the admin interface.
+Use `SetSiteName` to set QOR Admin's HTML title, the name will also be used to auto-load javascripts and stylesheet files that you can provide for customizing the admin interface.
 
-For example, say you set the Site Name as `Qor Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customize-views), and load them if present.
+For example, say you set the Site Name as `QOR Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customize-views), and load them if present.
 
 ```go
-Admin.SetSiteName("Qor DEMO")
+Admin.SetSiteName("QOR DEMO")
 ```
 
 ### Dashboard
 
-Qor provides a default dashboard page with some dummy text. If you want to customize the dashboard, you can create a file `dashboard.tmpl` in [QOR view paths](#customize-views), Qor will load it as golang templates when rendering the dashboard.
+QOR Admin provides a default dashboard page with some dummy text. If you want to customize the dashboard, you can create a file `dashboard.tmpl` in [QOR view paths](#customize-views), QOR Admin will load it as golang templates when rendering the dashboard.
 
 If you want to disable the dashboard, you can redirect it to some other page, for example:
 
@@ -90,7 +90,7 @@ Admin.GetRouter().Get("/", func(c *admin.Context) {
 
 ### Authentication
 
-Qor provides quite a flexible authorization solution. With it, you could integrate with your current authorization method.
+QOR Admin provides a flexible authorization solution. With it, you could integrate with your current authorization method.
 
 What you need to do is implement an `Auth` interface like below, and set it in the admin object.
 
@@ -129,13 +129,15 @@ func (u User) DisplayName() string {
   return u.Name
 }
 
-// Register Auth for Qor admin
+// Register Auth for QOR Admin
 Admin.SetAuth(&Auth{})
 ```
 
 ### Menu
 
-#### Register Menu
+#### Register a Menu
+
+It is possible to define a nested menu structure for the admin interface.
 
 ```go
 Admin.AddMenu(&admin.Menu{Name: "Dashboard", Link: "/admin"})
@@ -144,7 +146,7 @@ Admin.AddMenu(&admin.Menu{Name: "Dashboard", Link: "/admin"})
 Admin.AddMenu(&admin.Menu{Name: "menu", Link: "/link", Ancestors: []string{"Dashboard"}})
 ```
 
-#### Add Resource to menu
+#### Add Resources to a menu
 
 ```go
 Admin.AddResource(&User{})
@@ -156,7 +158,7 @@ Admin.AddResource(&Size{}, &admin.Config{Menu: []string{"Product Management"}})
 Admin.AddResource(&Order{}, &admin.Config{Menu: []string{"Order Management"}})
 ```
 
-If you don't want resource to be displayed in navigation, pass Invisible option in like this
+If you don't want a resource to be displayed in the menu, pass the Invisible option:
 
 ```go
 Admin.AddResource(&User{}, &admin.Config{Invisible: true})
@@ -166,15 +168,15 @@ Admin.AddResource(&User{}, &admin.Config{Invisible: true})
 
 To translate admin interface to a new language, you could use `i18n` [https://github.com/qor/i18n](https://github.com/qor/i18n)
 
-## Working with Resource
+## Working with a Resource
 
-Every Qor Resource need a [GORM-backend](https://github.com/jinzhu/gorm) model, so you need to define the model first, after that you could create qor resource with `Admin.AddResource(&Product{})`
+Every QOR Admin Resource needs a [GORM-backend](https://github.com/jinzhu/gorm) model. Once you have defined the model you can create a QOR Admin resource: `Admin.AddResource(&Product{})`
 
-When added a resource to admin, qor admin will generate the admin interface to manage it, including a RESTFul JSON API.
+Once a resource has been added, QOR Admin will generate the admin interface to manage it, including a RESTFul JSON API.
 
-So for above example, you could visit `localhost:9000/admin/products` to manage `Product` in the HTML admin interface, or use the RESTFul JSON api `localhost:9000/admin/products.json` to do CRUD
+So for above example, you could visit `localhost:9000/admin/products` to manage `Product` in the HTML admin interface, or use the RESTFul JSON api `localhost:9000/admin/products.json` to perform CRUD activities.
 
-### Customizing CURD pages
+### Customizing CRUD pages
 
 ```go
 // Set attributes will be shown in the index page
@@ -216,14 +218,14 @@ order.ShowAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "S
 
 ### Search
 
-Use `SearchAttrs` to set search attributes, when search the resource, will use those columns to search, aslo supporting nested relations
+It is possible to specify database table columns as search attributes, using `SearchAttrs`, the columns will be used to perform any search queries. It is also possible to specify nested relations.
 
 ```go
 // Search products with its name, code, category's name, brand's name
 product.SearchAttrs("Name", "Code", "Category.Name", "Brand.Name")
 ```
 
-If you want to fully customize the search function, you could set the `SearchHandler`
+If you want to fully customize the search function, you could set the `SearchHandler`:
 
 ```go
 order.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
@@ -233,7 +235,7 @@ order.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
 
 #### Search Center
 
-You might want to search everything you want in one place, then `Search Center` is for you, you could add resources that you want to search to the admin's search center, like this:
+You might want to search a broad range of resources from a single web page, in this case `Search Center` is for you!  Simply add resources that you want to be searchable to the admin object's search center:
 
 ```go
 // add resource `product`, `user`, `order` to search resources
@@ -244,7 +246,7 @@ Admin.AddSearchResource(product, user, order)
 
 ### Scopes
 
-Define scope to filter data with given conditions
+You can define scopes to filter data with given conditions, for example:
 
 ```go
 // Only show actived users
@@ -269,14 +271,14 @@ order.Scope(&admin.Scope{Name: "Shipped", Group: "State", Handle: func(db *gorm.
 
 ### Actions
 
-Qor Admin has defined four modes actions:
+QOR Admin has the notion of four action modes:
 
 * Bulk actions (will be shown in index page as bulk actions)
 * Edit form action (will be shown in edit page)
 * Show page action (will be shown in show page)
 * Menu item action (will be shown in table's menu)
 
-They could be registered with method `Action`, and using `Modes` to contol where to show them
+You can register an Action of any mode using the `Action` method, along with `Modes` values to contol where to show them:
 
 ```go
 product.Action(&admin.Action{
@@ -332,41 +334,39 @@ order.Action(&admin.Action{
 
 ### Customizing the Form
 
-Qor Admin will get your resource fields's data type and relations, based on that information to render the management pages.
+By default, management pages in QOR Admin are rendered based on your resource's fields' data types and relations. The default should satisfy most use cases, however should you need to you can customize the rendering by overwritting the `Meta` definition.
 
-It usually works enough for your application, but If you want to change some defaults settings, you could do that by overwritting `Meta`'s definition.
-
-There are some Meta's types has been predefined, including `string`, `password`, `date`, `datetime`, `rich_editor`, `select_one`, `select_many` and so on, QOR will auto select a type for `Meta` based on its data type, for example, if a field's type is `time.Time`, Qor will pick up `datetime` as the type
+There are some Meta types that have been predefined, including `string`, `password`, `date`, `datetime`, `rich_editor`, `select_one`, `select_many` and so on (see full list here: [qor admin form templates](https://github.com/qor/admin/tree/master/views/metas/form "qor admin form templates")). QOR Admin will auto select a type for `Meta` based on a field's data type. For example, if a field's type is `time.Time`, QOR Admin will determine `datetime` as the type.
 
 ```go
-// Change user's field `Password`'s Meta type from default value `string` to `password`
+// Change the Meta type of `Password` field in User resource from `string` (default value) to `password`
 user.Meta(&admin.Meta{Name: "Password", Type: "password"})
 
-// Change user's field `Gender`'s Meta type from default value `string` to `select_one`, options are `M`, `F`
+// Change the Meta type of `Gender` field in User resource from `string` (default value) to `select_one`, with options `M` | `F`
 user.Meta(&admin.Meta{Name: "Gender", Type: "select_one", Collection: []string{"M", "F"}})
 ```
 
-### Permission
+### Authorization and Permissions
 
-Qor Admin is using [https://github.com/qor/roles](https://github.com/qor/roles) for permission management, refer it for how to define roles, permissions
+Authorization in QOR Admin is based on setting Permissions per Role. QOR Admin uses [https://github.com/qor/roles](https://github.com/qor/roles) for Permission management, please refer to it's documentation for information on how to define Roles and Permissions.
 
 ```go
-// CURD permission for admin users, deny create permission for manager
+// CRUD permission for admin users, deny create permission for manager
 user := Admin.AddResource(&User{}, &admin.Config{Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
 
-// For user's Email field, allow CURD for admin users, deny update for manager
+// For user's Email field, allow CRUD for admin users, deny update for manager
 user.Meta(&admin.Meta{Name: "Email", Permission: roles.Allow(roles.CRUD, "admin").Deny(roles.Create, "manager")})
 ```
 
-### RESTFul API
+### An automagic RESTFul API
 
-RESTFul API shared same configuration with your admin interface, including actions, permission, so after you configured your admin interface, you will get an API for free!
+The RESTFul API shares the same configuration as your admin interface, including actions and permissions - so after you have configured your admin interface, you will get an API for free!
 
-## Extendable
+## Extendability
 
-#### Configure Qor Resources Automatically
+#### Configuring QOR Admin Resources Automatically
 
-If your model has defined below two methods, it will be called when registering
+If your model has the following two methods defined, they will be called when registering:
 
 ```go
 func ConfigureQorResourceBeforeInitialize(resource) {
@@ -378,9 +378,9 @@ func ConfigureQorResource(resource) {
 }
 ```
 
-#### Configure Qor Meta Automatically
+#### Configuring QOR Admin Meta Automatically
 
-If your field's type has defined below two methods, it will be called when registering
+If your field's type has the following two methods defined, they will be called when registering:
 
 ```go
 func ConfigureQorMetaBeforeInitialize(meta) {
@@ -392,25 +392,27 @@ func ConfigureMetaInterface(meta) {
 }
 ```
 
-#### Use Theme
+#### Using a Theme
 
-Use theme `fancy` for products, when visting product's CRUD pages, will load `assets/javascripts/fancy.js` and `assets/stylesheets/fancy.css` from [QOR view paths](#customize-views)
+A custom theme can be applied using a custom javascript and css file, for example to make a product page look super fancy. To apply a custom theme, provide the theme name using the `UseTheme` method, this will load `assets/javascripts/fancy.js` and `assets/stylesheets/fancy.css` from [QOR view paths](#customize-views)
 
 ```go
 product.UseTheme("fancy")
 ```
 
-#### Customize Views
+#### Customizing Views
 
-When rendering pages, qor will look up templates from qor view paths, and use them to render the page, qor has registered `{current path}/app/views/qor` for your to allow you extend your application from there. If you want to customize your views from other places, you could register new path with `admin.RegisterViewPath`
+QOR Admin will look up templates in QOR Admin view paths and use them to render any admin page. By placing your own templates in `{current path}/app/views/qor` you can extend your application by customizing it's views. If you want to customize your views from other places, you could register any new paths with `admin.RegisterViewPath`.
 
 Customize Views Rules:
 
-* To overwrite a template, create a file under `{current path}/app/views/qor` with same name
-* To overwrite templates for one resource, put templates with same name to `{qor view paths}/{resource param}`, for example `{current path}/app/views/qor/products/index.tmpl`
-* To overwrite templates for resources using theme, put templates with same name to `{qor view paths}/themes/{theme name}`
+* To overwrite a template, create a file with the same name under `{current path}/app/views/qor`.
+* To overwrite templates for a specific resource, put templates with the same name in `{qor view paths}/{resource param}`, for example `{current path}/app/views/qor/products/index.tmpl`.
+* To overwrite templates for resources using a theme, put templates with the same name in `{qor view paths}/themes/{theme name}`.
 
-#### Register routes
+#### Registering HTTP routes
+
+Qor admin uses Qor's Router.
 
 ```go
 router := Admin.GetRouter()
@@ -448,7 +450,7 @@ router.Get("/path/:name[\\d+]", func(context *admin.Context) { // "/hello/123"
 
 #### Plugins
 
-There are couple of plugins created for qor already, you could find some of them from here [https://github.com/qor](https://github.com/qor), visit them to learn more how to extend qor
+There are a few plugins created for QOR already, you can find some of them at [https://github.com/qor](https://github.com/qor), visit them to learn more about how to extend QOR.
 
 ## Live DEMO
 
