@@ -92,7 +92,7 @@ Admin.GetRouter().Get("/", func(c *admin.Context) {
 
 QOR Admin provides a flexible authorization solution. With it, you could integrate with your current authorization method.
 
-What you need to do is implement an `Auth` interface like below, and set it in the admin object.
+What you need to do is implement an `Auth` interface like below, and set it in the admin struct.
 
 ```go
 type Auth interface {
@@ -235,7 +235,7 @@ order.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
 
 #### Search Center
 
-You might want to search a broad range of resources from a single web page, in this case `Search Center` is for you!  Simply add resources that you want to be searchable to the admin object's search center:
+You might want to search a broad range of resources from a single web page, in this case `Search Center` is for you!  Simply add resources that you want to be searchable to the admin struct's search center:
 
 ```go
 // add resource `product`, `user`, `order` to search resources
