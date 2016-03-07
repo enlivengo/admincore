@@ -8,11 +8,11 @@ Instantly create a beautiful, cross platform, configurable Admin Interface and A
 
 - Admin Interface for managing data
 - JSON API
-- Handle Associations
+- Association handling
 - Search and filtering
 - Actions/Batch Actions
-- Authentication & Permission
-- Extendable
+- Authentication and Authorization (based on Permissions)
+- Extendability
 
 ## Quick Start
 
