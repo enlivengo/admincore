@@ -68,9 +68,9 @@ func main() {
 
 ### Site Name
 
-Use `SetSiteName` to set admin's HTML title, not only set the title, but it will also auto load javascripts, stylesheets files based on the name, you could use that to customize the admin interface.
+Use `SetSiteName` to set admin's HTML title, the name will also be used to auto-load javascripts and stylesheet files that you can provide for customizing the admin interface.
 
-For example, if you named it as `Qor Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customize-views), and load them if found
+For example, say you set the Site Name as `Qor Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customize-views), and load them if present.
 
 ```go
 Admin.SetSiteName("Qor DEMO")
@@ -78,9 +78,9 @@ Admin.SetSiteName("Qor DEMO")
 
 ### Dashboard
 
-Qor provides a default dashboard page with some dummy text, if you want to overwrite it, you could create a file `dashboard.tmpl` in [QOR view paths](#customize-views), Qor will load it as golang templates when rendering dashboard
+Qor provides a default dashboard page with some dummy text. If you want to customize the dashboard, you can create a file `dashboard.tmpl` in [QOR view paths](#customize-views), Qor will load it as golang templates when rendering the dashboard.
 
-If you want to disable the dashboard, you could redirect it to some other page, for example:
+If you want to disable the dashboard, you can redirect it to some other page, for example:
 
 ```go
 Admin.GetRouter().Get("/", func(c *admin.Context) {
@@ -90,9 +90,9 @@ Admin.GetRouter().Get("/", func(c *admin.Context) {
 
 ### Authentication
 
-Qor provides pretty flexable authorization solution, with it, you could integrate with your current authorization method.
+Qor provides quite a flexible authorization solution. With it, you could integrate with your current authorization method.
 
-What you need to do is implement an `Auth` interface like below, and set it to the admin
+What you need to do is implement an `Auth` interface like below, and set it in the admin object.
 
 ```go
 type Auth interface {
