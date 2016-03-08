@@ -95,7 +95,7 @@ func (ac *controller) Show(context *Context) {
 	// If singleton Resource
 	if context.Resource.Config.Singleton {
 		result = context.Resource.NewStruct()
-		if err = context.Resource.CallFindMany(result, context.Context); err == gorm.RecordNotFound {
+		if err = context.Resource.CallFindMany(result, context.Context); err == gorm.ErrRecordNotFound {
 			context.Execute("new", result)
 			return
 		}
