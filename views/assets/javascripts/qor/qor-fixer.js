@@ -13,6 +13,7 @@
 
   'use strict';
 
+  var $window = $(window);
   var NAMESPACE = 'qor.fixer';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
@@ -21,6 +22,7 @@
   var EVENT_SCROLL = 'scroll.' + NAMESPACE;
   var CLASS_IS_HIDDEN = 'is-hidden';
   var CLASS_IS_FIXED = 'is-fixed';
+  var CLASS_HEADER = '.qor-page__header';
 
   function QorFixer(element, options) {
     this.$element = $(element);
@@ -60,9 +62,8 @@
     bind: function () {
       this.$element.on(EVENT_CLICK, $.proxy(this.check, this));
 
-      this.$content.
-        on(EVENT_SCROLL, $.proxy(this.toggle, this)).
-        on(EVENT_RESIZE, $.proxy(this.resize, this));
+      this.$content.on(EVENT_SCROLL, $.proxy(this.toggle, this));
+      $window.on(EVENT_RESIZE, $.proxy(this.resize, this));
     },
 
     unbind: function () {
@@ -78,9 +79,11 @@
       var $thead = this.$thead;
       var $clone = this.$clone;
       var $items = $thead.find('> tr').children();
+      var pageBodyTop = this.$content.offset().top + $(CLASS_HEADER).height();
+      var tableWidth = this.$element.width();
 
       if (!$clone) {
-        this.$clone = $clone = $thead.clone().prependTo($this);
+        this.$clone = $clone = $thead.clone().prependTo($this).css({ top:pageBodyTop, width:tableWidth });
       }
 
       $clone.
@@ -88,7 +91,7 @@
         find('> tr').
           children().
             each(function (i) {
-              $(this).width($items.eq(i).width());
+              $(this).outerWidth($items.eq(i).outerWidth());
             });
     },
 
@@ -117,6 +120,7 @@
       var theadHeight = this.$thead.outerHeight();
       var tbodyLastRowHeight = this.$tbody.find('tr:last').outerHeight();
       var scrollTop = this.$content.scrollTop();
+      var scrollLeft = this.$content.scrollLeft();
       var minTop = 0;
       var maxTop = $this.outerHeight() - theadHeight - tbodyLastRowHeight;
       var offsetTop = this.$subHeader.outerHeight() + this.paddingHeight + this.marginBottomPX;
@@ -124,9 +128,9 @@
       var showTop = Math.min(scrollTop - offsetTop, maxTop) + headerHeight;
 
       if (scrollTop > offsetTop - headerHeight) {
-        $clone.css('top', showTop).removeClass(CLASS_IS_HIDDEN);
+        $clone.css({ 'margin-left': -scrollLeft }).removeClass(CLASS_IS_HIDDEN);
       } else {
-        $clone.css('top', minTop).addClass(CLASS_IS_HIDDEN);
+        $clone.css({ 'margin-left' : '0' }).addClass(CLASS_IS_HIDDEN);
       }
     },
 

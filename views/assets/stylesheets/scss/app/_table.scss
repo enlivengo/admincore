@@ -1,6 +1,11 @@
 .qor-table {
-  width: 100%;
+  width: calc(100% - 48px);
   margin: 0 24px;
+
+  td{
+    border-top-color: $color-dash;
+    border-bottom-color: $color-dash;
+  }
 
   a:not([class*="mdl-button"]) {
     color: unquote("rgba(#{$color-black}, 0.54)");

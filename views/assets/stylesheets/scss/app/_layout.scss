@@ -20,10 +20,10 @@
       border-radius: 50px;
     }
     &::-webkit-scrollbar-thumb:hover {
-      background: #ccc;
+      background: unquote("rgb(#{$color-primary})");
     }
     &::-webkit-scrollbar-thumb:active {
-      background: #000000;
+      background: unquote("rgb(#{$color-primary})");
     }
     &::-webkit-scrollbar-track {
       background: transparent;
@@ -31,10 +31,10 @@
       border-radius: 50px;
     }
     &::-webkit-scrollbar-track:hover {
-      background: #666666;
+      background: transparent;
     }
     &::-webkit-scrollbar-track:active {
-      background: #333333;
+      background: transparent;
     }
     &::-webkit-scrollbar-corner {
       background: transparent;
