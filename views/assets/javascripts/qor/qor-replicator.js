@@ -43,7 +43,7 @@
       $template = $all.filter(options.newClass);
 
       if (!$template.length) {
-        $template = $all.last();
+        return;
       }
 
       // Should destroy all components here
