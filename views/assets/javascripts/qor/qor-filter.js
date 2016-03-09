@@ -67,6 +67,9 @@
           var value;
 
           n = n.split('=');
+          if (/page/.test(n[0])){
+            return;
+          }
           value = n[1];
           param.push(n[0]);
 
@@ -123,7 +126,6 @@
         params = decodeSearch(location.search);
         name = $target.attr('name');
         value = $target.val();
-
         param = [name];
 
         if (value) {
@@ -163,7 +165,6 @@
       } else if ($target.is('a')) {
         e.preventDefault();
         data = decodeSearch($target.attr('href'));
-
         if ($target.hasClass(CLASS_IS_ACTIVE)) {
           search = encodeSearch(data, true); // set `true` to detach
         } else {
