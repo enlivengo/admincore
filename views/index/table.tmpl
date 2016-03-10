@@ -3,7 +3,7 @@
 {{$has_update_permission := has_update_permission $resource}}
 {{$has_delete_permission := has_delete_permission $resource}}
 
-<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp qor-table qor-js-table">
+<table class="mdl-data-table mdl-js-data-table qor-table qor-js-table">
   <thead>
     <tr>
       {{$order_by := $context.Request.URL.Query.Get "order_by"}}

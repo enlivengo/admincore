@@ -1,18 +1,42 @@
 .qor-table {
   width: calc(100% - 48px);
+  border: 0;
   margin: 0 24px;
-
+  @include shadow-2dp();
+  &::before{
+    content: ' ';
+    position: absolute;
+    z-index: 0;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    height: 54px;
+    background-color: $color-body-bg;
+  }
   td{
     border-top-color: $color-dash;
     border-bottom-color: $color-dash;
+    font-size: 14px;
+  }
+
+  thead{
+    z-index: 10;
+    position: relative;
+    th{
+      background-color: $color-body-bg;
+      font-size: 14px;
+      font-weight: 400;
+    }
   }
 
   a:not([class*="mdl-button"]) {
-    color: unquote("rgba(#{$color-black}, 0.54)");
+    color: unquote("rgba(#{$color-black}, 0.87)");
   }
 
-  tbody tr{
-    position: static;
+  tbody{
+    tr{
+      position: static;
+    }
   }
 
   img {
@@ -27,7 +51,8 @@
     }
 
     &.is-sorted {
-      color: unquote("rgba(#{$color-black}, 0.87)");
+      color: unquote("rgb(#{$color-black})");
+      font-weight: 500;
 
       &[data-order-by]::after {
         margin-left: 8px;
