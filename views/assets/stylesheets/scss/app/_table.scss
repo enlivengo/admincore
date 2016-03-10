@@ -26,6 +26,9 @@
       background-color: $color-body-bg;
       font-size: 14px;
       font-weight: 400;
+      &.qor-table__actions{
+        width: 80px;
+      }
     }
   }
 
