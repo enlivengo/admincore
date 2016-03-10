@@ -136,6 +136,9 @@
   }
   .qor-fieldset__add{
     display: inline-block;
+    &.mdl-menu__item{
+      display: block;
+    }
   }
 }
 
