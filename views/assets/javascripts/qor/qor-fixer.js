@@ -83,7 +83,7 @@
       var tableWidth = this.$element.width();
 
       if (!$clone) {
-        this.$clone = $clone = $thead.clone().prependTo($this).css({ top:pageBodyTop, width:tableWidth });
+        this.$clone = $clone = $thead.clone().prependTo($this).css({ top:pageBodyTop });
       }
 
       $clone.
