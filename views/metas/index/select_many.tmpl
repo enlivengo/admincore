@@ -2,7 +2,7 @@
 {{range $index, $value := $values}}
   {{$url := url_for $value}}
   {{if $url}}
-    {{link_to (stringify $value) $url}}
+    <a data-url="{{$url}}" href="{{$url}}">{{stringify $value}}</a>
   {{else}}
     {{stringify $value}}
   {{end}}
