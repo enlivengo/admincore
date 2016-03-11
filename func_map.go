@@ -755,16 +755,19 @@ func (context *Context) FuncMap() template.FuncMap {
 		"formatted_value_of":   context.FormattedValueOf,
 		"raw_value_of":         context.RawValueOf,
 
-		"get_menus":            context.getMenus,
-		"get_scopes":           context.GetScopes,
-		"get_formatted_errors": context.getFormattedErrors,
-
-		"escape":    html.EscapeString,
-		"raw":       func(str string) template.HTML { return template.HTML(str) },
-		"equal":     equal,
-		"stringify": utils.Stringify,
-		"plural":    inflection.Plural,
-		"singular":  inflection.Singular,
+		"t":          context.t,
+		"flashes":    context.GetFlashes,
+		"pagination": context.Pagination,
+		"escape":     html.EscapeString,
+		"raw":        func(str string) template.HTML { return template.HTML(str) },
+		"equal":      equal,
+		"stringify":  utils.Stringify,
+		"plural":     inflection.Plural,
+		"singular":   inflection.Singular,
+		"marshal": func(v interface{}) template.JS {
+			byt, _ := json.Marshal(v)
+			return template.JS(byt)
+		},
 
 		"render":      context.Render,
 		"render_form": context.renderForm,
@@ -773,34 +776,30 @@ func (context *Context) FuncMap() template.FuncMap {
 			context.renderMeta(meta, value, []string{}, "index", result)
 			return template.HTML(result.String())
 		},
-		"url_for":                context.URLFor,
-		"link_to":                context.linkTo,
-		"new_resource_path":      context.newResourcePath,
-		"search_center_path":     func() string { return path.Join(context.Admin.router.Prefix, "!search") },
-		"patch_current_url":      context.patchCurrentURL,
-		"patch_url":              context.patchURL,
-		"qor_theme_class":        context.themesClass,
-		"javascript_tag":         context.javaScriptTag,
-		"stylesheet_tag":         context.styleSheetTag,
-		"load_theme_stylesheets": context.loadThemeStyleSheets,
-		"load_theme_javascripts": context.loadThemeJavaScripts,
-		"load_admin_stylesheets": context.loadAdminStyleSheets,
-		"load_admin_javascripts": context.loadAdminJavaScripts,
-		"load_actions":           context.loadActions,
-		"allowed_actions":        context.AllowedActions,
-		"pagination":             context.Pagination,
-
 		"page_title": context.pageTitle,
 		"meta_label": func(meta *Meta) template.HTML {
 			key := fmt.Sprintf("%v.attributes.%v", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, meta.Label)
 		},
-		"all_metas":                 context.allMetas,
+
+		"url_for":            context.URLFor,
+		"link_to":            context.linkTo,
+		"new_resource_path":  context.newResourcePath,
+		"logout_url":         context.logoutURL,
+		"search_center_path": func() string { return path.Join(context.Admin.router.Prefix, "!search") },
+		"patch_current_url":  context.patchCurrentURL,
+		"patch_url":          context.patchURL,
+
+		"get_menus":                 context.getMenus,
+		"get_scopes":                context.GetScopes,
+		"get_formatted_errors":      context.getFormattedErrors,
+		"load_actions":              context.loadActions,
+		"allowed_actions":           context.AllowedActions,
+		"is_sortable_meta":          context.isSortableMeta,
 		"index_sections":            context.indexSections,
 		"show_sections":             context.showSections,
 		"new_sections":              context.newSections,
 		"edit_sections":             context.editSections,
-		"is_sortable_meta":          context.isSortableMeta,
 		"convert_sections_to_metas": context.convertSectionToMetas,
 
 		"has_create_permission": context.hasCreatePermission,
@@ -808,15 +807,13 @@ func (context *Context) FuncMap() template.FuncMap {
 		"has_update_permission": context.hasUpdatePermission,
 		"has_delete_permission": context.hasDeletePermission,
 
-		"logout_url": context.logoutURL,
-
-		"marshal": func(v interface{}) template.JS {
-			a, _ := json.Marshal(v)
-			return template.JS(a)
-		},
-
-		"t":       context.t,
-		"flashes": context.GetFlashes,
+		"qor_theme_class":        context.themesClass,
+		"javascript_tag":         context.javaScriptTag,
+		"stylesheet_tag":         context.styleSheetTag,
+		"load_theme_stylesheets": context.loadThemeStyleSheets,
+		"load_theme_javascripts": context.loadThemeJavaScripts,
+		"load_admin_stylesheets": context.loadAdminStyleSheets,
+		"load_admin_javascripts": context.loadAdminJavaScripts,
 	}
 
 	for key, value := range context.Admin.funcMaps {
