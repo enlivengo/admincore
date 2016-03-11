@@ -797,6 +797,15 @@ func (context *Context) FuncMap() template.FuncMap {
 		"logout_url":         context.logoutURL,
 		"search_center_path": func() string { return path.Join(context.Admin.router.Prefix, "!search") },
 		"new_resource_path":  context.newResourcePath,
+		"defined_resource_show_page": func(res *Resource) bool {
+			if res != nil {
+				if r := context.Admin.GetResource(res.Name); r != nil {
+					return r.isSetShowAttrs
+				}
+			}
+
+			return false
+		},
 
 		"get_menus":                 context.getMenus,
 		"get_scopes":                context.GetScopes,
