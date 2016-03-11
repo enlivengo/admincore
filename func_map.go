@@ -235,16 +235,18 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		var data = map[string]interface{}{
 			"Context":       context,
 			"BaseResource":  meta.baseResource,
-			"ResourceValue": value,
-			"InputId":       fmt.Sprintf("%v_%v_%v", scope.GetModelStruct().ModelType.Name(), scope.PrimaryKeyValue(), meta.Name),
-			"Label":         meta.Label,
-			"InputName":     strings.Join(prefix, "."),
-			"Value":         context.FormattedValueOf(value, meta),
 			"Meta":          meta,
+			"ResourceValue": value,
+			"Value":         context.FormattedValueOf(value, meta),
+			"Label":         meta.Label,
+			"InputId":       fmt.Sprintf("%v_%v_%v", scope.GetModelStruct().ModelType.Name(), scope.PrimaryKeyValue(), meta.Name),
+			"InputName":     strings.Join(prefix, "."),
 		}
 
-		if meta.GetCollection != nil && metaType == "form" {
-			data["CollectionValue"] = meta.GetCollection(value, context.Context)
+		if meta.GetCollection != nil {
+			data["CollectionValue"] = func() [][]string {
+				return meta.GetCollection(value, context.Context)
+			}
 		}
 
 		err = tmpl.Execute(writer, data)
