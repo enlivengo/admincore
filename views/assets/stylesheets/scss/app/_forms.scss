@@ -290,6 +290,9 @@
   padding: 16px 32px;
   border: 1px solid unquote("rgba(#{$color-black}, 0.12)");
   background-color: unquote("rgb(#{$palette-grey-50})");
+  .mdl-textfield__input{
+    margin-top: 10px;
+  }
 }
 
 .qor-fieldset__delete {
@@ -311,6 +314,9 @@
   float: left;
   padding-right: 40px;
   box-sizing: border-box;
+  .mdl-textfield .qor-field__edit{
+    margin-top: 10px;
+  }
 }
 
 .qor-section-columns-3 .qor-field {

@@ -11,17 +11,25 @@
     border-color: #ccc;
     border-radius: 2px;
     box-shadow: none;
+    height: 29px;
+    line-height: 28px;
+    abbr{
+      top: 7px;
+    }
+    div{
+      top: 1px;
+    }
   }
 }
 
 .chosen-container-active {
   .chosen-single {
-    border-color: #009688;
+    border-color: #03a9f4;
   }
 
   &.chosen-with-drop {
     .chosen-single {
-      border-color: #009688;
+      border-color: #03a9f4;
     }
   }
 }
@@ -34,11 +42,11 @@
 
 .chosen-container-active {
   .chosen-choices {
-    border-color: #009688;
+    border-color: #03a9f4;
     box-shadow: none;
   }
 
   .chosen-drop {
-    border-color: #009688;
+    border-color: #03a9f4;
   }
 }
