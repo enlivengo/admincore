@@ -771,9 +771,17 @@ func (context *Context) FuncMap() template.FuncMap {
 
 		"render":      context.Render,
 		"render_form": context.renderForm,
-		"render_index_meta": func(value interface{}, meta *Meta) template.HTML {
-			var result = bytes.NewBufferString("")
-			context.renderMeta(meta, value, []string{}, "index", result)
+		"render_meta": func(value interface{}, meta *Meta, types ...string) template.HTML {
+			var (
+				result = bytes.NewBufferString("")
+				typ    = "index"
+			)
+
+			for _, t := range types {
+				typ = t
+			}
+
+			context.renderMeta(meta, value, []string{}, typ, result)
 			return template.HTML(result.String())
 		},
 		"page_title": context.pageTitle,
@@ -784,11 +792,11 @@ func (context *Context) FuncMap() template.FuncMap {
 
 		"url_for":            context.URLFor,
 		"link_to":            context.linkTo,
-		"new_resource_path":  context.newResourcePath,
-		"logout_url":         context.logoutURL,
-		"search_center_path": func() string { return path.Join(context.Admin.router.Prefix, "!search") },
 		"patch_current_url":  context.patchCurrentURL,
 		"patch_url":          context.patchURL,
+		"logout_url":         context.logoutURL,
+		"search_center_path": func() string { return path.Join(context.Admin.router.Prefix, "!search") },
+		"new_resource_path":  context.newResourcePath,
 
 		"get_menus":                 context.getMenus,
 		"get_scopes":                context.GetScopes,
