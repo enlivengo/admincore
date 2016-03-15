@@ -54,6 +54,8 @@
       this.$content = $(options.content);
       this.marginBottomPX = parseInt(this.$subHeader.css('marginBottom'));
       this.paddingHeight = options.paddingHeight;
+      this.fixedHeaderWidth = [];
+      this.isEqualed = false;
 
       this.resize();
       this.bind();
@@ -78,6 +80,7 @@
       var $this = this.$element;
       var $thead = this.$thead;
       var $clone = this.$clone;
+      var self = this;
       var $items = $thead.find('> tr').children();
       var pageBodyTop = this.$content.offset().top + $(CLASS_HEADER).height();
       var tableWidth = this.$element.width();
@@ -92,6 +95,7 @@
           children().
             each(function (i) {
               $(this).outerWidth($items.eq(i).outerWidth());
+              self.fixedHeaderWidth.push($(this).outerWidth());
             });
     },
 
@@ -115,9 +119,11 @@
     },
 
     toggle: function () {
+      var self = this;
       var $this = this.$element;
       var $clone = this.$clone;
-      var theadHeight = this.$thead.outerHeight();
+      var $thead = this.$thead;
+      var theadHeight = $thead.outerHeight();
       var tbodyLastRowHeight = this.$tbody.find('tr:last').outerHeight();
       var scrollTop = this.$content.scrollTop();
       var scrollLeft = this.$content.scrollLeft();
@@ -127,6 +133,20 @@
       var headerHeight = $('.qor-page__header').outerHeight();
       var showTop = Math.min(scrollTop - offsetTop, maxTop) + headerHeight;
 
+      if (!this.isEqualed){
+        this.headerWidth = [];
+        var $items = $thead.find('> tr').children();
+        $items.each(function () {
+          self.headerWidth.push($(this).outerWidth());
+        });
+        var notEqualWidth = _.difference(self.fixedHeaderWidth, self.headerWidth);
+        if (notEqualWidth.length){
+          $('thead.is-fixed').find('>tr').children().each(function (i) {
+            $(this).outerWidth(self.headerWidth[i]);
+          });
+          this.isEqualed = true;
+        }
+      }
       if (scrollTop > offsetTop - headerHeight) {
         $clone.css({ 'margin-left': -scrollLeft }).removeClass(CLASS_IS_HIDDEN);
       } else {
