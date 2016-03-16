@@ -16,6 +16,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/inflection"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
@@ -745,6 +746,7 @@ func (context *Context) pageTitle() template.HTML {
 
 // FuncMap return funcs map
 func (context *Context) FuncMap() template.FuncMap {
+	htmlSanitizer := bluemonday.UGCPolicy()
 	funcMap := template.FuncMap{
 		"current_user":         func() qor.CurrentUser { return context.CurrentUser },
 		"get_resource":         context.Admin.GetResource,
@@ -759,7 +761,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"flashes":    context.GetFlashes,
 		"pagination": context.Pagination,
 		"escape":     html.EscapeString,
-		"raw":        func(str string) template.HTML { return template.HTML(str) },
+		"raw":        func(str string) template.HTML { return template.HTML(htmlSanitizer.Sanitize(str)) },
 		"equal":      equal,
 		"stringify":  utils.Stringify,
 		"plural":     inflection.Plural,
