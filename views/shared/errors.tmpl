@@ -6,7 +6,8 @@
         <label for="{{$formatted_error.Label}}">
           <i class="material-icons">error</i>
           {{range $error := $formatted_error.Errors}}
-            <span>{{t (printf "qor_admin.errors.%v" $error) $error}}</span>
+            {{$message := escape $error}}
+            <span>{{t (printf "qor_admin.errors.%v" $message) $message}}</span>
           {{end}}
         </label>
       </li>
