@@ -326,17 +326,17 @@
   box-sizing: border-box;
 }
 
-.qor-form-coupons{
-  .qor-field:first-child{
+.promotion-coupons .qor-section-columns-3 .qor-field{
+  &:first-child{
     width: 50%;
     .mdl-textfield{
       width: 100% !important;
     }
   }
-  .qor-field:last-child{
+  &:last-child{
     margin-top: 36px;
   }
-  .qor-field:nth-child(2){
+  &:nth-child(2){
     width: 60px;
     .mdl-textfield__label{
       overflow: inherit;
