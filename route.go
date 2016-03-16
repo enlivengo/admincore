@@ -270,18 +270,32 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 
 func (admin *Admin) compile() {
 	router := admin.GetRouter()
+
+	router.Use(&Middleware{
+		Name: "xss_check",
+		Handler: func(context *Context, middleware *Middleware) {
+			request := context.Request
+			if request.Method != "GET" {
+				if referrer := request.Referer(); referrer != "" {
+					if r, err := url.Parse(referrer); err == nil {
+						if r.Host == request.Host {
+							middleware.Next(context)
+							return
+						}
+					}
+				}
+				context.Writer.Write([]byte("Cross-site scripting detected"))
+				return
+			}
+
+			middleware.Next(context)
+		},
+	})
+
 	router.Use(&Middleware{
 		Name: "qor_handler",
 		Handler: func(context *Context, middleware *Middleware) {
 			request := context.Request
-
-			// 128 MB
-			request.ParseMultipartForm(32 << 22)
-
-			// set request method
-			if len(request.Form["_method"]) > 0 {
-				request.Method = strings.ToUpper(request.Form["_method"][0])
-			}
 
 			relativePath := "/" + strings.Trim(
 				strings.TrimSuffix(strings.TrimPrefix(request.URL.Path, router.Prefix), path.Ext(request.URL.Path)),
@@ -339,6 +353,12 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		context.SetDB(context.GetDB().Set("qor:current_user", context.CurrentUser))
 	}
 	context.Roles = roles.MatchedRoles(req, currentUser)
+
+	// Set Request Method
+	context.Request.ParseMultipartForm(32 << 22) // 128 MB
+	if method := context.Request.Form.Get("_method"); method != "" {
+		context.Request.Method = strings.ToUpper(method)
+	}
 
 	// Call first middleware
 	for _, middleware := range admin.router.middlewares {
