@@ -273,7 +273,7 @@ func (admin *Admin) compile() {
 
 	browserUserAgentRegexp := regexp.MustCompile("Mozilla|Gecko|WebKit|MSIE|Opera")
 	router.Use(&Middleware{
-		Name: "xss_check",
+		Name: "csrf_check",
 		Handler: func(context *Context, middleware *Middleware) {
 			request := context.Request
 			if request.Method != "GET" {
@@ -286,7 +286,7 @@ func (admin *Admin) compile() {
 							}
 						}
 					}
-					context.Writer.Write([]byte("Cross-site scripting detected"))
+					context.Writer.Write([]byte("Could not authorize you because 'CSRF detected'"))
 					return
 				}
 			}
