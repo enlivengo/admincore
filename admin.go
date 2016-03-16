@@ -140,7 +140,7 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 
 		res.Action(&Action{
 			Name:   "Edit",
-			Method: "Get",
+			Method: "GET",
 			URL: func(record interface{}, context *Context) string {
 				return context.URLFor(record, res)
 			},
