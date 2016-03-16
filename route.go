@@ -271,21 +271,24 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 func (admin *Admin) compile() {
 	router := admin.GetRouter()
 
+	browserUserAgentRegexp := regexp.MustCompile("Mozilla|Gecko|WebKit|MSIE|Opera")
 	router.Use(&Middleware{
 		Name: "xss_check",
 		Handler: func(context *Context, middleware *Middleware) {
 			request := context.Request
 			if request.Method != "GET" {
-				if referrer := request.Referer(); referrer != "" {
-					if r, err := url.Parse(referrer); err == nil {
-						if r.Host == request.Host {
-							middleware.Next(context)
-							return
+				if browserUserAgentRegexp.MatchString(request.UserAgent()) {
+					if referrer := request.Referer(); referrer != "" {
+						if r, err := url.Parse(referrer); err == nil {
+							if r.Host == request.Host {
+								middleware.Next(context)
+								return
+							}
 						}
 					}
+					context.Writer.Write([]byte("Cross-site scripting detected"))
+					return
 				}
-				context.Writer.Write([]byte("Cross-site scripting detected"))
-				return
 			}
 
 			middleware.Next(context)
