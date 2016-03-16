@@ -319,6 +319,8 @@ func (admin *Admin) compile() {
 						}
 					}
 
+					context.Writer.Header().Set("Cache-control", "no-store")
+					context.Writer.Header().Set("Pragma", "no-cache")
 					handler.Handle(context)
 					return
 				}
