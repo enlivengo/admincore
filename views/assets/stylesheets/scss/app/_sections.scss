@@ -1,6 +1,12 @@
 .qor-section {
   margin: 24px;
 
+  &.qor-section__table{
+    margin: 24px 0;
+    .qor-section__header{
+        margin-left: 24px;
+    }
+  }
   > .qor-table-container {
     margin: 0;
   }
@@ -14,5 +20,6 @@
   font-size: 18px;
   line-height: 24px;
   margin-bottom: 8px;
+  margin-top: 32px;
   color: unquote("rgba(#{$color-black}, 0.68)");
 }
