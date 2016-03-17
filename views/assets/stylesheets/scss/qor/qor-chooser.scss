@@ -8,6 +8,7 @@
   }
   .chosen-default{
     color: unquote("rgba(#{$color-black}, 0.54)");
+    border: 2px solid unquote("rgba(#{$color-black},0.12)") !important;
   }
 }
 
@@ -19,7 +20,10 @@
       height: 48px;
       line-height: 48px;
       padding: 0 16px;
-      &.highlighted,&.result-selected{
+      &.result-selected{
+        display: none;
+      }
+      &.highlighted{
         background-color: #eee !important;
         background-image: none !important;
         background-size: auto auto !important;
@@ -90,7 +94,7 @@
 .chosen-container {
   .chosen-choices {
     border-color: #ccc;
-    height: 32px !important;
+    min-height: 32px;
     background: unquote("rgb(#{$color-white})");
   }
 }
@@ -109,9 +113,15 @@
 }
 
 .chosen-container-multi{
+  &.chosen-default{
+    .chosen-choices{
+      border: 2px solid unquote("rgba(#{$color-black},0.12)") !important;
+    }
+  }
   .chosen-results{
     li.result-selected{
       color: unquote("rgba(#{$color-black}, 0.12)");
+      display: none;
     }
   }
   .chosen-choices{

@@ -28,6 +28,7 @@
 
     init: function () {
       var $this = this.$element;
+      var self = this;
 
       if (!$this.prop('multiple')) {
         if ($this.children('[selected]').length) {
@@ -42,7 +43,29 @@
         allow_single_deselect: true,
         search_contains: true,
         disable_search_threshold: 10,
-        width: '100%'
+        width: '100%',
+        display_selected_options: false
+      })
+      .on('change', function (e,params) {
+        var $target = $(e.target);
+        var $chosenMulti = $target.next('.chosen-container-multi');
+
+        if (!$chosenMulti.size()){
+          return;
+        }
+
+        if (params.deselected){
+
+          setTimeout(function () {
+            if (!$chosenMulti.find('.search-choice').size()){
+              $chosenMulti.addClass('chosen-default');
+            }
+          }, 10);
+
+        } else if (params.selected){
+          $chosenMulti.removeClass('chosen-default');
+        }
+
       });
     },
 
