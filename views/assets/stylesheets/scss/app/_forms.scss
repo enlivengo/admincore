@@ -287,7 +287,7 @@
   position: relative;
   margin-top: 16px;
   margin-bottom: 16px;
-  padding: 16px 32px;
+  padding: 16px 24px;
   border: 1px solid unquote("rgba(#{$color-black}, 0.12)");
   background-color: unquote("rgb(#{$palette-grey-50})");
   .mdl-textfield__input{
@@ -315,7 +315,7 @@
   padding-right: 40px;
   box-sizing: border-box;
   .mdl-textfield .qor-field__edit{
-    margin-top: 10px;
+    margin-top: 14px;
   }
 }
 
