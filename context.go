@@ -139,7 +139,8 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 			clone.Result = results[0]
 		}
 
-		if tmpl, err := template.New(filepath.Base(file)).Funcs(clone.FuncMap()).ParseFiles(file); err == nil {
+		var tmpl *template.Template
+		if tmpl, err = template.New(filepath.Base(file)).Funcs(clone.FuncMap()).ParseFiles(file); err == nil {
 			if err = tmpl.Execute(result, clone); err == nil {
 				return template.HTML(result.String())
 			}
