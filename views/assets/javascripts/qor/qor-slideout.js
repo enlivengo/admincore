@@ -467,6 +467,9 @@
         return;
       }
 
+      // empty body html when hide slideout
+      this.$body.html('');
+
       $slideout.
         one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
         removeClass(CLASS_IS_SLIDED);
