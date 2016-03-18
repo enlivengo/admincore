@@ -525,7 +525,15 @@
 
 @media screen and (min-width: 1025px) {
   .mdl-layout--fixed-drawer > .mdl-layout__header .mdl-layout__header-row {
-    padding-left: 24px; } }
+    padding-left: 24px; }
+  .qor-page__col-2 .qor-page__col-right {
+    width: calc(100% - 320px);
+    float: left; }
+  .qor-page__col-2 .qor-page__col-left {
+    float: left;
+    width: 320px; }
+    .qor-page__col-2 .qor-page__col-left h5 {
+      margin-top: 0; } }
 
 body {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
