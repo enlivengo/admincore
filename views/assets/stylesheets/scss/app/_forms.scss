@@ -33,6 +33,7 @@
 // Search Form
 // -------------------------
 
+
 .qor-search-container {
   float: right;
   z-index: 1;
@@ -242,8 +243,8 @@
       position: relative;
       float: left;
       display: block;
-      width: 160px;
-      height: 160px;
+      width: 150px;
+      height: 150px;
       margin-right: 10px;
       margin-bottom: 10px;
       border: 1px solid unquote("rgba(#{$color-black}, 0.12)");
