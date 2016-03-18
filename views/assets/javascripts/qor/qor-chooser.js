@@ -16,6 +16,9 @@
   var NAMESPACE = 'qor.chooser';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
+  var CLASS_MULTI = '.chosen-container-multi';
+  var CLASS_DEFAULT = 'chosen-default';
+  var CLASS_CHOSE = '.search-choice';
 
   function QorChooser(element, options) {
     this.$element = $(element);
@@ -48,25 +51,32 @@
       })
       .on('change', function (e,params) {
         var $target = $(e.target);
-        var $chosenMulti = $target.next('.chosen-container-multi');
+        var $chosenMulti = $target.next(CLASS_MULTI);
 
         if (!$chosenMulti.size()){
           return;
         }
 
         if (params.deselected){
-
           setTimeout(function () {
-            if (!$chosenMulti.find('.search-choice').size()){
-              $chosenMulti.addClass('chosen-default');
+            if (!$chosenMulti.find(CLASS_CHOSE).size()){
+              $chosenMulti.addClass(CLASS_DEFAULT);
             }
           }, 10);
-
         } else if (params.selected){
-          $chosenMulti.removeClass('chosen-default');
+          $chosenMulti.removeClass(CLASS_DEFAULT);
         }
 
       });
+
+      // init multiple selector layout
+      if ($this.prop('multiple')){
+        var $thisChosenMulti = $this.next(CLASS_MULTI);
+        if (!$thisChosenMulti.find(CLASS_CHOSE).size()){
+          $thisChosenMulti.addClass(CLASS_DEFAULT);
+        }
+      }
+
     },
 
     destroy: function () {
