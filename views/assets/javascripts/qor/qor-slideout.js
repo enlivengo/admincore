@@ -206,7 +206,12 @@
           success: function (html) {
             var returnUrl = $form.data('returnUrl');
 
-            if (returnUrl) {
+            if (returnUrl == 'refresh') {
+              _this.refresh();
+              return;
+            }
+
+            if (returnUrl && returnUrl != 'refresh') {
               _this.load(returnUrl);
             } else {
               var prefix = '/' + location.pathname.split('/')[1];
