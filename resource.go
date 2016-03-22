@@ -70,6 +70,12 @@ func (res Resource) ParamIDName() string {
 
 // ToParam used as urls to register routes for resource
 func (res Resource) ToParam() string {
+	if value, ok := res.Value.(interface {
+		ToParam() string
+	}); ok {
+		return value.ToParam()
+	}
+
 	if res.Config.Singleton == true {
 		return utils.ToParamString(res.Name)
 	}
