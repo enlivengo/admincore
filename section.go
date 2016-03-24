@@ -31,8 +31,8 @@ type Section struct {
 
 func (res *Resource) generateSections(values ...interface{}) []*Section {
 	var sections []*Section
-	var hasColumns []string
-	var excludedColumns []string
+	var hasColumns, excludedColumns []string
+
 	// Reverse values to make the last one as a key one
 	// e.g. Name, Code, -Name (`-Name` will get first and will skip `Name`)
 	for i := len(values) - 1; i >= 0; i-- {
@@ -56,6 +56,7 @@ func (res *Resource) generateSections(values ...interface{}) []*Section {
 			utils.ExitWithMsg(fmt.Sprintf("Qor Resource: attributes should be Section or String, but it is %+v", value))
 		}
 	}
+
 	sections = reverseSections(sections)
 	for _, section := range sections {
 		section.Resource = *res
@@ -99,7 +100,7 @@ func isContainsColumn(hasColumns []string, column string) bool {
 	return false
 }
 
-func isContainsPositiveValue(values ...interface{}) bool {
+func containsPositiveValue(values ...interface{}) bool {
 	for _, value := range values {
 		if _, ok := value.(*Section); ok {
 			return true
@@ -144,13 +145,13 @@ func (res *Resource) ConvertSectionToStrings(sections []*Section) []string {
 }
 
 func (res *Resource) setSections(sections *[]*Section, values ...interface{}) {
-	if len(*sections) > 0 && len(values) == 0 {
-		return
-	}
-	if len(*sections) == 0 && len(values) == 0 {
-		*sections = res.generateSections(res.allAttrs())
+	if len(values) == 0 {
+		if len(*sections) == 0 {
+			*sections = res.generateSections(res.allAttrs())
+		}
 	} else {
 		var flattenValues []interface{}
+
 		for _, value := range values {
 			if columns, ok := value.([]string); ok {
 				for _, column := range columns {
@@ -168,19 +169,19 @@ func (res *Resource) setSections(sections *[]*Section, values ...interface{}) {
 				utils.ExitWithMsg(fmt.Sprintf("Qor Resource: attributes should be Section or String, but it is %+v", value))
 			}
 		}
-		if isContainsPositiveValue(flattenValues...) {
+
+		if containsPositiveValue(flattenValues...) {
 			*sections = res.generateSections(flattenValues...)
 		} else {
-			var valueStrs []string
-			var availbleColumns []string
+			var columns, availbleColumns []string
 			for _, value := range flattenValues {
 				if column, ok := value.(string); ok {
-					valueStrs = append(valueStrs, column)
+					columns = append(columns, column)
 				}
 			}
 
 			for _, column := range res.allAttrs() {
-				if !isContainsColumn(valueStrs, column) {
+				if !isContainsColumn(columns, column) {
 					availbleColumns = append(availbleColumns, column)
 				}
 			}

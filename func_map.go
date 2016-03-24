@@ -296,10 +296,6 @@ func (context *Context) getResource(resources ...*Resource) *Resource {
 	return context.Resource
 }
 
-func (context *Context) allMetas(resources ...*Resource) []*Meta {
-	return context.getResource(resources...).allMetas()
-}
-
 func (context *Context) indexSections(resources ...*Resource) []*Section {
 	res := context.getResource(resources...)
 	return res.allowedSections(res.IndexAttrs(), context, roles.Read)
