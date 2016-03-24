@@ -3,7 +3,7 @@ package admin
 import (
 	"errors"
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -23,15 +23,15 @@ func init() {
 		root = path
 	}
 
-	registerViewPath(path.Join(root, "app/views/qor"))
+	registerViewPath(filepath.Join(root, "app/views/qor"))
 	RegisterViewPath("github.com/qor/admin/views")
 }
 
 // RegisterViewPath register views directory
 func RegisterViewPath(p string) {
-	if registerViewPath(path.Join(root, "vendor", p)) != nil {
+	if registerViewPath(filepath.Join(root, "vendor", p)) != nil {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
-			if registerViewPath(path.Join(gopath, "src", p)) == nil {
+			if registerViewPath(filepath.Join(gopath, "src", p)) == nil {
 				return
 			}
 		}
