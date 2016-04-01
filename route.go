@@ -360,7 +360,7 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	context.Roles = roles.MatchedRoles(req, currentUser)
 
 	// Set Request Method
-	context.Request.ParseMultipartForm(32 << 22) // 128 MB
+	context.Request.ParseMultipartForm(2 * 1024 * 1024)
 	if method := context.Request.Form.Get("_method"); method != "" {
 		context.Request.Method = strings.ToUpper(method)
 	}
