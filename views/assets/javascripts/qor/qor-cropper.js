@@ -31,6 +31,7 @@
   var CLASS_OPTIONS = '.qor-cropper__options';
   var CLASS_SAVE = '.qor-cropper__save';
   var CLASS_DLETE = '.qor-cropper__toggle--delete';
+  var CLASS_CROP = '.qor-cropper__toggle--crop';
 
   function capitalize(str) {
     if (typeof str === 'string') {
@@ -182,21 +183,20 @@
 
       $target = $(target);
 
-
-
       if ($target.closest(CLASS_DLETE).size()){
-        data.delete = true;
+        data.Delete = true;
         this.$output.val(JSON.stringify(data));
-        this.$list.hide()
+        this.$list.hide();
         return false;
       }
 
-      if (!$target.is('img')) {
+      if ($target.closest(CLASS_CROP).size()) {
         $target = $target.closest('li').find('img');
+        this.$target = $target;
+        this.$modal.qorModal('show');
       }
 
-      this.$target = $target;
-      this.$modal.qorModal('show');
+
     },
 
     read: function (e) {
@@ -289,6 +289,8 @@
 
         _this.$output.val(JSON.stringify(data));
       }).attr('src', url).data('originalUrl', url);
+
+      $list.show();
     },
 
     start: function () {
