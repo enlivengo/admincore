@@ -30,6 +30,7 @@
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_OPTIONS = '.qor-cropper__options';
   var CLASS_SAVE = '.qor-cropper__save';
+  var CLASS_DLETE = '.qor-cropper__toggle--delete';
 
   function capitalize(str) {
     if (typeof str === 'string') {
@@ -173,12 +174,22 @@
     click: function (e) {
       var target = e.target;
       var $target;
+      var data = this.data;
 
       if (target === this.$list[0]) {
         return;
       }
 
       $target = $(target);
+
+
+
+      if ($target.closest(CLASS_DLETE).size()){
+        data.delete = true;
+        this.$output.val(JSON.stringify(data));
+        this.$list.hide()
+        return false;
+      }
 
       if (!$target.is('img')) {
         $target = $target.closest('li').find('img');
@@ -520,7 +531,12 @@
     },
   };
 
-  QorCropper.TOGGLE = '<div class="qor-cropper__toggle"><i class="material-icons">crop</i></div>';
+  QorCropper.TOGGLE = ('<div class="qor-cropper__toggle">' +
+      '<div class="qor-cropper__toggle--crop"><i class="material-icons">crop</i></div>' +
+      '<div class="qor-cropper__toggle--delete"><i class="material-icons">delete</i></div>' +
+    '</div>'
+  );
+
   QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
   QorCropper.LIST = '<ul><li><img></li></ul>';
   QorCropper.MODAL = (
