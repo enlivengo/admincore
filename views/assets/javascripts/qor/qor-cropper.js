@@ -30,8 +30,9 @@
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_OPTIONS = '.qor-cropper__options';
   var CLASS_SAVE = '.qor-cropper__save';
-  var CLASS_DLETE = '.qor-cropper__toggle--delete';
+  var CLASS_DELETE = '.qor-cropper__toggle--delete';
   var CLASS_CROP = '.qor-cropper__toggle--crop';
+  var CLASS_UNDO = '.qor-fieldset__undo';
 
   function capitalize(str) {
     if (typeof str === 'string') {
@@ -176,6 +177,7 @@
       var target = e.target;
       var $target;
       var data = this.data;
+      var $alert;
 
       if (target === this.$list[0]) {
         return;
@@ -183,10 +185,21 @@
 
       $target = $(target);
 
-      if ($target.closest(CLASS_DLETE).size()){
+      if ($target.closest(CLASS_DELETE).size()){
         data.Delete = true;
+
         this.$output.val(JSON.stringify(data));
         this.$list.hide();
+
+        $alert = $(QorCropper.ALERT);
+        $alert.find(CLASS_UNDO).one(EVENT_CLICK, function () {
+          $alert.remove();
+          this.$list.show();
+          delete data.Delete;
+          this.$output.val(JSON.stringify(data));
+          return false;
+        }.bind(this));
+        this.$parent.find('.qor-fieldset').append($alert);
         return false;
       }
 
@@ -209,7 +222,7 @@
         if (/^image\/\w+$/.test(file.type) && URL) {
           this.load(URL.createObjectURL(file));
         } else {
-          this.$list.empty().text(file.name);
+          this.$list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
         }
       }
     },
@@ -539,8 +552,15 @@
     '</div>'
   );
 
+  QorCropper.ALERT = (
+    '<div class="qor-fieldset__alert">' +
+      '<button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>' +
+    '</div>'
+  );
+
   QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
   QorCropper.LIST = '<ul><li><img></li></ul>';
+  QorCropper.FILE_LIST = '<div class="qor-file__list-item"><span><span>{{filename}}</span></span>';
   QorCropper.MODAL = (
     '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
       '<div class="mdl-card mdl-shadow--2dp" role="document">' +
