@@ -296,10 +296,6 @@ func (context *Context) getResource(resources ...*Resource) *Resource {
 	return context.Resource
 }
 
-func (context *Context) allMetas(resources ...*Resource) []*Meta {
-	return context.getResource(resources...).allMetas()
-}
-
 func (context *Context) indexSections(resources ...*Resource) []*Section {
 	res := context.getResource(resources...)
 	return res.allowedSections(res.IndexAttrs(), context, roles.Read)
@@ -721,27 +717,34 @@ func (context *Context) pageTitle() template.HTML {
 		return context.t(fmt.Sprintf("%v.actions.%v", context.Resource.ToParam(), context.Result.(*Action).Label), context.Result.(*Action).Label)
 	}
 
-	var value string
-	var resourceKey, resourceName string
-	titleKey := fmt.Sprintf("qor_admin.form.%v_title", context.Action)
-	if context.Resource.Config.Singleton {
-		resourceKey = fmt.Sprintf("%v.name", context.Resource.ToParam())
-		resourceName = string(context.t(resourceKey, context.Resource.Name))
-	} else {
-		resourceKey = fmt.Sprintf("%v.name.plural", context.Resource.ToParam())
-		resourceName = string(context.t(resourceKey, inflection.Plural(context.Resource.Name)))
-	}
+	var (
+		defaultValue string
+		titleKey     = fmt.Sprintf("qor_admin.form.%v.title", context.Action)
+		usePlural    bool
+	)
+
 	switch context.Action {
 	case "new":
-		value = "Add {{$1}}"
+		defaultValue = "Add {{$1}}"
 	case "edit":
-		value = "Edit {{$1}}"
+		defaultValue = "Edit {{$1}}"
 	case "show":
-		value = "{{$1}} Details"
+		defaultValue = "{{$1}} Details"
 	default:
-		value = "{{$1}}"
+		defaultValue = "{{$1}}"
+		if !context.Resource.Config.Singleton {
+			usePlural = true
+		}
 	}
-	return context.t(titleKey, value, resourceName)
+
+	var resourceName string
+	if usePlural {
+		resourceName = string(context.t(fmt.Sprintf("%v.name.plural", context.Resource.ToParam()), inflection.Plural(context.Resource.Name)))
+	} else {
+		resourceName = string(context.t(fmt.Sprintf("%v.name", context.Resource.ToParam()), context.Resource.Name))
+	}
+
+	return context.t(titleKey, defaultValue, resourceName)
 }
 
 // FuncMap return funcs map

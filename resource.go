@@ -70,6 +70,12 @@ func (res Resource) ParamIDName() string {
 
 // ToParam used as urls to register routes for resource
 func (res Resource) ToParam() string {
+	if value, ok := res.Value.(interface {
+		ToParam() string
+	}); ok {
+		return value.ToParam()
+	}
+
 	if res.Config.Singleton == true {
 		return utils.ToParamString(res.Name)
 	}
@@ -482,9 +488,7 @@ Attrs:
 		}
 
 		if meta == nil {
-			meta = &Meta{}
-			meta.Name = attr
-			meta.baseResource = res
+			meta = &Meta{Name: attr, baseResource: res}
 			if attr == primaryKey {
 				meta.Type = "hidden"
 			}
@@ -509,23 +513,21 @@ func (res *Resource) GetMeta(name string) *Meta {
 
 // GetMetaOrNew get meta or initalize a new one
 func (res *Resource) GetMetaOrNew(name string) *Meta {
-	for _, meta := range res.Metas {
-		if meta.Name == name || meta.GetFieldName() == name {
-			return meta
-		}
+	if meta := res.GetMeta(name); meta != nil {
+		return meta
 	}
-	for _, meta := range res.allMetas() {
-		if meta.Name == name || meta.GetFieldName() == name {
-			return meta
-		}
-	}
-	return nil
-}
 
-func (res *Resource) allMetas() []*Meta {
-	return res.getCachedMetas("all_metas", func() []resource.Metaor {
-		return res.GetMetas([]string{})
-	})
+	if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
+		meta := &Meta{Name: name, baseResource: res}
+		if field.IsPrimaryKey {
+			meta.Type = "hidden"
+		}
+		meta.updateMeta()
+		res.Metas = append(res.Metas, meta)
+		return meta
+	}
+
+	return nil
 }
 
 func (res *Resource) allowedSections(sections []*Section, context *Context, roles ...roles.PermissionMode) []*Section {
