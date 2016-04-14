@@ -17,7 +17,7 @@
   var NAMESPACE = 'qor.modal';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_CLICK = 'mousedown.' + NAMESPACE;
   var EVENT_KEYUP = 'keyup.' + NAMESPACE;
   var EVENT_SHOW = 'show.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
