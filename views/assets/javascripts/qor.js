@@ -1720,7 +1720,8 @@ $('[data-toggle="qor.datepicker"]').materialDatePicker({ format : 'YYYY-MM-DD', 
   var NAMESPACE = 'qor.modal';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var EVENT_CLICK = 'mousedown.' + NAMESPACE;
+  var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_MOUSEDOWN = 'mousedown.' + NAMESPACE;
   var EVENT_KEYUP = 'keyup.' + NAMESPACE;
   var EVENT_SHOW = 'show.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
@@ -1755,7 +1756,7 @@ $('[data-toggle="qor.datepicker"]').materialDatePicker({ format : 'YYYY-MM-DD', 
     },
 
     bind: function () {
-      this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
+      this.$element.on(EVENT_MOUSEDOWN, $.proxy(this.click, this));
 
       if (this.options.keyboard) {
         $document.on(EVENT_KEYUP, $.proxy(this.keyup, this));
@@ -1763,7 +1764,7 @@ $('[data-toggle="qor.datepicker"]').materialDatePicker({ format : 'YYYY-MM-DD', 
     },
 
     unbind: function () {
-      this.$element.off(EVENT_CLICK, this.click);
+      this.$element.off(EVENT_MOUSEDOWN, this.click);
 
       if (this.options.keyboard) {
         $document.off(EVENT_KEYUP, this.keyup);
