@@ -144,6 +144,9 @@ Admin.AddMenu(&admin.Menu{Name: "Dashboard", Link: "/admin"})
 
 // Register nested menu
 Admin.AddMenu(&admin.Menu{Name: "menu", Link: "/link", Ancestors: []string{"Dashboard"}})
+
+// Register menu with permission
+Admin.AddMenu(&admin.Menu{Name: "Report", Link: "/admin", Permission: roles.Allow(roles.Read, "admin")})
 ```
 
 #### Add Resources to a menu

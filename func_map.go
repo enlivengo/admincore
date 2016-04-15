@@ -332,14 +332,16 @@ func (context *Context) getMenus() (menus []*menu) {
 
 	addMenu = func(parent *menu, menus []*Menu) {
 		for _, m := range menus {
-			var menu = &menu{Menu: m}
-			if strings.HasPrefix(context.Request.URL.Path, m.Link) && len(m.Link) > mostMatchedLength {
-				mostMatchedMenu = menu
-				mostMatchedLength = len(m.Link)
-			}
+			if m.HasPermission(roles.Read, context.Context) {
+				var menu = &menu{Menu: m}
+				if strings.HasPrefix(context.Request.URL.Path, m.Link) && len(m.Link) > mostMatchedLength {
+					mostMatchedMenu = menu
+					mostMatchedLength = len(m.Link)
+				}
 
-			addMenu(menu, menu.GetSubMenus())
-			parent.SubMenus = append(parent.SubMenus, menu)
+				addMenu(menu, menu.GetSubMenus())
+				parent.SubMenus = append(parent.SubMenus, menu)
+			}
 		}
 	}
 
