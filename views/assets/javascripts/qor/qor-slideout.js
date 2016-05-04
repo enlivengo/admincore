@@ -86,6 +86,7 @@
     keyup: function (e) {
       if (e.which === 27) {
         this.hide();
+        this.removeSelectedClass();
       }
     },
 
@@ -123,6 +124,10 @@
       return array;
     },
 
+    removeSelectedClass: function () {
+      this.$element.find('tbody > tr[data-url],a[data-url]').removeClass(CLASS_IS_SELECTED);
+    },
+
     click: function (e) {
       var $this = this.$element;
       var slideout = this.$slideout.get(0);
@@ -131,7 +136,7 @@
       var data;
 
       function toggleClass() {
-        $this.find('tbody > tr').removeClass(CLASS_IS_SELECTED);
+        $this.find('tbody > tr[data-url],a[data-url]').removeClass(CLASS_IS_SELECTED);
         $target.addClass(CLASS_IS_SELECTED);
       }
 
@@ -150,22 +155,31 @@
           break;
         } else if ($target.data('dismiss') === 'slideout') {
           this.hide();
+          this.removeSelectedClass();
           break;
         } else if ($target.is('table.qor-table > tbody > tr[data-url]')) {
           if ($(e.target).parents('.qor-table__actions').size() > 0) {
             return;
           }
-          // only load when not under loading and not activated
-          if (!this.loading && !$target.hasClass(CLASS_IS_SELECTED)) {
-            $this.one(EVENT_SHOW, toggleClass);
+
+          if ($target.hasClass(CLASS_IS_SELECTED)) {
+            this.hide();
+            this.removeSelectedClass();
+          } else {
+            toggleClass();
             data = $target.data();
             this.load(data.url);
           }
+
           break;
         } else if ($target.data('url')) {
           e.preventDefault();
-          if (!this.loading && !$target.hasClass(CLASS_IS_SELECTED)) {
-            $this.one(EVENT_SHOW, toggleClass);
+
+          if ($target.hasClass(CLASS_IS_SELECTED)) {
+            this.hide();
+            this.removeSelectedClass();
+          } else {
+            toggleClass();
             data = $target.data();
             this.load(data.url, data);
           }
@@ -275,11 +289,10 @@
       var dataType;
       var load;
 
-      if (!url || this.loading) {
+      if (!url) {
         return;
       }
 
-      this.loading = true;
       data = $.isPlainObject(data) ? data : {};
 
       method = data.method ? data.method : 'GET';
@@ -389,7 +402,6 @@
 
             } else {
               if (data.returnUrl) {
-                this.loading = false; // For reload
                 this.load(data.returnUrl);
               } else {
                 this.refresh();
@@ -410,10 +422,8 @@
               errors = response.responseText;
             }
             window.alert(errors);
-          }, this),
-          complete: $.proxy(function () {
-            this.loading = false;
           }, this)
+
         });
       }, this);
 
@@ -492,7 +502,6 @@
       // Enable to scroll body element
       $('body').removeClass(CLASS_OPEN);
 
-      this.$element.find('tbody > tr').removeClass(CLASS_IS_SELECTED);
       this.$slideout.removeClass(CLASS_IS_SHOWN).trigger(EVENT_HIDDEN);
     },
 
@@ -502,14 +511,6 @@
       setTimeout(function () {
         window.location.reload();
       }, 350);
-    },
-
-    toggle: function () {
-      if (this.slided) {
-        this.hide();
-      } else {
-        this.show();
-      }
     },
 
     destroy: function () {
