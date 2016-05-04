@@ -115,6 +115,10 @@
   content: "\e7f4";
 }
 
+[qor-icon-name*="Widget"] > a::before {
+  content: "\e30d";
+}
+
 [qor-icon-name*="Workers"] > a::before {
   content: "\e8f9";
 }
