@@ -214,7 +214,7 @@
                 }
               });
             });
-          },
+          }
         });
       }).one(EVENT_HIDDEN, function () {
         $clone.cropper('destroy').remove();
@@ -225,7 +225,7 @@
       this.unbind();
       this.$modal.qorModal('hide').remove();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorRedactor.DEFAULTS = {
@@ -237,8 +237,8 @@
     text: {
       title: 'Crop the image',
       ok: 'OK',
-      cancel: 'Cancel',
-    },
+      cancel: 'Cancel'
+    }
   };
 
   QorRedactor.BUTTON = '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>';

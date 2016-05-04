@@ -127,7 +127,6 @@
       var $this = this.$element;
       var slideout = this.$slideout.get(0);
       var target = e.target;
-      var dismissible;
       var $target;
       var data;
 
@@ -141,7 +140,6 @@
       }
 
       while (target !== document) {
-        dismissible = false;
         $target = $(target);
 
         if ($target.prop('disabled')) {
@@ -266,7 +264,7 @@
           },
           complete: function () {
             $submit.prop('disabled', false);
-          },
+          }
         });
       }
     },
@@ -411,11 +409,11 @@
             } else {
               errors = response.responseText;
             }
-            window.alert(response.responseText);
+            window.alert(errors);
           }, this),
           complete: $.proxy(function () {
             this.loading = false;
-          }, this),
+          }, this)
         });
       }, this);
 
@@ -518,12 +516,12 @@
       this.unbind();
       this.unbuild();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorSlideout.DEFAULTS = {
     title: false,
-    content: false,
+    content: false
   };
 
   QorSlideout.TEMPLATE = (

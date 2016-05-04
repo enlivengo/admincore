@@ -173,13 +173,13 @@
 
     destroy: function () {
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorModal.DEFAULTS = {
     backdrop: true,
     keyboard: true,
-    show: true,
+    show: true
   };
 
   QorModal.plugin = function (options) {
