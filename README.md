@@ -46,7 +46,7 @@ func main() {
   DB.AutoMigrate(&User{}, &Product{})
 
   // Initalize
-  Admin := admin.New(&qor.Config{DB: &DB})
+  Admin := admin.New(&qor.Config{DB: DB})
 
   // Create resources from GORM-backend model
   Admin.AddResource(&User{})
