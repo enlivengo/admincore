@@ -166,8 +166,11 @@
           break;
         } else if ($target.data('url')) {
           e.preventDefault();
-          data = $target.data();
-          this.load(data.url, data);
+          if (!this.loading && !$target.hasClass(CLASS_IS_SELECTED)) {
+            $this.one(EVENT_SHOW, toggleClass);
+            data = $target.data();
+            this.load(data.url, data);
+          }
           break;
         } else {
           if ($target.is('a')) {
@@ -439,7 +442,6 @@
         return;
       }
 
-      /*jshint expr:true */
       $slideout.addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
       $slideout.
         one(EVENT_TRANSITIONEND, $.proxy(this.shown, this)).
