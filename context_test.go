@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/qor/qor"
 	"github.com/qor/admin"
+	"github.com/qor/qor"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -61,7 +61,6 @@ func TestPagination(t *testing.T) {
 	// Test current page 1
 	context.Searcher.Pagination.Pages = 10
 	context.Searcher.Pagination.CurrentPage = 1
-
 	pages := *context.Pagination()
 
 	if !pages[0].Current {
@@ -69,24 +68,28 @@ func TestPagination(t *testing.T) {
 	}
 
 	// +1 for "Next page" link which is a "Page" too
-	if len(pages) != 8+1 {
+	// +1 for "Last page"
+	if len(pages) != 8+1+1 {
 		t.Error("visible pages in current context beyond the bound of VISIBLE_PAGE_COUNT")
 	}
 
 	// Test current page 8 => the length between start and end less than MAX_VISIBLE_PAGES
+	context.Searcher.Pagination.Pages = 10
 	context.Searcher.Pagination.CurrentPage = 8
 	pages = *context.Pagination()
 
-	if !pages[6].Current {
+	if !pages[7].Current {
 		t.Error("visible previous pages count incorrect")
 	}
 
-	// 1 for "Prev"
-	if len(pages) != 8+1 {
+	// +1 for "Prev"
+	// +1 for "First page"
+	if len(pages) != 8+1+1 {
 		t.Error("visible pages in current context beyond the bound of VISIBLE_PAGE_COUNT")
 	}
 
 	// Test current page at last
+	context.Searcher.Pagination.Pages = 10
 	context.Searcher.Pagination.CurrentPage = 10
 	pages = *context.Pagination()
 
@@ -94,7 +97,7 @@ func TestPagination(t *testing.T) {
 		t.Error("last page is not the current page")
 	}
 
-	if len(pages) != 8+1 {
+	if len(pages) != 8+2 {
 		t.Error("visible pages count is incorrect")
 	}
 

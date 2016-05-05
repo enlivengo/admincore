@@ -4,11 +4,19 @@
       {{range $index, $page := pagination}}
         {{if $page.IsPrevious}}
           <li class="qor-pagination-item qor-pagination-previous">
-            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.previous" "Previous Page"}}" aria-label="{{t "qor_admin.pagination.previous"}}">&laquo;</a>
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.previous" "Previous Page"}}" aria-label="{{t "qor_admin.pagination.previous"}}">&lsaquo;</a>
           </li>
         {{else if $page.IsNext}}
           <li class="qor-pagination-item qor-pagination-next">
-            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.next" "Next Page"}}" aria-label="{{t "qor_admin.pagination.next"}}">&raquo;</a>
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.next" "Next Page"}}" aria-label="{{t "qor_admin.pagination.next"}}">&rsaquo;</a>
+          </li>
+        {{else if $page.IsFirst }}
+          <li class="qor-pagination-item qor-pagination-next">
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.first" "First Page"}}" aria-label="{{t "qor_admin.pagination.first"}}">&laquo;</a>
+          </li>
+        {{else if $page.IsLast }}
+          <li class="qor-pagination-item qor-pagination-next">
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.alst" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">&raquo;</a>
           </li>
         {{else if $page.Current}}
           <li class="qor-pagination-item active"><a href="{{patch_current_url "page" $page.Page}}">{{$page.Page}}</a></li>

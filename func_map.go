@@ -425,6 +425,8 @@ type Page struct {
 	Current    bool
 	IsPrevious bool
 	IsNext     bool
+	IsFirst    bool
+	IsLast     bool
 }
 
 const visiblePageCount = 8
@@ -465,6 +467,7 @@ func (context *Context) Pagination() *[]Page {
 	var pages []Page
 	// Append prev link
 	if start > 1 {
+		pages = append(pages, Page{Page: 1, IsFirst: true})
 		pages = append(pages, Page{Page: start - 1, IsPrevious: true})
 	}
 
@@ -475,6 +478,7 @@ func (context *Context) Pagination() *[]Page {
 	// Append next link
 	if end < pagination.Pages {
 		pages = append(pages, Page{Page: end + 1, IsNext: true})
+		pages = append(pages, Page{Page: pagination.Pages, IsLast: true})
 	}
 
 	return &pages
