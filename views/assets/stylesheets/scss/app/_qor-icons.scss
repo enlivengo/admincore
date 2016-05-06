@@ -123,6 +123,10 @@
   content: "\e8f9";
 }
 
+[qor-icon-name*="Public keys"] > a::before {
+  content: "\e897";
+}
+
 [qor-icon-name] [qor-icon-name] > a::before {
   content: " " !important;
 }
