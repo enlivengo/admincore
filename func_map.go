@@ -285,13 +285,13 @@ func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool
 		scope := &gorm.Scope{Value: value}
 		primaryKeys = append(primaryKeys, scope.PrimaryKeyValue())
 	} else if reflectValue.Kind() == reflect.String {
-		return strings.Contains(reflectValue.Interface().(string), fmt.Sprintf("%v", hasValue))
+		return reflectValue.Interface().(string) == fmt.Sprint(hasValue)
 	} else if reflectValue.IsValid() {
 		primaryKeys = append(primaryKeys, reflect.Indirect(reflectValue).Interface())
 	}
 
 	for _, key := range primaryKeys {
-		if fmt.Sprintf("%v", key) == result {
+		if fmt.Sprint(key) == result {
 			return true
 		}
 	}
