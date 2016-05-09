@@ -258,6 +258,27 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	}
 }
 
+func (context *Context) isEqual(value interface{}, hasValue interface{}) bool {
+	var result string
+
+	if reflect.Indirect(reflect.ValueOf(hasValue)).Kind() == reflect.Struct {
+		scope := &gorm.Scope{Value: hasValue}
+		result = fmt.Sprint(scope.PrimaryKeyValue())
+	} else {
+		result = fmt.Sprint(hasValue)
+	}
+
+	reflectValue := reflect.Indirect(reflect.ValueOf(value))
+	if reflectValue.Kind() == reflect.Struct {
+		scope := &gorm.Scope{Value: value}
+		return fmt.Sprint(scope.PrimaryKeyValue()) == result
+	} else if reflectValue.Kind() == reflect.String {
+		return reflectValue.Interface().(string) == result
+	} else {
+		return fmt.Sprint(reflectValue.Interface()) == result
+	}
+}
+
 func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool {
 	var result string
 	if reflect.Indirect(reflect.ValueOf(hasValue)).Kind() == reflect.Struct {
@@ -285,7 +306,7 @@ func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool
 		scope := &gorm.Scope{Value: value}
 		primaryKeys = append(primaryKeys, scope.PrimaryKeyValue())
 	} else if reflectValue.Kind() == reflect.String {
-		return reflectValue.Interface().(string) == fmt.Sprint(hasValue)
+		return strings.Contains(reflectValue.Interface().(string), result)
 	} else if reflectValue.IsValid() {
 		primaryKeys = append(primaryKeys, reflect.Indirect(reflectValue).Interface())
 	}
@@ -766,6 +787,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"get_resource":         context.Admin.GetResource,
 		"new_resource_context": context.NewResourceContext,
 		"is_new_record":        context.isNewRecord,
+		"is_equal":             context.isEqual,
 		"is_included":          context.isIncluded,
 		"primary_key_of":       context.primaryKeyOf,
 		"formatted_value_of":   context.FormattedValueOf,
