@@ -438,6 +438,11 @@ type Page struct {
 	IsLast     bool
 }
 
+type PaginationResult struct {
+	Pagination Pagination
+	Pages      []Page
+}
+
 const visiblePageCount = 8
 
 // Pagination return pagination information
@@ -450,9 +455,10 @@ const visiblePageCount = 8
 // When current page is 10
 // [prev, 5, 6, 7, 8, 9, current, 11, 12]
 // If total page count less than VISIBLE_PAGE_COUNT, always show all pages
-func (context *Context) Pagination() *[]Page {
+func (context *Context) Pagination() *PaginationResult {
+	var pages []Page
 	pagination := context.Searcher.Pagination
-	if pagination.Pages <= 1 {
+	if pagination.Total < context.Searcher.Resource.Config.PageCount {
 		return nil
 	}
 
@@ -473,7 +479,6 @@ func (context *Context) Pagination() *[]Page {
 		start = 1
 	}
 
-	var pages []Page
 	// Append prev link
 	if start > 1 {
 		pages = append(pages, Page{Page: 1, IsFirst: true})
@@ -490,7 +495,7 @@ func (context *Context) Pagination() *[]Page {
 		pages = append(pages, Page{Page: pagination.Pages, IsLast: true})
 	}
 
-	return &pages
+	return &PaginationResult{Pagination: pagination, Pages: pages}
 }
 
 // PatchCurrentURL is a convinent wrapper for qor/utils.PatchURL

@@ -1,7 +1,8 @@
-{{if pagination}}
+{{ $paginationResult := pagination }}
+{{ if $paginationResult }}
   <nav class="qor-pagination-container">
-    <ul class="qor-pagination">
-      {{range $index, $page := pagination}}
+    <ul class="qor-pagination" style="margin-right: 10px;">
+      {{range $index, $page := $paginationResult.Pages}}
         {{if $page.IsPrevious}}
           <li class="qor-pagination-item qor-pagination-previous">
             <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.previous" "Previous Page"}}" aria-label="{{t "qor_admin.pagination.previous"}}">&lsaquo;</a>
@@ -25,6 +26,13 @@
         {{end}}
       {{end}}
     </ul>
-    <a class="qor-pagination-all" href="{{patch_current_url "page" "-1" }}">{{t "qor_admin.pagination.show_all" "Show All"}}</a>
+    <div data-toggle="qor.filter">
+      <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{$paginationResult.Pagination.PerPage}}">
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="-1">{{t "qor_admin.pagination.show_all" "Show All"}}</option>
+      </select>
+    </div>
   </nav>
-{{end}}
+{{ end }}
