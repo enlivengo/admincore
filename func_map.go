@@ -259,8 +259,17 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 }
 
 func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool {
+	var result string
+	if reflect.Indirect(reflect.ValueOf(hasValue)).Kind() == reflect.Struct {
+		scope := &gorm.Scope{Value: hasValue}
+		result = fmt.Sprint(scope.PrimaryKeyValue())
+	} else {
+		result = fmt.Sprint(hasValue)
+	}
+
 	primaryKeys := []interface{}{}
 	reflectValue := reflect.Indirect(reflect.ValueOf(value))
+
 	if reflectValue.Kind() == reflect.Slice {
 		for i := 0; i < reflectValue.Len(); i++ {
 			if value := reflectValue.Index(i); value.IsValid() {
@@ -282,7 +291,7 @@ func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool
 	}
 
 	for _, key := range primaryKeys {
-		if fmt.Sprintf("%v", hasValue) == fmt.Sprintf("%v", key) {
+		if fmt.Sprintf("%v", key) == result {
 			return true
 		}
 	}

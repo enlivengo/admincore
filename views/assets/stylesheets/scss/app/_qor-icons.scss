@@ -115,8 +115,16 @@
   content: "\e7f4";
 }
 
+[qor-icon-name*="Widget"] > a::before {
+  content: "\e30d";
+}
+
 [qor-icon-name*="Workers"] > a::before {
   content: "\e8f9";
+}
+
+[qor-icon-name*="Public keys"] > a::before {
+  content: "\e897";
 }
 
 [qor-icon-name] [qor-icon-name] > a::before {

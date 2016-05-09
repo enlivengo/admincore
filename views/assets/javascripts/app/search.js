@@ -3,7 +3,6 @@ $(function () {
   'use strict';
 
   var location = window.location;
-  var a='a';
 
   $('.qor-search').each(function () {
     var $this = $(this);
@@ -14,11 +13,11 @@ $(function () {
     var emptySearch = function () {
       var search = location.search.replace(new RegExp($input.attr('name') + '\\=?\\w*'), '');
       if (search == '?'){
-        location.href = location.href.split('?')[0]
+        location.href = location.href.split('?')[0];
       } else {
         location.search = location.search.replace(new RegExp($input.attr('name') + '\\=?\\w*'), '');
       }
-    }
+    };
 
     $this.closest('.qor-page__header').addClass('has-search');
 
