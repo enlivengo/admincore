@@ -14,6 +14,7 @@
   'use strict';
 
   var $window = $(window);
+  var _ = window._;
   var NAMESPACE = 'qor.fixer';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
@@ -83,7 +84,6 @@
       var self = this;
       var $items = $thead.find('> tr').children();
       var pageBodyTop = this.$content.offset().top + $(CLASS_HEADER).height();
-      var tableWidth = this.$element.width();
 
       if (!$clone) {
         this.$clone = $clone = $thead.clone().prependTo($this).css({ top:pageBodyTop });
@@ -120,18 +120,12 @@
 
     toggle: function () {
       var self = this;
-      var $this = this.$element;
       var $clone = this.$clone;
       var $thead = this.$thead;
-      var theadHeight = $thead.outerHeight();
-      var tbodyLastRowHeight = this.$tbody.find('tr:last').outerHeight();
       var scrollTop = this.$content.scrollTop();
       var scrollLeft = this.$content.scrollLeft();
-      var minTop = 0;
-      var maxTop = $this.outerHeight() - theadHeight - tbodyLastRowHeight;
       var offsetTop = this.$subHeader.outerHeight() + this.paddingHeight + this.marginBottomPX;
       var headerHeight = $('.qor-page__header').outerHeight();
-      var showTop = Math.min(scrollTop - offsetTop, maxTop) + headerHeight;
 
       if (!this.isEqualed){
         this.headerWidth = [];
@@ -163,12 +157,12 @@
       this.unbind();
       this.unbuild();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorFixer.DEFAULTS = {
     header: false,
-    content: false,
+    content: false
   };
 
   QorFixer.plugin = function (options) {
@@ -193,7 +187,7 @@
           header: '.mdl-layout__header',
           subHeader: '.qor-page__header',
           content: '.mdl-layout__content',
-          paddingHeight: 2, // Fix sub header height bug
+          paddingHeight: 2 // Fix sub header height bug
         };
 
     $(document).

@@ -181,12 +181,12 @@
     destroy: function () {
       this.unbuild();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorSelector.DEFAULTS = {
     aligned: 'left',
-    clearable: false,
+    clearable: false
   };
 
   QorSelector.TEMPLATE = (

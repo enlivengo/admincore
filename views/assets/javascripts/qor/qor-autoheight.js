@@ -59,7 +59,7 @@
     destroy: function () {
       this.unbind();
       this.$element.css('overflow', this.overflow).removeData(NAMESPACE);
-    },
+    }
   };
 
   QorAutoheight.DEFAULTS = {};

@@ -135,7 +135,7 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 			menuName = inflection.Plural(res.Name)
 		}
 
-		menu := &Menu{rawPath: res.ToParam(), Name: menuName}
+		menu := &Menu{rawPath: res.ToParam(), Name: menuName, Permission: res.Config.Permission}
 		admin.menus = appendMenu(admin.menus, res.Config.Menu, menu)
 
 		res.Action(&Action{

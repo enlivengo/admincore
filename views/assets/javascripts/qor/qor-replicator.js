@@ -191,7 +191,7 @@
     destroy: function () {
       this.unbind();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorReplicator.DEFAULTS = {
@@ -200,7 +200,7 @@
     addClass: false,
     delClass: false,
     childrenClass: false,
-    alertTemplate: '',
+    alertTemplate: ''
   };
 
   QorReplicator.plugin = function (options) {
@@ -233,7 +233,7 @@
               '<input type="hidden" name="{{name}}._destroy" value="1">' +
               '<button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>' +
             '</div>'
-          ),
+          )
         };
 
     $(document).

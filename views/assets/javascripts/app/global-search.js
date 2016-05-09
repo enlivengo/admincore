@@ -2,7 +2,6 @@ $(function () {
 
   'use strict';
 
-  var location = window.location;
   var modal = (
     '<div class="qor-dialog qor-dialog--global-search" tabindex="-1" role="dialog" aria-hidden="true">' +
       '<div class="qor-dialog-content">' +
@@ -30,7 +29,7 @@ $(function () {
       var modalHTML = window.Mustache.render(modal, data);
 
       $('body').append(modalHTML);
-      componentHandler.upgradeElement(document.getElementById('global-search-textfield'));
+      window.componentHandler.upgradeElement(document.getElementById('global-search-textfield'));
       $('#globalSearch').focus();
 
   });

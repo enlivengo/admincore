@@ -259,8 +259,17 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 }
 
 func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool {
+	var result string
+	if reflect.Indirect(reflect.ValueOf(hasValue)).Kind() == reflect.Struct {
+		scope := &gorm.Scope{Value: hasValue}
+		result = fmt.Sprint(scope.PrimaryKeyValue())
+	} else {
+		result = fmt.Sprint(hasValue)
+	}
+
 	primaryKeys := []interface{}{}
 	reflectValue := reflect.Indirect(reflect.ValueOf(value))
+
 	if reflectValue.Kind() == reflect.Slice {
 		for i := 0; i < reflectValue.Len(); i++ {
 			if value := reflectValue.Index(i); value.IsValid() {
@@ -282,7 +291,7 @@ func (context *Context) isIncluded(value interface{}, hasValue interface{}) bool
 	}
 
 	for _, key := range primaryKeys {
-		if fmt.Sprintf("%v", hasValue) == fmt.Sprintf("%v", key) {
+		if fmt.Sprintf("%v", key) == result {
 			return true
 		}
 	}
@@ -332,14 +341,16 @@ func (context *Context) getMenus() (menus []*menu) {
 
 	addMenu = func(parent *menu, menus []*Menu) {
 		for _, m := range menus {
-			var menu = &menu{Menu: m}
-			if strings.HasPrefix(context.Request.URL.Path, m.Link) && len(m.Link) > mostMatchedLength {
-				mostMatchedMenu = menu
-				mostMatchedLength = len(m.Link)
-			}
+			if m.HasPermission(roles.Read, context.Context) {
+				var menu = &menu{Menu: m}
+				if strings.HasPrefix(context.Request.URL.Path, m.Link) && len(m.Link) > mostMatchedLength {
+					mostMatchedMenu = menu
+					mostMatchedLength = len(m.Link)
+				}
 
-			addMenu(menu, menu.GetSubMenus())
-			parent.SubMenus = append(parent.SubMenus, menu)
+				addMenu(menu, menu.GetSubMenus())
+				parent.SubMenus = append(parent.SubMenus, menu)
+			}
 		}
 	}
 
@@ -637,7 +648,7 @@ func (context *Context) logoutURL() string {
 func (context *Context) t(values ...interface{}) template.HTML {
 	switch len(values) {
 	case 1:
-		return context.Admin.T(context.Context, fmt.Sprint(values[0]), "")
+		return context.Admin.T(context.Context, fmt.Sprint(values[0]), fmt.Sprint(values[0]))
 	case 2:
 		return context.Admin.T(context.Context, fmt.Sprint(values[0]), fmt.Sprint(values[1]))
 	case 3:

@@ -109,9 +109,7 @@
         $list.find('ul').hide();
       }
 
-      try {
-        data = JSON.parse($.trim(this.$output.val()));
-      } catch (e) {}
+      data = JSON.parse($.trim(this.$output.val()));
 
       this.data = data || {};
       this.build();
@@ -275,14 +273,14 @@
 
           emulateImageData = {
             naturalWidth: naturalWidth,
-            naturalHeight: naturalHeight,
+            naturalHeight: naturalHeight
           };
 
           emulateCropData = {
             x: Math.round((naturalWidth - width) / 2),
             y: Math.round((naturalHeight - height) / 2),
             width: Math.round(width),
-            height: Math.round(height),
+            height: Math.round(height)
           };
 
           _this.preview($this, emulateImageData, emulateCropData);
@@ -360,9 +358,7 @@
             _this.imageData = $clone.cropper('getImageData');
             _this.cropData = cropData;
 
-            try {
-              url = $clone.cropper('getCroppedCanvas').toDataURL();
-            } catch (e) {}
+            url = $clone.cropper('getCroppedCanvas').toDataURL();
 
             $modal.find(CLASS_OPTIONS + ' input').each(function () {
               var $this = $(this);
@@ -375,7 +371,7 @@
             _this.output(url, syncData);
             $modal.qorModal('hide');
           });
-        },
+        }
       });
     },
 
@@ -460,7 +456,7 @@
 
       $canvas.css({
         width: canvasWidth,
-        height: canvasHeight,
+        height: canvasHeight
       });
 
       $target.css({
@@ -469,7 +465,7 @@
         width: imageData.naturalWidth / scaledRatio,
         height: imageData.naturalHeight / scaledRatio,
         marginLeft: -cropData.x / scaledRatio,
-        marginTop: -cropData.y / scaledRatio,
+        marginTop: -cropData.y / scaledRatio
       });
 
       this.center($target);
@@ -530,7 +526,7 @@
       this.unbind();
       this.unbuild();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorCropper.DEFAULTS = {
@@ -542,8 +538,8 @@
     text: {
       title: 'Crop the image',
       ok: 'OK',
-      cancel: 'Cancel',
-    },
+      cancel: 'Cancel'
+    }
   };
 
   QorCropper.TOGGLE = ('<div class="qor-cropper__toggle">' +
@@ -618,7 +614,7 @@
           parent: '.qor-file',
           output: '.qor-file__options',
           list: '.qor-file__list',
-          key: 'CropOptions',
+          key: 'CropOptions'
         };
 
     $(document).
