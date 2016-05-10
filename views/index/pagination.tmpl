@@ -17,7 +17,7 @@
           </li>
         {{else if $page.IsLast }}
           <li class="qor-pagination-item qor-pagination-next">
-            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.alst" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">&raquo;</a>
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.last" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">&raquo;</a>
           </li>
         {{else if $page.Current}}
           <li class="qor-pagination-item active"><a href="{{patch_current_url "page" $page.Page}}">{{$page.Page}}</a></li>
