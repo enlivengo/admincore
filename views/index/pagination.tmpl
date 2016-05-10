@@ -27,7 +27,11 @@
       {{end}}
     </ul>
     <div data-toggle="qor.filter">
-      <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{$paginationResult.Pagination.PerPage}}">
+      {{ if eq -1 $paginationResult.Pagination.PerPage }}
+        <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{t "qor_admin.pagination.show_all" "Show All"}}">
+      {{ else }}
+        <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{$paginationResult.Pagination.PerPage}}">
+      {{ end }}
         <option value="20">20</option>
         <option value="50">50</option>
         <option value="100">100</option>
