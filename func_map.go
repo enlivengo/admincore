@@ -606,21 +606,22 @@ func (context *Context) loadAdminStyleSheets() template.HTML {
 
 func (context *Context) loadActions(action string) template.HTML {
 	var actions = map[string]string{}
-	var actionKeys = []string{}
-	var viewPaths = context.getViewPaths()
+	var actionKeys, actionFiles []string
 
-	for j := len(viewPaths); j > 0; j-- {
-		view := viewPaths[j-1]
-		globalfiles, _ := filepath.Glob(path.Join(view, "actions/*.tmpl"))
-		files, _ := filepath.Glob(path.Join(view, "actions", action, "*.tmpl"))
+	if matches, err := AssetFS.Glob("action/*.tmpl"); err == nil {
+		actionFiles = append(actionFiles, matches...)
+	}
 
-		for _, file := range append(globalfiles, files...) {
-			base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(path.Base(file), "")
-			if _, ok := actions[base]; !ok {
-				actionKeys = append(actionKeys, path.Base(file))
-			}
-			actions[base] = file
+	if matches, err := AssetFS.Glob(path.Join("actions", action, "*.tmpl")); err == nil {
+		actionFiles = append(actionFiles, matches...)
+	}
+
+	for _, actionFile := range actionFiles {
+		base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(path.Base(actionFile), "")
+		if _, ok := actions[base]; !ok {
+			actionKeys = append(actionKeys, path.Base(actionFile))
 		}
+		actions[base] = actionFile
 	}
 
 	sort.Strings(actionKeys)
@@ -636,11 +637,12 @@ func (context *Context) loadActions(action string) template.HTML {
 		}()
 
 		base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(key, "")
-		file := actions[base]
-		if tmpl, err := template.New(filepath.Base(file)).Funcs(context.FuncMap()).ParseFiles(file); err == nil {
-			if err := tmpl.Execute(result, context); err != nil {
-				utils.ExitWithMsg(err)
-				result.WriteString(err.Error())
+		if content, err := context.Asset(actions[base]); err == nil {
+			if tmpl, err := template.New(filepath.Base(actions[base])).Funcs(context.FuncMap()).Parse(string(content)); err == nil {
+				if err := tmpl.Execute(result, context); err != nil {
+					utils.ExitWithMsg(err)
+					result.WriteString(err.Error())
+				}
 			}
 		}
 	}
