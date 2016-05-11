@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,7 +13,6 @@ var (
 	layouts    = map[string]*template.Template{}
 	templates  = map[string]*template.Template{}
 	tmplSuffix = regexp.MustCompile(`(\.tmpl)?$`)
-	viewPaths  = []string{}
 	root, _    = os.Getwd()
 )
 
@@ -23,17 +21,15 @@ func init() {
 		root = path
 	}
 
-	registerViewPath(filepath.Join(root, "app/views/qor"))
+	AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
 	RegisterViewPath("github.com/qor/admin/views")
 }
 
 // RegisterViewPath register views directory
 func RegisterViewPath(p string) {
-	if registerViewPath(filepath.Join(root, "vendor", p)) != nil {
+	if AssetFS.RegisterPath(filepath.Join(root, "vendor", p)) != nil {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
-			if registerViewPath(filepath.Join(gopath, "src", p)) == nil {
-				return
-			}
+			AssetFS.RegisterPath(filepath.Join(gopath, "src", p))
 		}
 	}
 }
@@ -44,23 +40,4 @@ func isExistingDir(pth string) bool {
 		return false
 	}
 	return fi.Mode().IsDir()
-}
-
-func registerViewPath(path string) error {
-	if isExistingDir(path) {
-		var found bool
-
-		for _, viewPath := range viewPaths {
-			if path == viewPath {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			viewPaths = append(viewPaths, path)
-		}
-		return nil
-	}
-	return errors.New("path not found")
 }

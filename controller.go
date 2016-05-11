@@ -210,8 +210,8 @@ func (ac *controller) Action(context *Context) {
 
 func (ac *controller) Asset(context *Context) {
 	file := strings.TrimPrefix(context.Request.URL.Path, ac.GetRouter().Prefix)
-	if filename, err := context.findFile(file); err == nil {
-		http.ServeFile(context.Writer, context.Request, filename)
+	if content, err := context.Asset(file); err == nil {
+		context.Writer.Write(content)
 	} else {
 		http.NotFound(context.Writer, context.Request)
 	}
