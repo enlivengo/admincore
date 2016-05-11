@@ -1,8 +1,10 @@
 package admin
 
 import (
+	"mime"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -212,6 +214,9 @@ func (ac *controller) Asset(context *Context) {
 	file := strings.TrimPrefix(context.Request.URL.Path, ac.GetRouter().Prefix)
 
 	if content, err := context.Asset(file); err == nil {
+		if ctype := mime.TypeByExtension(filepath.Ext(file)); ctype != "" {
+			context.Writer.Header().Set("Content-Type", ctype)
+		}
 		context.Writer.Write(content)
 	} else {
 		http.NotFound(context.Writer, context.Request)
