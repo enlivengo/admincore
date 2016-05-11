@@ -599,7 +599,7 @@ func (context *Context) loadAdminStyleSheets() template.HTML {
 
 	var file = path.Join("assets", "stylesheets", strings.ToLower(strings.Replace(siteName, " ", "_", -1))+".css")
 	if _, err := context.Asset(file); err == nil {
-		return template.HTML(fmt.Sprintf(`<script src="%s"></script>`, path.Join(context.Admin.GetRouter().Prefix, file)))
+		return template.HTML(fmt.Sprintf(`<link type="text/css" rel="stylesheet" href="%s">`, path.Join(context.Admin.GetRouter().Prefix, file)))
 	}
 	return ""
 }

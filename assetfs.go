@@ -2,6 +2,7 @@ package admin
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,7 +35,7 @@ func (fs *fileSystem) Asset(name string) ([]byte, error) {
 			return ioutil.ReadFile(filepath.Join(pth, name))
 		}
 	}
-	return []byte{}, nil
+	return []byte{}, fmt.Errorf("%v not found", name)
 }
 
 func (fs *fileSystem) Glob(pattern string) (matches []string, err error) {

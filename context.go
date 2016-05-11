@@ -60,44 +60,42 @@ func (context *Context) setResource(res *Resource) *Context {
 	return context
 }
 
-// Template
-// func (context *Context) getViewPaths() (paths []string) {
-// 	var dirs = []string{context.resourcePath(), path.Join("themes", "default"), "."}
-// 	var themes []string
-
-// 	if context.Request != nil {
-// 		if theme := context.Request.URL.Query().Get("theme"); theme != "" {
-// 			themePath := path.Join("themes", theme)
-// 			themes = append(themes, []string{path.Join(themePath, context.resourcePath()), themePath}...)
-// 		}
-// 	}
-
-// 	if context.Resource != nil {
-// 		for _, theme := range context.Resource.Config.Themes {
-// 			themePath := path.Join("themes", theme)
-// 			themes = append(themes, []string{path.Join(themePath, context.resourcePath()), themePath}...)
-// 		}
-// 	}
-
-// 	for _, p := range append(themes, dirs...) {
-// 		for _, d := range viewPaths {
-// 			if context.Action != "" {
-// 				if isExistingDir(path.Join(d, p, context.Action)) {
-// 					paths = append(paths, path.Join(d, p, context.Action))
-// 				}
-// 			}
-
-// 			if isExistingDir(path.Join(d, p)) {
-// 				paths = append(paths, path.Join(d, p))
-// 			}
-// 		}
-// 	}
-// 	return paths
-// }
-
 func (context *Context) Asset(layouts ...string) ([]byte, error) {
-	// TODO Fix ME
+	var prefixes, themes []string
+
+	if context.Request != nil {
+		if theme := context.Request.URL.Query().Get("theme"); theme != "" {
+			themes = append(themes, theme)
+		}
+	}
+
+	if len(themes) == 0 && context.Resource != nil {
+		themes = append(themes, context.Resource.Config.Themes...)
+	}
+
+	if resourcePath := context.resourcePath(); resourcePath != "" {
+		for _, theme := range themes {
+			prefixes = append(prefixes, filepath.Join("themes", theme, resourcePath))
+		}
+		prefixes = append(prefixes, resourcePath)
+	}
+
+	for _, theme := range themes {
+		prefixes = append(prefixes, filepath.Join("themes", theme))
+	}
+
+	// 	TODO if context.Action != "" {
+	// 		if isExistingDir(path.Join(d, p, context.Action)) {
+	// 			paths = append(paths, path.Join(d, p, context.Action))
+	// 		}
+	// 	 }
 	for _, layout := range layouts {
+		for _, prefix := range prefixes {
+			if content, err := AssetFS.Asset(filepath.Join(prefix, layout)); err == nil {
+				return content, nil
+			}
+		}
+
 		if content, err := AssetFS.Asset(layout); err == nil {
 			return content, nil
 		}
@@ -105,18 +103,6 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 
 	return []byte(""), fmt.Errorf("template not found: %v", layouts)
 }
-
-// FindTemplate find template based on context
-// func (context *Context) FindTemplate(layouts ...string) (string, error) {
-// 	for _, layout := range layouts {
-// 		for _, p := range context.getViewPaths() {
-// 			if _, err := os.Stat(filepath.Join(p, layout)); !os.IsNotExist(err) {
-// 				return filepath.Join(p, layout), nil
-// 			}
-// 		}
-// 	}
-// 	return "", fmt.Errorf("template not found: %v", layouts)
-// }
 
 // Render render template based on context
 func (context *Context) Render(name string, results ...interface{}) template.HTML {
