@@ -24,7 +24,16 @@ type fileSystem struct {
 
 func (fs *fileSystem) RegisterPath(pth string) error {
 	if _, err := os.Stat(pth); !os.IsNotExist(err) {
-		fs.Paths = append(fs.Paths, pth)
+		var existing bool
+		for _, p := range fs.Paths {
+			if p == pth {
+				existing = true
+				break
+			}
+		}
+		if !existing {
+			fs.Paths = append(fs.Paths, pth)
+		}
 		return nil
 	}
 	return errors.New("not found")
