@@ -608,7 +608,7 @@ func (context *Context) loadActions(action string) template.HTML {
 	var actions = map[string]string{}
 	var actionKeys, actionFiles []string
 
-	if matches, err := AssetFS.Glob("action/*.tmpl"); err == nil {
+	if matches, err := AssetFS.Glob("actions/*.tmpl"); err == nil {
 		actionFiles = append(actionFiles, matches...)
 	}
 
@@ -640,9 +640,12 @@ func (context *Context) loadActions(action string) template.HTML {
 		if content, err := context.Asset(actions[base]); err == nil {
 			if tmpl, err := template.New(filepath.Base(actions[base])).Funcs(context.FuncMap()).Parse(string(content)); err == nil {
 				if err := tmpl.Execute(result, context); err != nil {
-					utils.ExitWithMsg(err)
 					result.WriteString(err.Error())
+					utils.ExitWithMsg(err)
 				}
+			} else {
+				result.WriteString(err.Error())
+				utils.ExitWithMsg(err)
 			}
 		}
 	}

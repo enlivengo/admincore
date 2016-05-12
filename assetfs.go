@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var AssetFS AssetFSInterface
@@ -41,7 +42,9 @@ func (fs *fileSystem) Asset(name string) ([]byte, error) {
 func (fs *fileSystem) Glob(pattern string) (matches []string, err error) {
 	for _, pth := range fs.Paths {
 		if results, err := filepath.Glob(filepath.Join(pth, pattern)); err == nil {
-			matches = append(matches, results...)
+			for _, result := range results {
+				matches = append(matches, strings.TrimPrefix(result, pth))
+			}
 		}
 	}
 	return
