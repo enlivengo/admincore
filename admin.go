@@ -43,7 +43,7 @@ func New(config *qor.Config) *Admin {
 		metaConfigorMaps: metaConfigorMaps,
 	}
 
-	admin.SetAssetFS(&fileSystem{})
+	admin.SetAssetFS(&AssetFileSystem{})
 	return &admin
 }
 

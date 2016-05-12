@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/qor/qor"
 	"github.com/qor/admin"
+	"github.com/qor/qor"
 
 	_ "github.com/mattn/go-sqlite3"
 )
