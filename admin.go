@@ -2,7 +2,10 @@ package admin
 
 import (
 	"html/template"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/jinzhu/inflection"
 	"github.com/qor/qor"
@@ -13,9 +16,10 @@ import (
 
 // Admin is a struct that used to generate admin/api interface
 type Admin struct {
-	Config           *qor.Config
 	SiteName         string
+	Config           *qor.Config
 	I18n             I18n
+	AssetFS          AssetFSInterface
 	menus            []*Menu
 	resources        []*Resource
 	searchResources  []*Resource
@@ -33,11 +37,13 @@ type ResourceNamer interface {
 // New new admin with configuration
 func New(config *qor.Config) *Admin {
 	admin := Admin{
-		funcMaps:         make(template.FuncMap),
 		Config:           config,
+		funcMaps:         make(template.FuncMap),
 		router:           newRouter(),
 		metaConfigorMaps: metaConfigorMaps,
 	}
+
+	admin.SetAssetFS(&fileSystem{})
 	return &admin
 }
 
@@ -50,6 +56,27 @@ func (admin *Admin) SetSiteName(siteName string) {
 // SetAuth set admin's authorization gateway
 func (admin *Admin) SetAuth(auth Auth) {
 	admin.auth = auth
+}
+
+func (admin *Admin) SetAssetFS(assetFS AssetFSInterface) {
+	admin.AssetFS = assetFS
+
+	admin.AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
+	admin.RegisterViewPath("github.com/qor/admin/views")
+
+	for _, viewPath := range viewPaths {
+		admin.RegisterViewPath(viewPath)
+	}
+}
+
+func (admin *Admin) RegisterViewPath(pth string) {
+	if admin.AssetFS.RegisterPath(filepath.Join(root, "vendor", pth)) != nil {
+		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
+			if admin.AssetFS.RegisterPath(filepath.Join(gopath, "src", pth)) == nil {
+				break
+			}
+		}
+	}
 }
 
 // RegisterMetaConfigor register configor for a kind, it will be called when register those kind of metas

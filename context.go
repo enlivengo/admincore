@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path"
 	"path/filepath"
 
 	"github.com/qor/qor"
@@ -84,19 +83,14 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 		prefixes = append(prefixes, filepath.Join("themes", theme))
 	}
 
-	// 	TODO if context.Action != "" {
-	// 		if isExistingDir(path.Join(d, p, context.Action)) {
-	// 			paths = append(paths, path.Join(d, p, context.Action))
-	// 		}
-	// 	 }
 	for _, layout := range layouts {
 		for _, prefix := range prefixes {
-			if content, err := AssetFS.Asset(filepath.Join(prefix, layout)); err == nil {
+			if content, err := context.Admin.AssetFS.Asset(filepath.Join(prefix, layout)); err == nil {
 				return content, nil
 			}
 		}
 
-		if content, err := AssetFS.Asset(layout); err == nil {
+		if content, err := context.Admin.AssetFS.Asset(layout); err == nil {
 			return content, nil
 		}
 	}
@@ -140,7 +134,6 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 // Execute execute template with layout
 func (context *Context) Execute(name string, result interface{}) {
 	var tmpl *template.Template
-	var cacheKey string
 
 	if name == "show" && !context.Resource.isSetShowAttrs {
 		name = "edit"
@@ -150,30 +143,20 @@ func (context *Context) Execute(name string, result interface{}) {
 		context.Action = name
 	}
 
-	if context.Resource != nil {
-		cacheKey = path.Join(context.resourcePath(), name)
-	} else {
-		cacheKey = name
-	}
-
-	if t, ok := templates[cacheKey]; !ok || true {
-		if content, err := context.Asset("layout.tmpl"); err == nil {
-			if tmpl, err = template.New("layout").Funcs(context.FuncMap()).Parse(string(content)); err == nil {
-				for _, name := range []string{"header", "footer"} {
-					if tmpl.Lookup(name) == nil {
-						if content, err := context.Asset(name + ".tmpl"); err == nil {
-							tmpl.Parse(string(content))
-						}
-					} else {
-						utils.ExitWithMsg(err)
+	if content, err := context.Asset("layout.tmpl"); err == nil {
+		if tmpl, err = template.New("layout").Funcs(context.FuncMap()).Parse(string(content)); err == nil {
+			for _, name := range []string{"header", "footer"} {
+				if tmpl.Lookup(name) == nil {
+					if content, err := context.Asset(name + ".tmpl"); err == nil {
+						tmpl.Parse(string(content))
 					}
+				} else {
+					utils.ExitWithMsg(err)
 				}
-			} else {
-				utils.ExitWithMsg(err)
 			}
+		} else {
+			utils.ExitWithMsg(err)
 		}
-	} else {
-		tmpl = t
 	}
 
 	context.Result = result

@@ -9,7 +9,15 @@ import (
 	"strings"
 )
 
-var AssetFS AssetFSInterface
+var (
+	root, _ = os.Getwd()
+)
+
+func init() {
+	if path := os.Getenv("WEB_ROOT"); path != "" {
+		root = path
+	}
+}
 
 type AssetFSInterface interface {
 	RegisterPath(path string) error
@@ -61,8 +69,4 @@ func (fs *fileSystem) Glob(pattern string) (matches []string, err error) {
 
 func (fs *fileSystem) Compile() error {
 	return nil
-}
-
-func init() {
-	AssetFS = &fileSystem{}
 }

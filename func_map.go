@@ -608,20 +608,20 @@ func (context *Context) loadActions(action string) template.HTML {
 	var actions = map[string]string{}
 	var actionKeys, actionFiles []string
 
-	if matches, err := AssetFS.Glob("actions/*.tmpl"); err == nil {
+	if matches, err := context.Admin.AssetFS.Glob("actions/*.tmpl"); err == nil {
 		actionFiles = append(actionFiles, matches...)
 	}
 
-	if matches, err := AssetFS.Glob(path.Join("actions", action, "*.tmpl")); err == nil {
+	if matches, err := context.Admin.AssetFS.Glob(path.Join("actions", action, "*.tmpl")); err == nil {
 		actionFiles = append(actionFiles, matches...)
 	}
 
 	for _, theme := range context.getThemes() {
-		if matches, err := AssetFS.Glob(filepath.Join("themes", theme, "actions/*.tmpl")); err == nil {
+		if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme, "actions/*.tmpl")); err == nil {
 			actionFiles = append(actionFiles, matches...)
 		}
 
-		if matches, err := AssetFS.Glob(filepath.Join("themes", theme, "actions", action, "*.tmpl")); err == nil {
+		if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme, "actions", action, "*.tmpl")); err == nil {
 			actionFiles = append(actionFiles, matches...)
 		}
 	}
