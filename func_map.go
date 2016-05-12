@@ -616,6 +616,16 @@ func (context *Context) loadActions(action string) template.HTML {
 		actionFiles = append(actionFiles, matches...)
 	}
 
+	for _, theme := range context.getThemes() {
+		if matches, err := AssetFS.Glob(filepath.Join("themes", theme, "actions/*.tmpl")); err == nil {
+			actionFiles = append(actionFiles, matches...)
+		}
+
+		if matches, err := AssetFS.Glob(filepath.Join("themes", theme, "actions", action, "*.tmpl")); err == nil {
+			actionFiles = append(actionFiles, matches...)
+		}
+	}
+
 	for _, actionFile := range actionFiles {
 		base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(path.Base(actionFile), "")
 		if _, ok := actions[base]; !ok {
