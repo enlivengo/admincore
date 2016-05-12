@@ -58,17 +58,20 @@ func (admin *Admin) SetAuth(auth Auth) {
 	admin.auth = auth
 }
 
+// SetAssetFS set AssetFS for admin
 func (admin *Admin) SetAssetFS(assetFS AssetFSInterface) {
 	admin.AssetFS = assetFS
+	globalAssetFSes = append(globalAssetFSes, assetFS)
 
 	admin.AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
 	admin.RegisterViewPath("github.com/qor/admin/views")
 
-	for _, viewPath := range viewPaths {
+	for _, viewPath := range globalViewPaths {
 		admin.RegisterViewPath(viewPath)
 	}
 }
 
+// RegisterViewPath register view path for admin
 func (admin *Admin) RegisterViewPath(pth string) {
 	if admin.AssetFS.RegisterPath(filepath.Join(root, "vendor", pth)) != nil {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
