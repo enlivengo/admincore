@@ -1,37 +1,43 @@
 package bindata
 
-import "github.com/qor/admin"
+import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 
-// TODO
-// generate config.bindata.go - copy config.go add build tag
-// generate bindata.go
-// read bindata.go from config.bindata.go
-// add build tag to config.go
+	"github.com/qor/admin"
+)
 
 type Bindata struct {
 	AssetFileSystem admin.AssetFSInterface
-	Config          *Config
+	ViewPaths       []string
 }
 
-type Config struct {
-}
-
-func New(config *Config) *Bindata {
-	return &Bindata{AssetFileSystem: &admin.AssetFileSystem{}, Config: config}
+func New() *Bindata {
+	return &Bindata{AssetFileSystem: &admin.AssetFileSystem{}}
 }
 
 func (bindata *Bindata) RegisterPath(path string) error {
+	bindata.ViewPaths = append(bindata.ViewPaths, path)
 	return bindata.AssetFileSystem.RegisterPath(path)
 }
 
-func (bindata *Bindata) Asset(name string) ([]byte, error) {
-	return bindata.AssetFileSystem.Asset(name)
-}
+func (bindata *Bindata) CopyFiles(templatesPath string) {
+	for _, viewPath := range bindata.ViewPaths {
+		filepath.Walk(viewPath, func(path string, info os.FileInfo, err error) error {
+			if err == nil {
+				var relativePath = strings.TrimPrefix(path, viewPath)
 
-func (bindata *Bindata) Glob(pattern string) (matches []string, err error) {
-	return bindata.AssetFileSystem.Glob(name)
-}
-
-func (bindata *Bindata) Compile() error {
-	return bindata.AssetFileSystem.Compile()
+				if info.IsDir() {
+					err = os.MkdirAll(filepath.Join(templatesPath, relativePath), os.ModePerm)
+				} else if info.Mode().IsRegular() {
+					if source, err := ioutil.ReadFile(path); err == nil {
+						err = ioutil.WriteFile(filepath.Join(templatesPath, relativePath), source, os.ModePerm)
+					}
+				}
+			}
+			return err
+		})
+	}
 }
