@@ -70,7 +70,7 @@ func main() {
 
 Use `SetSiteName` to set QOR Admin's HTML title, the name will also be used to auto-load javascripts and stylesheet files that you can provide for customizing the admin interface.
 
-For example, say you set the Site Name as `QOR Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customize-views), and load them if present.
+For example, say you set the Site Name as `QOR Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in [QOR view paths](#customizing-views), and load them if present.
 
 ```go
 Admin.SetSiteName("QOR DEMO")
@@ -78,7 +78,7 @@ Admin.SetSiteName("QOR DEMO")
 
 ### Dashboard
 
-QOR Admin provides a default dashboard page with some dummy text. If you want to customize the dashboard, you can create a file `dashboard.tmpl` in [QOR view paths](#customize-views), QOR Admin will load it as golang templates when rendering the dashboard.
+QOR Admin provides a default dashboard page with some dummy text. If you want to customize the dashboard, you can create a file `dashboard.tmpl` in [QOR view paths](#customizing-views), QOR Admin will load it as golang templates when rendering the dashboard.
 
 If you want to disable the dashboard, you can redirect it to some other page, for example:
 
@@ -397,7 +397,7 @@ func ConfigureMetaInterface(meta) {
 
 #### Using a Theme
 
-A custom theme can be applied using a custom javascript and css file, for example to make a product page look super fancy. To apply a custom theme, provide the theme name using the `UseTheme` method, this will load `assets/javascripts/fancy.js` and `assets/stylesheets/fancy.css` from [QOR view paths](#customize-views)
+A custom theme can be applied using a custom javascript and css file, for example to make a product page look super fancy. To apply a custom theme, provide the theme name using the `UseTheme` method, this will load `assets/javascripts/fancy.js` and `assets/stylesheets/fancy.css` from [QOR view paths](#customizing-views)
 
 ```go
 product.UseTheme("fancy")
