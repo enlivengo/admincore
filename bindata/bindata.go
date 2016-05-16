@@ -24,7 +24,8 @@ func (bindata *Bindata) RegisterPath(path string) error {
 }
 
 func (bindata *Bindata) CopyFiles(templatesPath string) {
-	for _, viewPath := range bindata.ViewPaths {
+	for i := len(bindata.ViewPaths) - 1; i >= 0; i-- {
+		viewPath := bindata.ViewPaths[i]
 		filepath.Walk(viewPath, func(path string, info os.FileInfo, err error) error {
 			if err == nil {
 				var relativePath = strings.TrimPrefix(path, viewPath)
