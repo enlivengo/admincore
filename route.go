@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"net/url"
@@ -268,8 +269,18 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 	admin.compile()
 }
 
+var compileQORTemplates = flag.Bool("compile-qor-templates", false, "Compile QOR templates")
+
+func init() {
+	flag.Parse()
+}
+
 func (admin *Admin) compile() {
 	router := admin.GetRouter()
+
+	if *compileQORTemplates {
+		admin.AssetFS.Compile()
+	}
 
 	browserUserAgentRegexp := regexp.MustCompile("Mozilla|Gecko|WebKit|MSIE|Opera")
 	router.Use(&Middleware{

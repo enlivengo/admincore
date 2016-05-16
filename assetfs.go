@@ -43,11 +43,11 @@ type AssetFSInterface interface {
 	Compile() error
 }
 
-type fileSystem struct {
+type AssetFileSystem struct {
 	Paths []string
 }
 
-func (fs *fileSystem) RegisterPath(pth string) error {
+func (fs *AssetFileSystem) RegisterPath(pth string) error {
 	if _, err := os.Stat(pth); !os.IsNotExist(err) {
 		var existing bool
 		for _, p := range fs.Paths {
@@ -64,7 +64,7 @@ func (fs *fileSystem) RegisterPath(pth string) error {
 	return errors.New("not found")
 }
 
-func (fs *fileSystem) Asset(name string) ([]byte, error) {
+func (fs *AssetFileSystem) Asset(name string) ([]byte, error) {
 	for _, pth := range fs.Paths {
 		if _, err := os.Stat(filepath.Join(pth, name)); err == nil {
 			return ioutil.ReadFile(filepath.Join(pth, name))
@@ -73,7 +73,7 @@ func (fs *fileSystem) Asset(name string) ([]byte, error) {
 	return []byte{}, fmt.Errorf("%v not found", name)
 }
 
-func (fs *fileSystem) Glob(pattern string) (matches []string, err error) {
+func (fs *AssetFileSystem) Glob(pattern string) (matches []string, err error) {
 	for _, pth := range fs.Paths {
 		if results, err := filepath.Glob(filepath.Join(pth, pattern)); err == nil {
 			for _, result := range results {
@@ -84,6 +84,6 @@ func (fs *fileSystem) Glob(pattern string) (matches []string, err error) {
 	return
 }
 
-func (fs *fileSystem) Compile() error {
+func (fs *AssetFileSystem) Compile() error {
 	return nil
 }
