@@ -3,9 +3,7 @@
   <nav class="qor-pagination-container">
     {{range $index, $page := $paginationResult.Pages}}
       {{if $page.IsFirst }}
-        <li class="qor-pagination-item qor-pagination-first">
-          <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.first" "First Page"}}" aria-label="{{t "qor_admin.pagination.first"}}">{{t "qor_admin.pagination.first"}}</a>
-        </li>
+        <a class="qor-pagination-first" href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.first" "First Page"}}" aria-label="{{t "qor_admin.pagination.first"}}">{{t "qor_admin.pagination.first"}}</a>
       {{end}}
     {{end}}
 
@@ -29,14 +27,12 @@
 
     {{range $index, $page := $paginationResult.Pages}}
       {{if $page.IsLast }}
-        <li class="qor-pagination-item qor-pagination-last">
-          <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.last" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">{{t "qor_admin.pagination.last"}}</a>
-        </li>
+        <a class="qor-pagination-last" href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.last" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">{{t "qor_admin.pagination.last"}}</a>
       {{end}}
     {{end}}
 
     <div class="qor-actions" data-toggle="qor.filter">
-      <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page"
+      <select class="qor-action--select" data-toggle="qor.selector" data-position="bottom" data-hover="true" data-clearable="false" name="per_page"
               {{ if eq 20 $paginationResult.Pagination.PerPage }}
                 placeholder="{{t "qor_admin.pagination.20_entries" "20 Entries per page" }}"
               {{ else if eq 50 $paginationResult.Pagination.PerPage }}
