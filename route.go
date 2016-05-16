@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -269,15 +270,12 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 	admin.compile()
 }
 
-var compileQORTemplates = flag.Bool("compile-qor-templates", false, "Compile QOR templates")
-
-func init() {
-	flag.Parse()
-}
-
 func (admin *Admin) compile() {
 	router := admin.GetRouter()
 
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
+	cmdLine.Parse(os.Args[1:])
 	if *compileQORTemplates {
 		admin.AssetFS.Compile()
 	}
