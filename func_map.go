@@ -605,24 +605,32 @@ func (context *Context) loadAdminStyleSheets() template.HTML {
 }
 
 func (context *Context) loadActions(action string) template.HTML {
-	var actions = map[string]string{}
-	var actionKeys, actionFiles []string
+	var (
+		actionKeys, actionFiles []string
+		actions                 = map[string]string{}
+	)
 
-	if matches, err := context.Admin.AssetFS.Glob("actions/*.tmpl"); err == nil {
-		actionFiles = append(actionFiles, matches...)
-	}
-
-	if matches, err := context.Admin.AssetFS.Glob(path.Join("actions", action, "*.tmpl")); err == nil {
-		actionFiles = append(actionFiles, matches...)
-	}
-
-	for _, theme := range context.getThemes() {
-		if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme, "actions/*.tmpl")); err == nil {
+	for _, pattern := range []string{"actions/*.tmpl", filepath.Join("actions", action, "*.tmpl")} {
+		if matches, err := context.Admin.AssetFS.Glob(pattern); err == nil {
 			actionFiles = append(actionFiles, matches...)
 		}
 
-		if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme, "actions", action, "*.tmpl")); err == nil {
-			actionFiles = append(actionFiles, matches...)
+		if resourcePath := context.resourcePath(); resourcePath != "" {
+			if matches, err := context.Admin.AssetFS.Glob(filepath.Join(resourcePath, pattern)); err == nil {
+				actionFiles = append(actionFiles, matches...)
+			}
+		}
+
+		for _, theme := range context.getThemes() {
+			if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme, pattern)); err == nil {
+				actionFiles = append(actionFiles, matches...)
+			}
+
+			if resourcePath := context.resourcePath(); resourcePath != "" {
+				if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme, resourcePath, pattern)); err == nil {
+					actionFiles = append(actionFiles, matches...)
+				}
+			}
 		}
 	}
 
