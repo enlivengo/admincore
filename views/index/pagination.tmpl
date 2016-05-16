@@ -13,11 +13,11 @@
           </li>
         {{else if $page.IsFirst }}
           <li class="qor-pagination-item qor-pagination-next">
-            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.first" "First Page"}}" aria-label="{{t "qor_admin.pagination.first"}}">&laquo;</a>
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.first" "First Page"}}" aria-label="{{t "qor_admin.pagination.first"}}">{{t "qor_admin.pagination.first"}}</a>
           </li>
         {{else if $page.IsLast }}
           <li class="qor-pagination-item qor-pagination-next">
-            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.last" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">&raquo;</a>
+            <a href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.last" "Last Page"}}" aria-label="{{t "qor_admin.pagination.last"}}">{{t "qor_admin.pagination.last"}}</a>
           </li>
         {{else if $page.Current}}
           <li class="qor-pagination-item active"><a href="{{patch_current_url "page" $page.Page}}">{{$page.Page}}</a></li>
@@ -26,5 +26,22 @@
         {{end}}
       {{end}}
     </ul>
+
+    <div class="qor-actions" data-toggle="qor.filter">
+      {{ if eq 20 $paginationResult.Pagination.PerPage }}
+        <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{t "qor_admin.pagination.20_entries" "20 Entries per page" }}">
+      {{ else if eq 50 $paginationResult.Pagination.PerPage }}
+        <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{t "qor_admin.pagination.50_entries" "50 Entries per page" }}">
+      {{ else if eq 100 $paginationResult.Pagination.PerPage }}
+        <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{t "qor_admin.pagination.100_entries" "100 Entries per page" }}">
+      {{ else }}
+        <select class="qor-action--select" data-toggle="qor.selector" data-clearable="true" name="per_page" placeholder="{{t "qor_admin.pagination.show_all" "Show All Entries"}}">
+      {{ end }}
+        <option value="20">{{t "qor_admin.pagination.20_entries" "20 Entries per page" }}</option>
+        <option value="50">{{t "qor_admin.pagination.50_entries" "50 Entries per page" }}</option>
+        <option value="100">{{t "qor_admin.pagination.100_entries" "100 Entries per page" }}</option>
+        <option value="-1">{{t "qor_admin.pagination.show_all" "Show All Entries"}}</option>
+      </select>
+    </div>
   </nav>
 {{ end }}
