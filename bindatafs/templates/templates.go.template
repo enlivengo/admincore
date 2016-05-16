@@ -1,6 +1,6 @@
 // +build !bindatafs
 
-package bindata
+package {{package_name}}
 
 import "fmt"
 
