@@ -273,7 +273,7 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 func (admin *Admin) compile() {
 	router := admin.GetRouter()
 
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
 	cmdLine.Parse(os.Args[1:])
 	if *compileQORTemplates {
