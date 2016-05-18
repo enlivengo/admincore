@@ -180,7 +180,11 @@ func (s *Searcher) parseContext() *qor.Context {
 	}
 
 	if s.Pagination.PerPage == 0 {
-		s.Pagination.PerPage = s.Resource.Config.PageCount
+		if perPage, err := strconv.Atoi(s.Context.Request.Form.Get("per_page")); err == nil {
+			s.Pagination.PerPage = perPage
+		} else {
+			s.Pagination.PerPage = s.Resource.Config.PageCount
+		}
 	}
 
 	if s.Pagination.CurrentPage > 0 {

@@ -4,16 +4,31 @@
 .qor-pagination-container {
   margin: 24px;
   @extend .clearfix;
+  .qor-actions{
+    float: left;
+    margin: 0 16px;
+    padding: 0;
+  }
+  .qor-pagination-first,.qor-pagination-last{
+    float: left;
+    text-decoration: none;
+    height: 32px;
+    line-height: 32px;
+  }
 }
 
 .qor-pagination {
   float: left;
-  margin: 0;
+  margin: 0 16px;
   padding: 0;
   @include shadow-2dp();
 
   > li {
     display: inline; // Remove list-style and block-level defaults
+
+    .material-icons{
+      line-height: 32px;
+    }
 
     > a,
     > span {
