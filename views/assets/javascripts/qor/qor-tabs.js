@@ -13,7 +13,6 @@
 
   'use strict';
 
-  var $document = $(document);
   var NAMESPACE = 'qor.tabbar';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
