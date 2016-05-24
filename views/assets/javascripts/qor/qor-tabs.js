@@ -13,12 +13,15 @@
 
   'use strict';
 
+  var _ = window._;
   var NAMESPACE = 'qor.tabbar';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var CLASS_TAB = '.qor-layout__tab-button';
   var CLASS_TAB_CONTENT = '.qor-layout__tab-content';
+  var CLASS_TAB_BAR = '.qor-layout__tab-bar';
+  var CLASS_TAB_BAR_MORE = '.qor-layout__tab-more';
   var CLASS_ACTIVE = 'is-active';
 
   function QorTab(element, options) {
@@ -32,18 +35,46 @@
 
     init: function () {
       $(CLASS_TAB).first().addClass(CLASS_ACTIVE);
+      this.initTab();
       this.bind();
     },
 
     bind: function () {
-      this.$element.on(EVENT_CLICK, CLASS_TAB, this.click.bind(this));
+      this.$element.on(EVENT_CLICK, CLASS_TAB, this.switchTab.bind(this));
+      this.$element.on(EVENT_CLICK, CLASS_TAB_BAR_MORE, this.scrollTab.bind(this));
     },
 
     unbind: function () {
-      this.$element.off(EVENT_CLICK, CLASS_TAB, this.click);
+      this.$element.off(EVENT_CLICK, CLASS_TAB, this.switchTab);
+      this.$element.off(EVENT_CLICK, CLASS_TAB_BAR_MORE, this.scrollTab);
     },
 
-    click: function (e) {
+    initTab: function () {
+      var slideoutWidth = $(CLASS_TAB_CONTENT).outerWidth();
+      var tabWidth = 0;
+
+      _.each($(CLASS_TAB), function(ele) {
+        tabWidth = tabWidth + $(ele).outerWidth();
+      });
+
+      if (tabWidth > slideoutWidth) {
+        this.$element.find(CLASS_TAB_BAR).append(QorTab.ARROW);
+      }
+
+    },
+
+    scrollTab: function (e) {
+      e.stopPropagation();
+
+      var $target = $(e.target),
+          $element = this.$element,
+          data = $target.data();
+
+      // scroll to right
+
+    },
+
+    switchTab: function (e) {
       e.stopPropagation();
 
       var $target = $(e.target),
@@ -54,7 +85,6 @@
         return;
       }
 
-
       $element.find(CLASS_TAB).removeClass(CLASS_ACTIVE);
       $target.addClass(CLASS_ACTIVE);
 
@@ -64,13 +94,18 @@
           processData: false,
           contentType: false,
           beforeSend: function () {
-            $element.find(CLASS_TAB_CONTENT).hide();
+            $('.qor-layout__tab-spinner').remove();
+            var $spinner = '<div class="mdl-spinner mdl-js-spinner is-active qor-layout__tab-spinner"></div>';
+            $element.find(CLASS_TAB_CONTENT).hide().before($spinner);
+            componentHandler.upgradeElement($('.qor-layout__tab-spinner')[0]);
           },
           success: function (html) {
+            $('.qor-layout__tab-spinner').remove();
             var $content = $(html).find(CLASS_TAB_CONTENT).html();
-
             $element.find(CLASS_TAB_CONTENT).show().html($content).trigger('enable');
-
+          },
+          error: function () {
+            $('.qor-layout__tab-spinner').remove();
           }
         });
 
@@ -81,6 +116,8 @@
       this.unbind();
     }
   };
+
+  QorTab.ARROW = '<a href="javascript://" class="qor-layout__tab-more"></a>';
 
   QorTab.DEFAULTS = {};
 
