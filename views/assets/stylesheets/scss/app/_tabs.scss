@@ -14,8 +14,9 @@
         flex-shrink: 0;
         overflow: hidden;
     }
-    .qor-layout__tab-more{
+    .qor-layout__tab-right,.qor-layout__tab-left{
         position: absolute;
+        z-index: 999;
         top: 0;
         right: 0;
         width: 48px;
@@ -28,6 +29,13 @@
             line-height: 48px;
             width: 48px;
             text-align: center;
+        }
+    }
+    .qor-layout__tab-left{
+        right: auto;
+        left: 0;
+        &:after{
+            content: '\E408';
         }
     }
     .qor-layout__tab-spinner{

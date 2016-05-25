@@ -21,7 +21,8 @@
   var CLASS_TAB = '.qor-layout__tab-button';
   var CLASS_TAB_CONTENT = '.qor-layout__tab-content';
   var CLASS_TAB_BAR = '.qor-layout__tab-bar';
-  var CLASS_TAB_BAR_MORE = '.qor-layout__tab-more';
+  var CLASS_TAB_BAR_RIGHT = '.qor-layout__tab-right';
+  var CLASS_TAB_BAR_LEFT = '.qor-layout__tab-left';
   var CLASS_ACTIVE = 'is-active';
 
   function QorTab(element, options) {
@@ -41,37 +42,70 @@
 
     bind: function () {
       this.$element.on(EVENT_CLICK, CLASS_TAB, this.switchTab.bind(this));
-      this.$element.on(EVENT_CLICK, CLASS_TAB_BAR_MORE, this.scrollTab.bind(this));
+      this.$element.on(EVENT_CLICK, CLASS_TAB_BAR_RIGHT, this.scrollTabRight.bind(this));
+      this.$element.on(EVENT_CLICK, CLASS_TAB_BAR_LEFT, this.scrollTabLeft.bind(this));
     },
 
     unbind: function () {
       this.$element.off(EVENT_CLICK, CLASS_TAB, this.switchTab);
-      this.$element.off(EVENT_CLICK, CLASS_TAB_BAR_MORE, this.scrollTab);
+      this.$element.off(EVENT_CLICK, CLASS_TAB_BAR_RIGHT, this.scrollTabRight);
+      this.$element.off(EVENT_CLICK, CLASS_TAB_BAR_LEFT, this.scrollTabLeft);
     },
 
     initTab: function () {
-      var slideoutWidth = $(CLASS_TAB_CONTENT).outerWidth();
-      var tabWidth = 0;
+      this.tabWidth = 0;
+      this.slideoutWidth = $(CLASS_TAB_CONTENT).outerWidth();
 
       _.each($(CLASS_TAB), function(ele) {
-        tabWidth = tabWidth + $(ele).outerWidth();
-      });
+        this.tabWidth = this.tabWidth + $(ele).outerWidth();
+      }.bind(this));
 
-      if (tabWidth > slideoutWidth) {
-        this.$element.find(CLASS_TAB_BAR).append(QorTab.ARROW);
+      if (this.tabWidth > this.slideoutWidth) {
+        this.$element.find(CLASS_TAB_BAR).append(QorTab.ARROW_RIGHT);
       }
 
     },
 
-    scrollTab: function (e) {
+    scrollTabLeft: function (e) {
       e.stopPropagation();
 
-      var $target = $(e.target),
-          $element = this.$element,
-          data = $target.data();
+      var $scrollBar = $(CLASS_TAB_BAR),
+          scrollLeft = $scrollBar.scrollLeft(),
+          jumpDistance = scrollLeft - this.slideoutWidth;
 
-      // scroll to right
+      if (scrollLeft > 0){
+        $scrollBar.animate({scrollLeft:jumpDistance}, 400, function () {
 
+          $(CLASS_TAB_BAR_RIGHT).show();
+          if ($scrollBar.scrollLeft() == 0) {
+            $(CLASS_TAB_BAR_LEFT).hide();
+          }
+
+        });
+      }
+    },
+
+    scrollTabRight: function (e) {
+      e.stopPropagation();
+
+      var $scrollBar = $(CLASS_TAB_BAR),
+          scrollLeft = $scrollBar.scrollLeft(),
+          tabWidth = this.tabWidth,
+          slideoutWidth = this.slideoutWidth,
+          jumpDistance = scrollLeft + slideoutWidth;
+
+      if (jumpDistance < tabWidth){
+        $scrollBar.animate({scrollLeft:jumpDistance}, 400, function () {
+
+          $(CLASS_TAB_BAR_LEFT).show();
+          if ($scrollBar.scrollLeft() + slideoutWidth >= tabWidth) {
+            $(CLASS_TAB_BAR_RIGHT).hide();
+          }
+
+        });
+
+        !$(CLASS_TAB_BAR_LEFT).size() && this.$element.find(CLASS_TAB_BAR).prepend(QorTab.ARROW_LEFT);
+      }
     },
 
     switchTab: function (e) {
@@ -82,7 +116,7 @@
           data = $target.data();
 
       if ($target.hasClass(CLASS_ACTIVE)){
-        return;
+        return false;
       }
 
       $element.find(CLASS_TAB).removeClass(CLASS_ACTIVE);
@@ -97,7 +131,7 @@
             $('.qor-layout__tab-spinner').remove();
             var $spinner = '<div class="mdl-spinner mdl-js-spinner is-active qor-layout__tab-spinner"></div>';
             $element.find(CLASS_TAB_CONTENT).hide().before($spinner);
-            componentHandler.upgradeElement($('.qor-layout__tab-spinner')[0]);
+            window.componentHandler.upgradeElement($('.qor-layout__tab-spinner')[0]);
           },
           success: function (html) {
             $('.qor-layout__tab-spinner').remove();
@@ -117,7 +151,8 @@
     }
   };
 
-  QorTab.ARROW = '<a href="javascript://" class="qor-layout__tab-more"></a>';
+  QorTab.ARROW_RIGHT = '<a href="javascript://" class="qor-layout__tab-right"></a>';
+  QorTab.ARROW_LEFT = '<a href="javascript://" class="qor-layout__tab-left"></a>';
 
   QorTab.DEFAULTS = {};
 
