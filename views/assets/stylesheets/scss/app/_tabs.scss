@@ -21,7 +21,7 @@
         right: 0;
         width: 48px;
         height: 48px;
-        background-color: $color-slideout-header;
+        background-color: $color-main-header;
         &:after{
             content: '\E409';
             @extend .material-icons;
@@ -47,7 +47,7 @@
         @include shadow-2dp-bottom();
     }
     .qor-layout__tab-container{
-        margin: -16px -24px;
+        margin: 0;
         width: auto;
         overflow: initial;
         .mdl-layout__tab-bar-button{
@@ -57,7 +57,7 @@
 
     .qor-layout__tab-content{
         width: 100%;
-        padding: 0 24px;
+        padding: 0;
         box-sizing: border-box;
         overflow: initial;
         .mdl-layout__tab-panel{
@@ -149,9 +149,30 @@
 }
 
 .qor-slideout{
-    .qor-layout__tab .qor-layout__tab-bar{
+    .qor-layout__tab-right,.qor-layout__tab-left{
         background-color: $color-slideout-header;
-        padding: 0;
+    }
+    .qor-layout__tab-left{
+        right: auto;
+        left: 0;
+        &:after{
+            content: '\E408';
+        }
+    }
+    .qor-layout__tab{
+        .qor-layout__tab-container{
+            margin: -16px 0;
+        }
+        .qor-layout__tab-content{
+            padding: 0 24px;
+        }
+        .qor-layout__tab-container{
+            margin: -16px -24px;
+        }
+        .qor-layout__tab-bar{
+            background-color: $color-slideout-header;
+            padding: 0;
+        }
     }
 }
 
