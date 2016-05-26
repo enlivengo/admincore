@@ -14,12 +14,40 @@
         flex-shrink: 0;
         overflow: hidden;
     }
+    .qor-layout__tab-right,.qor-layout__tab-left{
+        position: absolute;
+        z-index: 999;
+        top: 0;
+        right: 0;
+        width: 48px;
+        height: 48px;
+        background-color: $color-main-header;
+        &:after{
+            content: '\E409';
+            @extend .material-icons;
+            color: #fff;
+            line-height: 48px;
+            width: 48px;
+            text-align: center;
+        }
+    }
+    .qor-layout__tab-left{
+        right: auto;
+        left: 0;
+        &:after{
+            content: '\E408';
+        }
+    }
+    .qor-layout__tab-spinner{
+        margin: 60px auto;
+    }
+
     .mdl-layout__header{
         min-height: 0;
         @include shadow-2dp-bottom();
     }
     .qor-layout__tab-container{
-        margin: -16px -24px;
+        margin: 0;
         width: auto;
         overflow: initial;
         .mdl-layout__tab-bar-button{
@@ -29,7 +57,7 @@
 
     .qor-layout__tab-content{
         width: 100%;
-        padding: 0 24px;
+        padding: 0;
         box-sizing: border-box;
         overflow: initial;
         .mdl-layout__tab-panel{
@@ -56,8 +84,8 @@
         display: -webkit-flex;
         display: -ms-flexbox;
         display: flex;
-        background-color: $color-slideout-header;
-        padding: 0;
+        background-color: transparent;
+        padding: 0 0 0 24px;
         overflow-y: hidden;
         overflow-x: scroll;
     }
@@ -117,6 +145,34 @@
         -ms-flex-positive: 1;
         flex-grow: 1;
         padding: 0;
+    }
+}
+
+.qor-slideout{
+    .qor-layout__tab-right,.qor-layout__tab-left{
+        background-color: $color-slideout-header;
+    }
+    .qor-layout__tab-left{
+        right: auto;
+        left: 0;
+        &:after{
+            content: '\E408';
+        }
+    }
+    .qor-layout__tab{
+        .qor-layout__tab-container{
+            margin: -16px 0;
+        }
+        .qor-layout__tab-content{
+            padding: 0 24px;
+        }
+        .qor-layout__tab-container{
+            margin: -16px -24px;
+        }
+        .qor-layout__tab-bar{
+            background-color: $color-slideout-header;
+            padding: 0;
+        }
     }
 }
 
