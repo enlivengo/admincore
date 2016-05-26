@@ -502,7 +502,7 @@ func (context *Context) Pagination() *PaginationResult {
 	// Append prev link
 	if start > 1 {
 		pages = append(pages, Page{Page: 1, IsFirst: true})
-		pages = append(pages, Page{Page: start - 1, IsPrevious: true})
+		pages = append(pages, Page{Page: pagination.CurrentPage - 1, IsPrevious: true})
 	}
 
 	for i := start; i <= end; i++ {
@@ -511,7 +511,7 @@ func (context *Context) Pagination() *PaginationResult {
 
 	// Append next link
 	if end < pagination.Pages {
-		pages = append(pages, Page{Page: end + 1, IsNext: true})
+		pages = append(pages, Page{Page: pagination.CurrentPage + 1, IsNext: true})
 		pages = append(pages, Page{Page: pagination.Pages, IsLast: true})
 	}
 
