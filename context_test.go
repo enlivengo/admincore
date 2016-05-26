@@ -68,6 +68,10 @@ func TestPagination(t *testing.T) {
 		t.Error("first page not set as current page")
 	}
 
+	if !pages[len(pages)-2].IsNext && pages[len(pages)-2].Page != 2 {
+		t.Error("Should have next page arrow")
+	}
+
 	// +1 for "Next page" link which is a "Page" too
 	// +1 for "Last page"
 	if len(pages) != 8+1+1 {
@@ -81,6 +85,10 @@ func TestPagination(t *testing.T) {
 
 	if !pages[7].Current {
 		t.Error("visible previous pages count incorrect")
+	}
+
+	if !pages[1].IsPrevious && pages[1].Page != 7 {
+		t.Error("Should have previous page arrow")
 	}
 
 	// +1 for "Prev"

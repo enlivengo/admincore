@@ -131,8 +131,11 @@ $qor-picker-clock-coordinate-left:
       font-weight: 400;
       font-size: 14px;
       text-align: center;
+      > span{
+        color: unquote("rgba(#{$color-black}, 0.24)")
+      }
       > a{
-        color: unquote("rgba(#{$color-black}, 0.54)");
+        color: unquote("rgba(#{$color-black}, 0.75)");
         text-decoration: none;
         border-radius: 100% !important;
         display: block;

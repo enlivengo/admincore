@@ -35,7 +35,7 @@
   @media screen and (min-width: $layout-screen-size-threshold) {
     .mdl-card {
       max-width: 640px;
-      margin: 32px auto;
+      margin: 128px auto;
     }
   }
 
@@ -46,6 +46,12 @@
 
   &.in .mdl-card {
     transform: translate(0, 0);
+  }
+}
+
+.qor-modal-mini{
+  .mdl-card{
+    width: 400px;
   }
 }
 
