@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"database/sql"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -235,8 +236,11 @@ func (meta *Meta) updateMeta() {
 		if hasColumn {
 			if meta.Resource == nil {
 				var result interface{}
+
 				if fieldType.Kind() == reflect.Struct {
-					result = reflect.New(fieldType).Interface()
+					if _, ok := reflect.New(fieldType).Interface().(sql.Scanner); !ok {
+						result = reflect.New(fieldType).Interface()
+					}
 				} else if fieldType.Kind() == reflect.Slice {
 					refelectType := fieldType.Elem()
 					for refelectType.Kind() == reflect.Ptr {
