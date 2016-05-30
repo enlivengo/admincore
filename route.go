@@ -345,7 +345,12 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var relativePath = strings.TrimPrefix(req.URL.Path, admin.router.Prefix)
 	var context = admin.NewContext(w, req)
 
-	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) {
+	// Set Request Method
+	if method := context.Request.Form.Get("_method"); method != "" {
+		context.Request.Method = strings.ToUpper(method)
+	}
+
+	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) && strings.ToUpper(context.Request.Method) == "GET" {
 		(&controller{Admin: admin}).Asset(context)
 		return
 	}
@@ -357,6 +362,7 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}()()
 
+	// Set Current User
 	var currentUser qor.CurrentUser
 	if admin.auth != nil {
 		if currentUser = admin.auth.GetCurrentUser(context); currentUser == nil {
@@ -368,11 +374,8 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	context.Roles = roles.MatchedRoles(req, currentUser)
 
-	// Set Request Method
+	// Parse Request Form
 	context.Request.ParseMultipartForm(2 * 1024 * 1024)
-	if method := context.Request.Form.Get("_method"); method != "" {
-		context.Request.Method = strings.ToUpper(method)
-	}
 
 	// Call first middleware
 	for _, middleware := range admin.router.middlewares {
