@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
 	"github.com/qor/roles"
 )
@@ -232,26 +233,29 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 		}
 
 		// Sub Resources
-		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
-				if len(meta.Resource.newSections) > 0 {
-					registerResourceToRouter(meta.Resource, "create")
+		scope := gorm.Scope{Value: res.Value}
+		if scope.PrimaryField() != nil {
+			for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
+				if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+					if len(meta.Resource.newSections) > 0 {
+						registerResourceToRouter(meta.Resource, "create")
+					}
 				}
 			}
-		}
 
-		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
-				if len(meta.Resource.showSections) > 0 {
-					registerResourceToRouter(meta.Resource, "read")
+			for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
+				if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+					if len(meta.Resource.showSections) > 0 {
+						registerResourceToRouter(meta.Resource, "read")
+					}
 				}
 			}
-		}
 
-		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
-				if len(meta.Resource.editSections) > 0 {
-					registerResourceToRouter(meta.Resource, "update", "delete")
+			for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
+				if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+					if len(meta.Resource.editSections) > 0 {
+						registerResourceToRouter(meta.Resource, "update", "delete")
+					}
 				}
 			}
 		}
