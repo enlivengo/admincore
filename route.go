@@ -345,6 +345,9 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var relativePath = strings.TrimPrefix(req.URL.Path, admin.router.Prefix)
 	var context = admin.NewContext(w, req)
 
+	// Parse Request Form
+	context.Request.ParseMultipartForm(2 * 1024 * 1024)
+
 	// Set Request Method
 	if method := context.Request.Form.Get("_method"); method != "" {
 		context.Request.Method = strings.ToUpper(method)
@@ -373,9 +376,6 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		context.SetDB(context.GetDB().Set("qor:current_user", context.CurrentUser))
 	}
 	context.Roles = roles.MatchedRoles(req, currentUser)
-
-	// Parse Request Form
-	context.Request.ParseMultipartForm(2 * 1024 * 1024)
 
 	// Call first middleware
 	for _, middleware := range admin.router.middlewares {
