@@ -20,6 +20,7 @@ Instantly create a beautiful, cross platform, configurable Admin Interface and A
 package main
 
 import (
+    "fmt"
     "net/http"
 
     "github.com/jinzhu/gorm"
