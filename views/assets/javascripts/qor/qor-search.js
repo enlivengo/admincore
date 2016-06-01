@@ -68,7 +68,7 @@
         var hasResource = /resource_name/.test(oldUrl);
         var hasKeyword = /keyword/.test(oldUrl);
         var resourceParam = 'resource_name=' + newResourceName;
-        var searchSymbol = hasKeyword ? '&' : '?';
+        var searchSymbol = hasKeyword ? '&' : '?keyword=&';
 
         if (newResourceName){
           if (hasResource){
