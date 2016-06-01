@@ -51,14 +51,8 @@
       &::before,
       &::after {
         position: absolute;
-        top: 8px;
-        width: 24px;
-        height: 24px;
-        font-size: 18px;
-        line-height: 24px;
         text-align: center;
         color: inherit;
-        @extend .material-icons;
       }
 
       &::before {
