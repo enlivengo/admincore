@@ -1,7 +1,7 @@
 [qor-icon-name]{
   > a, > span{
     display: block;
-    padding: 0 20px 0 54px;
+    padding: 0 20px 0 48px;
     position: relative;
     &::before,
     &::after {
@@ -35,7 +35,8 @@
 [qor-icon-name] > a, [qor-icon-name] > span {
   &::before,
   &::after {
-    top: 8px;
+    top: 50%;
+    margin-top: -12px;
   }
   &::before {
     left: 8px;
