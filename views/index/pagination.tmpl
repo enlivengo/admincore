@@ -27,7 +27,7 @@
 
     {{range $index, $page := $paginationResult.Pages}}
       {{if $page.IsLast }}
-        <a class="qor-pagination-last" href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.page_num" "Page {{.Pages}}" $paginationResult.Pagination  }}" aria-label="{{t "qor_admin.pagination.last" "Last"}}">{{t "qor_admin.pagination.last" "Last"}}</a>
+        <a class="qor-pagination-last" href="{{patch_current_url "page" $page.Page}}" title="{{t "qor_admin.pagination.page_num" "Page {{.Pages}}" $paginationResult.Pagination  }}" aria-label="{{t "qor_admin.pagination.last" "Last Page"}}">{{t "qor_admin.pagination.last" "Last Page"}}</a>
       {{end}}
     {{end}}
 
