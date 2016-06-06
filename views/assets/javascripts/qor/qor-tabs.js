@@ -14,6 +14,7 @@
   'use strict';
 
   var _ = window._;
+  var $body = $('body');
   var NAMESPACE = 'qor.tabbar';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
@@ -35,7 +36,6 @@
     constructor: QorTab,
 
     init: function () {
-      $(CLASS_TAB).first().addClass(CLASS_ACTIVE);
       this.initTab();
       this.bind();
     },
@@ -53,6 +53,15 @@
     },
 
     initTab: function () {
+      var data = this.$element.data();
+
+      if (!data.scopeActive) {
+        $(CLASS_TAB).first().addClass(CLASS_ACTIVE);
+        $body.data('tabScopeActive',$(CLASS_TAB).first().data('name'));
+      } else {
+        $body.data('tabScopeActive',data.scopeActive);
+      }
+
       this.tabWidth = 0;
       this.slideoutWidth = $(CLASS_TAB_CONTENT).outerWidth();
 
@@ -109,11 +118,15 @@
     },
 
     switchTab: function (e) {
-      e.stopPropagation();
-
       var $target = $(e.target),
           $element = this.$element,
-          data = $target.data();
+          data = $target.data(),
+          tabScopeActive = $body.data().tabScopeActive,
+          isInSlideout = $('.qor-slideout').is(':visible');
+
+      if (!isInSlideout) {
+        return;
+      }
 
       if ($target.hasClass(CLASS_ACTIVE)){
         return false;
@@ -135,19 +148,22 @@
           },
           success: function (html) {
             $('.qor-layout__tab-spinner').remove();
+            $body.data('tabScopeActive',$target.data('name'));
             var $content = $(html).find(CLASS_TAB_CONTENT).html();
             $element.find(CLASS_TAB_CONTENT).show().html($content).trigger('enable');
+
           },
           error: function () {
             $('.qor-layout__tab-spinner').remove();
+            $body.data('tabScopeActive',tabScopeActive);
           }
         });
-
       return false;
     },
 
     destroy: function () {
       this.unbind();
+      $body.removeData('tabScopeActive');
     }
   };
 
