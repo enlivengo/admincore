@@ -365,6 +365,7 @@
 
               }
 
+
               // end
 
               $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
@@ -384,9 +385,6 @@
               });
 
               this.show();
-
-              $('[data-toggle="qor.datetimepicker"]').materialDatePicker({ format : 'YYYY-MM-DD HH:mm' });
-              $('[data-toggle="qor.datepicker"]').materialDatePicker({ format : 'YYYY-MM-DD', time: false });
 
               // callback for after slider loaded HTML
               if (options.afterShow){
