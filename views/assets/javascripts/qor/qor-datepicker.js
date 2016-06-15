@@ -21,6 +21,7 @@
 
   var CLASS_EMBEDDED = '.qor-datepicker__embedded';
   var CLASS_SAVE = '.qor-datepicker__save';
+  var CLASS_PARENT = '.qor-field__datetimepicker';
 
   function replaceText(str, data) {
     if (typeof str === 'string') {
@@ -40,6 +41,7 @@
     this.date = null;
     this.formatDate = null;
     this.built = false;
+    this.pickerData = this.$element.data();
     this.init();
   }
 
@@ -58,6 +60,14 @@
 
     build: function () {
       var $modal;
+      var $ele = this.$element;
+      var data = this.pickerData;
+      var datepickerOptions = {
+            date: $ele.val(),
+            dateFormat: 'yyyy-mm-dd',
+            inline: true
+          };
+      var parent = $ele.closest(CLASS_PARENT);
 
       if (this.built) {
         return;
@@ -65,14 +75,14 @@
 
       this.$modal = $modal = $(replaceText(QorDatepicker.TEMPLATE, this.options.text)).appendTo('body');
 
+      if (data.targetInput && parent.size()) {
+        datepickerOptions.date = parent.find(data.targetInput).val();
+      }
+
       $modal.
         find(CLASS_EMBEDDED).
           on(EVENT_CHANGE, $.proxy(this.change, this)).
-          datepicker({
-            date: this.$element.val(),
-            dateFormat: 'yyyy-mm-dd',
-            inline: true,
-          }).
+          datepicker(datepickerOptions).
           triggerHandler(EVENT_CHANGE);
 
       $modal.
@@ -123,7 +133,27 @@
     },
 
     pick: function () {
-      this.$element.val(this.formatDate).closest('.mdl-js-textfield').trigger('update.qor.material');
+      var $targetInput = this.$element;
+      var targetInputClass = this.pickerData.targetInput;
+      var newValue = this.formatDate;
+
+      if (targetInputClass) {
+        $targetInput = $targetInput.closest(CLASS_PARENT).find(targetInputClass);
+
+        var oldValue = $targetInput.val();
+        var hasDate = /^\d{4}-\d{2}-\d{2}/.test(oldValue);
+        var hasTime = /\d{2}:\d{2}/.test(oldValue);
+
+        if (hasDate) {
+          newValue = oldValue.replace(/^\d{4}-\d{2}-\d{2}/, newValue);
+        } else if (hasTime) {
+          newValue = newValue + ' ' + oldValue.replace(/\s/g, '');
+        }
+
+      }
+
+      // $targetInput.val(this.formatDate).closest('.mdl-js-textfield').trigger('update.qor.material'); update material elements
+      $targetInput.val(newValue);
       this.$modal.qorModal('hide');
     },
 
@@ -131,14 +161,14 @@
       this.unbind();
       this.unbuild();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorDatepicker.DEFAULTS = {
     text: {
       title: 'Pick a date',
       ok: 'OK',
-      cancel: 'Cancel',
+      cancel: 'Cancel'
     }
   };
 

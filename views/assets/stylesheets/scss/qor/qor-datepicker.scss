@@ -92,3 +92,12 @@
     line-height: 70px;
   }
 }
+
+.qor-field__datetimepicker{
+  .qor-action__timepicker{
+    right: 0;
+  }
+  .qor-action__datepicker{
+    right: 40px;
+  }
+}
