@@ -17,10 +17,13 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_KEYDOWN = 'keydown.' + NAMESPACE;
+  var EVENT_BLUR = 'blur.' + NAMESPACE;
   var EVENT_CHANGE_TIME = 'selectTime.' + NAMESPACE;
 
   var CLASS_PARENT = '.qor-field__datetimepicker';
-  var CLASS_SELECTED_TIME = '.ui-timepicker-selected';
+  var CLASS_TIME_SELECTED = '.ui-timepicker-selected';
+  var CLASS_TIME_WRAPPER = '.ui-timepicker-wrapper';
 
   function QorTimepicker(element, options) {
     this.$element = $(element);
@@ -43,39 +46,69 @@
 
       var pickerOptions = {
             timeFormat: 'H:i',
-            showOn: [],
+            showOn: null,
             wrapHours: false,
-            showOnFocus: false,
             scrollDefault: 'now'
           };
 
       if (this.isDateTimePicker) {
-
         this.$targetInput
           .timepicker(pickerOptions)
-          .on(EVENT_CHANGE_TIME, $.proxy(this.changeTime, this));
+          .on(EVENT_CHANGE_TIME, $.proxy(this.changeTime, this))
+          .on(EVENT_BLUR, $.proxy(this.blur, this))
+          .on(EVENT_KEYDOWN, $.proxy(this.keydown, this));
       }
 
       this.$element.on(EVENT_CLICK, $.proxy(this.show, this));
     },
 
     unbind: function () {
-      this.isDateTimePicker && this.$targetInput.off(EVENT_CHANGE_TIME, this.changeTime);
       this.$element.off(EVENT_CLICK, this.show);
+
+      if (this.isDateTimePicker) {
+        this.$targetInput
+        .off(EVENT_CHANGE_TIME, this.changeTime)
+        .off(EVENT_BLUR, this.blur)
+        .off(EVENT_KEYDOWN, this.keydown);
+      }
+    },
+
+    blur: function () {
+      var inputValue = this.$targetInput.val();
+
+      if (!inputValue) {
+        return;
+      }
+    },
+
+    keydown: function (e) {
+      var keycode = e.keyCode;
+      var keys = [48,49,50,51,52,53,54,55,56,57,8,37,38,39,40,27,32,20,189,16,186,96,97,98,99,100,101,102,103,104,105];
+      if (keys.indexOf(keycode) == -1) {
+        e.preventDefault()
+      }
+    },
+
+    checkDate: function () {
+      var regCheckDate = /^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{1,2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$/
+    },
+
+    checkTime: function () {
+      var regCheckDate = /^([01]\d|2[0-3]):?([0-5]\d)$/;
     },
 
     changeTime: function () {
       var $targetInput = this.$targetInput;
 
       var oldValue = this.oldValue;
-      var timeReg = /\d{2}:\d{2}/;
-      var dateReg = /^\d{4}-\d{2}-\d{2}/;
+      var timeReg = /\d{1,2}:\d{1,2}/;
+      var dateReg = /^\d{4}-\d{1,2}-\d{1,2}/;
       var hasDate = dateReg.test(oldValue);
       var hasTime = timeReg.test(oldValue);
-      var selectedTime = $(CLASS_SELECTED_TIME).text();
+      var selectedTime = $targetInput.data().timepickerList.find(CLASS_TIME_SELECTED).html();
       var newValue;
 
-      if (!oldValue || !hasDate) {
+      if (!oldValue || !hasDate || !selectedTime) {
         return;
       }
 
@@ -84,10 +117,6 @@
       } else {
         newValue = oldValue + ' ' + selectedTime;
       }
-
-      console.log(oldValue)
-      console.log(selectedTime)
-      console.log(newValue)
 
       $targetInput.val(newValue);
 

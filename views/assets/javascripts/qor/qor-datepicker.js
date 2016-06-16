@@ -140,12 +140,13 @@
       if (targetInputClass) {
         $targetInput = $targetInput.closest(CLASS_PARENT).find(targetInputClass);
 
+        var regDate = /^\d{4}-\d{1,2}-\d{1,2}/;
         var oldValue = $targetInput.val();
-        var hasDate = /^\d{4}-\d{2}-\d{2}/.test(oldValue);
-        var hasTime = /\d{2}:\d{2}/.test(oldValue);
+        var hasDate = regDate.test(oldValue);
+        var hasTime = /\d{1,2}:\d{1,2}/.test(oldValue);
 
         if (hasDate) {
-          newValue = oldValue.replace(/^\d{4}-\d{2}-\d{2}/, newValue);
+          newValue = oldValue.replace(regDate, newValue);
         } else if (hasTime) {
           newValue = newValue + ' ' + oldValue.replace(/\s/g, '');
         }

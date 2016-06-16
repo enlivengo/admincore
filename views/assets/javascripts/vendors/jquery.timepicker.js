@@ -65,8 +65,12 @@
                         }
                     }
                     self.on('change.timepicker', _formatValue);
-                    self.on('keydown.timepicker', _keydownhandler);
-                    self.on('keyup.timepicker', _keyuphandler);
+
+                    // Hacked by Jason 2016-06-16
+                    //
+                    // self.on('keydown.timepicker', _keydownhandler);
+                    // self.on('keyup.timepicker', _keyuphandler);
+
                     if (settings.disableTextInput) {
                         self.on('keydown.timepicker', _disableTextInputHandler);
                     }
@@ -578,7 +582,9 @@
                 self.off('focus.timepicker');
                 self.on('focus.timepicker-ie-hack', function(){
                     self.off('focus.timepicker-ie-hack');
-                    self.on('focus.timepicker', methods.show);
+
+                    // Hacked by Jason 2016-06-16
+                    // self.on('focus.timepicker', methods.show);
                 });
 
                 if (!_hideKeyboard(self)) {
