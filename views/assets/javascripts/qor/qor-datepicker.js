@@ -154,7 +154,7 @@
       }
 
       // $targetInput.val(this.formatDate).closest('.mdl-js-textfield').trigger('update.qor.material'); update material elements
-      $targetInput.val(newValue);
+      $targetInput.val(newValue).focus();
       this.$modal.qorModal('hide');
     },
 

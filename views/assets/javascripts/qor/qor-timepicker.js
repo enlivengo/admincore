@@ -24,7 +24,6 @@
 
   var CLASS_PARENT = '.qor-field__datetimepicker';
   var CLASS_TIME_SELECTED = '.ui-timepicker-selected';
-  var CLASS_TIME_WRAPPER = '.ui-timepicker-wrapper';
 
   function QorTimepicker(element, options) {
     this.$element = $(element);
@@ -84,6 +83,7 @@
       var inputValue = this.$targetInput.val();
       var inputArr = inputValue.split(' ');
       var inputArrLen = inputArr.length;
+      var dateNow = new Date();
       var tempValue;
       var newDateValue;
       var newTimeValue;
@@ -94,45 +94,62 @@
       var timeReg = /\d{1,2}:\d{1,2}/;
       var dateReg = /^\d{4}-\d{1,2}-\d{1,2}/;
 
-      if (!inputArrLen) {
+      if (!inputValue || inputArrLen == 0) {
         return;
       }
 
-      for (var i = 0; i < inputArrLen; i++) {
-        // check for date && time
-        isDate = dateReg.test(inputArr[i]);
-        isTime = timeReg.test(inputArr[i]);
-
-        if (isDate) {
-          newDateValue = inputArr[i];
-          splitSym = '-';
+      if (inputArrLen == 1) {
+        if (dateReg.test(inputArr[0])) {
+          newDateValue = inputArr[0];
+          newTimeValue = '00:00';
         }
 
-        if (isTime){
-          newTimeValue = inputArr[i];
-          splitSym = ':';
+        if (timeReg.test(inputArr[0])) {
+          var month = dateNow.getMonth();
+          month = (month < 8) ? '0' + (month + 1) : month;
+
+          newDateValue = dateNow.getFullYear() + '-' + month + '-' + dateNow.getDate();
+          newTimeValue = inputArr[0];
         }
 
-        tempValue = inputArr[i].split(splitSym);
+      } else {
+        for (var i = 0; i < inputArrLen; i++) {
+          // check for date && time
+          isDate = dateReg.test(inputArr[i]);
+          isTime = timeReg.test(inputArr[i]);
 
-        for (var j = 0; j < tempValue.length; j++) {
-          if (tempValue[j].length < 2) {
-            tempValue[j] = '0' + tempValue[j];
+          if (isDate) {
+            newDateValue = inputArr[i];
+            splitSym = '-';
           }
-        }
 
-        if (isDate) {
-          newDateValue = tempValue.join(splitSym);
-        }
+          if (isTime){
+            newTimeValue = inputArr[i];
+            splitSym = ':';
+          }
 
-        if (isTime) {
-          newTimeValue = tempValue.join(splitSym);
+          tempValue = inputArr[i].split(splitSym);
+
+          for (var j = 0; j < tempValue.length; j++) {
+            if (tempValue[j].length < 2) {
+              tempValue[j] = '0' + tempValue[j];
+            }
+          }
+
+          if (isDate) {
+            newDateValue = tempValue.join(splitSym);
+          }
+
+          if (isTime) {
+            newTimeValue = tempValue.join(splitSym);
+          }
         }
 
       }
 
       if (this.checkDate(newDateValue) && this.checkTime(newTimeValue)) {
         this.$targetInput.val(newDateValue + ' ' + newTimeValue);
+        this.oldValue = this.$targetInput.val();
       } else {
         this.$targetInput.val(this.oldValue);
         alert('Please enter a valid date time format yyyy-mm-dd hh:mm"');
@@ -144,12 +161,12 @@
       var keycode = e.keyCode;
       var keys = [48,49,50,51,52,53,54,55,56,57,8,37,38,39,40,27,32,20,189,16,186,96,97,98,99,100,101,102,103,104,105];
       if (keys.indexOf(keycode) == -1) {
-        e.preventDefault()
+        e.preventDefault();
       }
     },
 
     checkDate: function (value) {
-      var regCheckDate = /^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{1,2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$/
+      var regCheckDate = /^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{1,2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$/;
       return regCheckDate.test(value);
     },
 
@@ -174,7 +191,7 @@
       }
 
       if (hasTime) {
-        newValue = oldValue.replace(timeReg,selectedTime)
+        newValue = oldValue.replace(timeReg,selectedTime);
       } else {
         newValue = oldValue + ' ' + selectedTime;
       }
