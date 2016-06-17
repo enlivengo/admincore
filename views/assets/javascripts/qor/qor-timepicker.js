@@ -17,6 +17,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_FOCUS = 'focus.' + NAMESPACE;
   var EVENT_KEYDOWN = 'keydown.' + NAMESPACE;
   var EVENT_BLUR = 'blur.' + NAMESPACE;
   var EVENT_CHANGE_TIME = 'selectTime.' + NAMESPACE;
@@ -56,6 +57,7 @@
           .timepicker(pickerOptions)
           .on(EVENT_CHANGE_TIME, $.proxy(this.changeTime, this))
           .on(EVENT_BLUR, $.proxy(this.blur, this))
+          .on(EVENT_FOCUS, $.proxy(this.focus, this))
           .on(EVENT_KEYDOWN, $.proxy(this.keydown, this));
       }
 
@@ -69,16 +71,73 @@
         this.$targetInput
         .off(EVENT_CHANGE_TIME, this.changeTime)
         .off(EVENT_BLUR, this.blur)
+        .off(EVENT_FOCUS, this.focus)
         .off(EVENT_KEYDOWN, this.keydown);
       }
     },
 
+    focus: function () {
+      this.oldValue = this.$targetInput.val();
+    },
+
     blur: function () {
       var inputValue = this.$targetInput.val();
+      var inputArr = inputValue.split(' ');
+      var inputArrLen = inputArr.length;
+      var tempValue;
+      var newDateValue;
+      var newTimeValue;
+      var isDate;
+      var isTime;
+      var splitSym;
 
-      if (!inputValue) {
+      var timeReg = /\d{1,2}:\d{1,2}/;
+      var dateReg = /^\d{4}-\d{1,2}-\d{1,2}/;
+
+      if (!inputArrLen) {
         return;
       }
+
+      for (var i = 0; i < inputArrLen; i++) {
+        // check for date && time
+        isDate = dateReg.test(inputArr[i]);
+        isTime = timeReg.test(inputArr[i]);
+
+        if (isDate) {
+          newDateValue = inputArr[i];
+          splitSym = '-';
+        }
+
+        if (isTime){
+          newTimeValue = inputArr[i];
+          splitSym = ':';
+        }
+
+        tempValue = inputArr[i].split(splitSym);
+
+        for (var j = 0; j < tempValue.length; j++) {
+          if (tempValue[j].length < 2) {
+            tempValue[j] = '0' + tempValue[j];
+          }
+        }
+
+        if (isDate) {
+          newDateValue = tempValue.join(splitSym);
+        }
+
+        if (isTime) {
+          newTimeValue = tempValue.join(splitSym);
+        }
+
+      }
+
+      if (this.checkDate(newDateValue) && this.checkTime(newTimeValue)) {
+        this.$targetInput.val(newDateValue + ' ' + newTimeValue);
+      } else {
+        this.$targetInput.val(this.oldValue);
+        alert('Please enter a valid date time format yyyy-mm-dd hh:mm"');
+      }
+
     },
 
     keydown: function (e) {
@@ -89,12 +148,14 @@
       }
     },
 
-    checkDate: function () {
+    checkDate: function (value) {
       var regCheckDate = /^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{1,2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$/
+      return regCheckDate.test(value);
     },
 
-    checkTime: function () {
-      var regCheckDate = /^([01]\d|2[0-3]):?([0-5]\d)$/;
+    checkTime: function (value) {
+      var regCheckTime = /^([01]\d|2[0-3]):?([0-5]\d)$/;
+      return regCheckTime.test(value);
     },
 
     changeTime: function () {
