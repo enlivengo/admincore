@@ -146,13 +146,17 @@ func (meta *Meta) SetPermission(permission *roles.Permission) {
 }
 
 func (meta *Meta) updateMeta() {
+	newPermission := meta.Permission
+	if newPermission == nil {
+		newPermission = meta.baseResource.Permission
+	}
 	meta.Meta = resource.Meta{
 		Name:            meta.Name,
 		FieldName:       meta.FieldName,
 		Setter:          meta.Setter,
 		FormattedValuer: meta.FormattedValuer,
 		Valuer:          meta.Valuer,
-		Permission:      meta.Permission.Concat(meta.baseResource.Permission),
+		Permission:      newPermission,
 		Resource:        meta.baseResource,
 	}
 
