@@ -96,8 +96,15 @@
 }
 
 .qor-field__datetimepicker{
+  position: relative;
+  .qor-action__timepicker,.qor-action__datepicker{
+    bottom: 0;
+    position: absolute;
+    margin: 0;
+  }
   .qor-action__timepicker{
     right: 0;
+
   }
   .qor-action__datepicker{
     right: 40px;
