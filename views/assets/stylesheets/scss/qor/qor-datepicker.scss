@@ -35,60 +35,62 @@
   .datepicker-container {
     float: none;
     position: static;
+    width: auto;
   }
 
-  .datepicker-content {
+  .datepicker-panel>ul>li[data-view='month current'], .datepicker-panel>ul>li[data-view='years current'], .datepicker-panel>ul>li[data-view='year current']{
+    width: 200px;
+  }
+
+  .datepicker-panel {
     width: 280px;
     border: none;
     box-shadow: none;
   }
 
-  .datepicker-content li {
+  .datepicker-panel li {
     width: 40px;
     height: 40px;
     border-radius: 20px;
     line-height: 40px;
   }
 
-  .datepicker-content .col-1 {
+  .datepicker-panel .col-1 {
     width: 40px;
   }
 
-  .datepicker-content .col-2 {
+  .datepicker-panel .col-2 {
     width: 80px;
   }
 
-  .datepicker-content .col-3 {
+  .datepicker-panel .col-3 {
     width: 120px;
   }
 
-  .datepicker-content .col-4 {
+  .datepicker-panel .col-4 {
     width: 160px;
   }
 
-  .datepicker-content .col-5 {
+  .datepicker-panel .col-5 {
     width: 200px;
   }
 
-  .datepicker-content .col-6 {
+  .datepicker-panel .col-6 {
     width: 240px;
   }
 
-  .datepicker-content .col-7 {
+  .datepicker-panel .col-7 {
     width: 280px;
   }
 
-  .datepicker-content .selected,
-  .datepicker-content .selected:hover {
+  .datepicker-panel .picked,
+  .datepicker-panel .picked:hover {
     background-color: unquote("rgb(#{$color-primary})");
     color: #fff;
   }
 
-  .datepicker-years li,
-  .datepicker-months li {
-    width: 70px;
-    height: 70px;
-    border-radius: 35px;
+  [data-view="months picker"] li,
+  [data-view="years picker"] li {
     line-height: 70px;
   }
 }

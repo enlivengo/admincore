@@ -16,7 +16,7 @@
   var NAMESPACE = 'qor.datepicker';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var EVENT_CHANGE = 'change.' + NAMESPACE;
+  var EVENT_CHANGE = 'pick.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
 
   var CLASS_EMBEDDED = '.qor-datepicker__embedded';
@@ -64,8 +64,8 @@
       var data = this.pickerData;
       var datepickerOptions = {
             date: $ele.val(),
-            dateFormat: 'yyyy-mm-dd',
-            inline: true
+            inline: true,
+            startDate: new Date()
           };
       var parent = $ele.closest(CLASS_PARENT);
 
@@ -118,8 +118,8 @@
 
       $modal.find('.qor-datepicker__picked-year').text(date.getFullYear());
       $modal.find('.qor-datepicker__picked-date').text([
-        $target.datepicker('getDayByNumber', date.getDay(), true) + ',',
-        String($target.datepicker('getMonthByNumber', date.getMonth(), true)),
+        $target.datepicker('getDayName', date.getDay(), true) + ',',
+        String($target.datepicker('getMonthName', date.getMonth(), true)),
         date.getDate()
       ].join(' '));
     },

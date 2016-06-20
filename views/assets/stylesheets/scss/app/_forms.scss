@@ -412,3 +412,14 @@
     }
   }
 }
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: unquote("rgba(#{$color-black}, 0.12)");
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color: unquote("rgba(#{$color-black}, 0.12)");
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color: unquote("rgba(#{$color-black}, 0.12)");
+}
