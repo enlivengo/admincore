@@ -67,7 +67,7 @@
             inline: true
           };
       var parent = $ele.closest(CLASS_PARENT);
-      var $targetInput = parent.find(data.targetInput)
+      var $targetInput = parent.find(data.targetInput);
 
       if (this.built) {
         return;
@@ -79,7 +79,7 @@
         datepickerOptions.date = $targetInput.val();
       }
 
-      if ($targetInput.data().startDate) {
+      if (data.targetInput && $targetInput.data().startDate) {
         datepickerOptions.startDate = new Date();
       }
 
@@ -147,18 +147,16 @@
         var regDate = /^\d{4}-\d{1,2}-\d{1,2}/;
         var oldValue = $targetInput.val();
         var hasDate = regDate.test(oldValue);
-        var hasTime = /\d{1,2}:\d{1,2}/.test(oldValue);
 
         if (hasDate) {
           newValue = oldValue.replace(regDate, newValue);
-        } else if (hasTime) {
-          newValue = newValue + ' ' + oldValue.replace(/\s/g, '');
+        } else {
+          newValue = newValue + ' 00:00';
         }
 
       }
 
-      // $targetInput.val(this.formatDate).closest('.mdl-js-textfield').trigger('update.qor.material'); update material elements
-      $targetInput.val(newValue).focus();
+      $targetInput.val(newValue);
       this.$modal.qorModal('hide');
     },
 

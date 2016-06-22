@@ -152,7 +152,6 @@
         this.oldValue = this.$targetInput.val();
       } else {
         this.$targetInput.val(this.oldValue);
-        alert('Please enter a valid date time format yyyy-mm-dd hh:mm"');
       }
 
     },
