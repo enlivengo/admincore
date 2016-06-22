@@ -64,10 +64,10 @@
       var data = this.pickerData;
       var datepickerOptions = {
             date: $ele.val(),
-            inline: true,
-            startDate: new Date()
+            inline: true
           };
       var parent = $ele.closest(CLASS_PARENT);
+      var $targetInput = parent.find(data.targetInput)
 
       if (this.built) {
         return;
@@ -75,8 +75,12 @@
 
       this.$modal = $modal = $(replaceText(QorDatepicker.TEMPLATE, this.options.text)).appendTo('body');
 
-      if (data.targetInput && parent.size()) {
-        datepickerOptions.date = parent.find(data.targetInput).val();
+      if ($targetInput.size()) {
+        datepickerOptions.date = $targetInput.val();
+      }
+
+      if ($targetInput.data().startDate) {
+        datepickerOptions.startDate = new Date();
       }
 
       $modal.

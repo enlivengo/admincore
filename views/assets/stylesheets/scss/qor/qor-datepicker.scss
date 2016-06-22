@@ -88,11 +88,6 @@
     background-color: unquote("rgb(#{$color-primary})");
     color: #fff;
   }
-
-  [data-view="months picker"] li,
-  [data-view="years picker"] li {
-    line-height: 70px;
-  }
 }
 
 .qor-field__datetimepicker{
