@@ -175,9 +175,17 @@
   z-index: 4;
 }
 
+.qor-page__header .qor-page-subnav__header{
+  width: calc(100% + 48px);
+}
 .qor-page-subnav__header{
-  padding: 0;
+  padding: 0 !important;
   background-color: transparent;
+  margin: 0 -24px;
+  .mdl-layout__tab{
+    min-width: 128px;
+    box-sizing: border-box;
+  }
   .mdl-layout__tab-bar{
     padding: 0;
   }
