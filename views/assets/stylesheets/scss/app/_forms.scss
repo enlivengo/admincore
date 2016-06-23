@@ -329,6 +329,13 @@
       width: 100%;
       align-items: center;
       height: 80px;
+
+      img {
+        display: block;
+        margin: auto;
+        max-height: 80px;
+      }
+
       span{
         display: inline-block;
         width: 100%;
