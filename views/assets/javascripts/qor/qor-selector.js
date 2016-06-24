@@ -20,6 +20,7 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var CLASS_OPEN = 'open';
   var CLASS_ACTIVE = 'active';
+  var CLASS_HOVER = 'hover';
   var CLASS_SELECTED = 'selected';
   var CLASS_DISABLED = 'disabled';
   var CLASS_CLEARABLE = 'clearable';
@@ -50,6 +51,12 @@
       var $selector = $(QorSelector.TEMPLATE);
       var alignedClass = this.options.aligned + '-aligned';
       var data = {};
+      var eleData = $this.data();
+      var hover = eleData.hover;
+
+      this.isBottom = eleData.position == 'bottom';
+
+      hover && $selector.addClass(CLASS_HOVER);
 
       $selector.addClass(alignedClass).find(SELECTOR_MENU).html(function () {
         var list = [];
@@ -172,21 +179,27 @@
 
       // Open the current dropdown
       this.$selector.addClass(CLASS_OPEN);
+      if (this.isBottom) {
+        this.$selector.addClass('bottom');
+      }
     },
 
     close: function () {
       this.$selector.removeClass(CLASS_OPEN);
+      if (this.isBottom) {
+        this.$selector.removeClass('bottom');
+      }
     },
 
     destroy: function () {
       this.unbuild();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorSelector.DEFAULTS = {
     aligned: 'left',
-    clearable: false,
+    clearable: false
   };
 
   QorSelector.TEMPLATE = (

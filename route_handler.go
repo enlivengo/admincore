@@ -41,8 +41,10 @@ func newRouteHandler(path string, handle requestHandler, configs ...RouteConfig)
 	return handler
 }
 
+var emptyPermissionMode roles.PermissionMode
+
 func (handler routeHandler) HasPermission(context *qor.Context) bool {
-	if handler.Config.Permission == nil || handler.Config.PermissionMode == 0 {
+	if handler.Config.Permission == nil || handler.Config.PermissionMode == emptyPermissionMode {
 		return true
 	}
 	return handler.Config.Permission.HasPermission(handler.Config.PermissionMode, context.Roles...)

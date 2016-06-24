@@ -80,8 +80,9 @@
 
     $(function () {
         $(document).on('change', 'form:not(".qor-search-container")', function () {
-
+            console.log('changed')
             if ($(this).hasChanged()){
+                console.log('hasChanged')
                 window.onbeforeunload = function () {
                     return "You have unsaved changes on this page. If you leave this page, you will lose all unsaved changes.";
                 };
@@ -90,5 +91,4 @@
             }
         });
     });
-
 });

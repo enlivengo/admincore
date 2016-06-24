@@ -13,6 +13,7 @@
 
   'use strict';
 
+  var componentHandler = window.componentHandler;
   var NAMESPACE = 'qor.material';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;

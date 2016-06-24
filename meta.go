@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"database/sql"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -145,13 +146,17 @@ func (meta *Meta) SetPermission(permission *roles.Permission) {
 }
 
 func (meta *Meta) updateMeta() {
+	newPermission := meta.Permission
+	if newPermission == nil {
+		newPermission = meta.baseResource.Permission
+	}
 	meta.Meta = resource.Meta{
 		Name:            meta.Name,
 		FieldName:       meta.FieldName,
 		Setter:          meta.Setter,
 		FormattedValuer: meta.FormattedValuer,
 		Valuer:          meta.Valuer,
-		Permission:      meta.Permission.Concat(meta.baseResource.Permission),
+		Permission:      newPermission,
 		Resource:        meta.baseResource,
 	}
 
@@ -214,28 +219,47 @@ func (meta *Meta) updateMeta() {
 					meta.Type = "float"
 				} else if _, ok := reflect.New(fieldType).Interface().(*time.Time); ok {
 					meta.Type = "datetime"
+				} else {
+					if fieldType.Kind() == reflect.Struct {
+						meta.Type = "single_edit"
+					} else if fieldType.Kind() == reflect.Slice {
+						refelectType := fieldType.Elem()
+						for refelectType.Kind() == reflect.Ptr {
+							refelectType = refelectType.Elem()
+						}
+						if refelectType.Kind() == reflect.Struct {
+							meta.Type = "collection_edit"
+						}
+					}
 				}
 			}
 		}
 	}
 
 	{ // Set Meta Resource
-		if hasColumn && (meta.FieldStruct.Relationship != nil) {
+		if hasColumn {
 			if meta.Resource == nil {
 				var result interface{}
+
 				if fieldType.Kind() == reflect.Struct {
-					result = reflect.New(fieldType).Interface()
+					if _, ok := reflect.New(fieldType).Interface().(sql.Scanner); !ok {
+						result = reflect.New(fieldType).Interface()
+					}
 				} else if fieldType.Kind() == reflect.Slice {
 					refelectType := fieldType.Elem()
 					for refelectType.Kind() == reflect.Ptr {
 						refelectType = refelectType.Elem()
 					}
-					result = reflect.New(refelectType).Interface()
+					if refelectType.Kind() == reflect.Struct {
+						result = reflect.New(refelectType).Interface()
+					}
 				}
 
-				res := meta.baseResource.GetAdmin().NewResource(result)
-				res.configure()
-				meta.Resource = res
+				if result != nil {
+					res := meta.baseResource.GetAdmin().NewResource(result)
+					res.configure()
+					meta.Resource = res
+				}
 			}
 
 			if meta.Resource != nil {

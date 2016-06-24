@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/qor/qor"
 	"github.com/qor/admin"
+	"github.com/qor/qor"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -49,59 +49,71 @@ func TestUrlForResourceName(t *testing.T) {
 
 func TestPagination(t *testing.T) {
 	context := &admin.Context{Admin: Admin}
+	context.Resource = &admin.Resource{Config: &admin.Config{PageCount: 10}}
 	context.Searcher = &admin.Searcher{Context: context}
 
-	// Test no pagination if only has one page
-	context.Searcher.Pagination.Pages = 1
-	context.Searcher.Pagination.CurrentPage = 1
+	// Test no pagination if total result count is less than PageCount
+	context.Searcher.Pagination.Total = 8
 	if context.Pagination() != nil {
 		t.Error("Don't display pagination if only has one page")
 	}
 
 	// Test current page 1
+	context.Searcher.Pagination.Total = 1000
 	context.Searcher.Pagination.Pages = 10
 	context.Searcher.Pagination.CurrentPage = 1
-
-	pages := *context.Pagination()
+	pages := context.Pagination().Pages
 
 	if !pages[0].Current {
 		t.Error("first page not set as current page")
 	}
 
+	if !pages[len(pages)-2].IsNext && pages[len(pages)-2].Page != 2 {
+		t.Error("Should have next page arrow")
+	}
+
 	// +1 for "Next page" link which is a "Page" too
-	if len(pages) != 8+1 {
+	// +1 for "Last page"
+	if len(pages) != 8+1+1 {
 		t.Error("visible pages in current context beyond the bound of VISIBLE_PAGE_COUNT")
 	}
 
 	// Test current page 8 => the length between start and end less than MAX_VISIBLE_PAGES
+	context.Searcher.Pagination.Pages = 10
 	context.Searcher.Pagination.CurrentPage = 8
-	pages = *context.Pagination()
+	pages = context.Pagination().Pages
 
-	if !pages[6].Current {
+	if !pages[7].Current {
 		t.Error("visible previous pages count incorrect")
 	}
 
-	// 1 for "Prev"
-	if len(pages) != 8+1 {
+	if !pages[1].IsPrevious && pages[1].Page != 7 {
+		t.Error("Should have previous page arrow")
+	}
+
+	// +1 for "Prev"
+	// +1 for "First page"
+	if len(pages) != 8+1+1 {
 		t.Error("visible pages in current context beyond the bound of VISIBLE_PAGE_COUNT")
 	}
 
 	// Test current page at last
+	context.Searcher.Pagination.Pages = 10
 	context.Searcher.Pagination.CurrentPage = 10
-	pages = *context.Pagination()
+	pages = context.Pagination().Pages
 
 	if !pages[len(pages)-1].Current {
 		t.Error("last page is not the current page")
 	}
 
-	if len(pages) != 8+1 {
+	if len(pages) != 8+2 {
 		t.Error("visible pages count is incorrect")
 	}
 
 	// Test current page at last but total page count less than VISIBLE_PAGE_COUNT
 	context.Searcher.Pagination.Pages = 5
 	context.Searcher.Pagination.CurrentPage = 5
-	pages = *context.Pagination()
+	pages = context.Pagination().Pages
 
 	if len(pages) != 5 {
 		t.Error("incorrect pages count")

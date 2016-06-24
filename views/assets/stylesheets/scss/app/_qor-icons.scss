@@ -1,13 +1,11 @@
 [qor-icon-name]{
   > a, > span{
     display: block;
-    padding: 0 20px 0 54px;
+    padding: 0 20px 0 40px;
     position: relative;
     &::before,
     &::after {
       position: absolute;
-      top: 11px;
-      left: 20px;
       width: 24px;
       height: 24px;
       font-size: 18px;
@@ -35,7 +33,8 @@
 [qor-icon-name] > a, [qor-icon-name] > span {
   &::before,
   &::after {
-    top: 8px;
+    top: 50%;
+    margin-top: -12px;
   }
   &::before {
     left: 8px;
@@ -115,8 +114,16 @@
   content: "\e7f4";
 }
 
+[qor-icon-name*="Widget"] > a::before {
+  content: "\e30d";
+}
+
 [qor-icon-name*="Workers"] > a::before {
   content: "\e8f9";
+}
+
+[qor-icon-name*="Public keys"] > a::before {
+  content: "\e897";
 }
 
 [qor-icon-name] [qor-icon-name] > a::before {

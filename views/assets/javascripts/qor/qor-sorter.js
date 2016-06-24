@@ -67,7 +67,7 @@
     destroy: function () {
       this.unbind();
       this.$element.removeClass(CLASS_IS_SORTABLE).removeData(NAMESPACE);
-    },
+    }
   };
 
   QorSorter.DEFAULTS = {};

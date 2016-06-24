@@ -171,6 +171,16 @@ Fields:
 
 		if (field.IsNormal || field.Relationship != nil) && !field.IsIgnored {
 			attrs = append(attrs, field.Name)
+			continue
+		}
+
+		fieldType := field.Struct.Type
+		for fieldType.Kind() == reflect.Ptr || fieldType.Kind() == reflect.Slice {
+			fieldType = fieldType.Elem()
+		}
+
+		if fieldType.Kind() == reflect.Struct {
+			attrs = append(attrs, field.Name)
 		}
 	}
 

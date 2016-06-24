@@ -2,10 +2,15 @@
 // --------------------------------------------------
 
 .qor-selector {
+
   position: relative;
   display: inline-block;
   vertical-align: middle;
 
+  &.bottom > .qor-selector-menu {
+    top: auto;
+    bottom: 0;
+  }
   &.open > .qor-selector-menu {
     display: block;
   }
@@ -13,6 +18,27 @@
   &.right-aligned > .qor-selector-menu {
     right: 0;
     left: auto;
+  }
+  &.hover{
+    .qor-selector-toggle {
+      background-color: transparent;
+      border: 0;
+      height: 32px;
+      line-height: 32px;
+      color: unquote("rgba(#{$color-black}, 0.87)");
+      > .material-icons{
+        height: 32px;
+        line-height: 32px;
+      }
+      &.active {
+        border: 0;
+      }
+      &:hover{
+        background-color: #fff;
+        border: 0;
+        @include shadow-2dp();
+      }
+    }
   }
 }
 

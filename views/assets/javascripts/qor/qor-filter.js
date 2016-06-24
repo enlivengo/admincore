@@ -178,7 +178,7 @@
     destroy: function () {
       this.unbind();
       this.$element.removeData(NAMESPACE);
-    },
+    }
   };
 
   QorFilter.DEFAULTS = {
@@ -210,7 +210,7 @@
     var selector = '[data-toggle="qor.filter"]';
     var options = {
           label: 'a',
-          group: 'select',
+          group: 'select'
         };
 
     $(document).

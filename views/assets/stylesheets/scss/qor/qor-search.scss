@@ -52,9 +52,4 @@
     color: unquote("rgb(#{$color-primary})");
     cursor: pointer;
   }
-
-  &::before {
-    top: 14px;
-  }
-
 }

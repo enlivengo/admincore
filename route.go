@@ -1,14 +1,17 @@
 package admin
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
 	"github.com/qor/roles"
 )
@@ -230,26 +233,29 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 		}
 
 		// Sub Resources
-		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
-				if len(meta.Resource.newSections) > 0 {
-					registerResourceToRouter(meta.Resource, "create")
+		scope := gorm.Scope{Value: res.Value}
+		if scope.PrimaryField() != nil {
+			for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
+				if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+					if len(meta.Resource.newSections) > 0 {
+						registerResourceToRouter(meta.Resource, "create")
+					}
 				}
 			}
-		}
 
-		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
-				if len(meta.Resource.showSections) > 0 {
-					registerResourceToRouter(meta.Resource, "read")
+			for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
+				if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+					if len(meta.Resource.showSections) > 0 {
+						registerResourceToRouter(meta.Resource, "read")
+					}
 				}
 			}
-		}
 
-		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
-				if len(meta.Resource.editSections) > 0 {
-					registerResourceToRouter(meta.Resource, "update", "delete")
+			for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
+				if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+					if len(meta.Resource.editSections) > 0 {
+						registerResourceToRouter(meta.Resource, "update", "delete")
+					}
 				}
 			}
 		}
@@ -270,6 +276,13 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 
 func (admin *Admin) compile() {
 	router := admin.GetRouter()
+
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
+	cmdLine.Parse(os.Args[1:])
+	if *compileQORTemplates {
+		admin.AssetFS.Compile()
+	}
 
 	browserUserAgentRegexp := regexp.MustCompile("Mozilla|Gecko|WebKit|MSIE|Opera")
 	router.Use(&Middleware{
@@ -336,7 +349,15 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var relativePath = strings.TrimPrefix(req.URL.Path, admin.router.Prefix)
 	var context = admin.NewContext(w, req)
 
-	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) {
+	// Parse Request Form
+	context.Request.ParseMultipartForm(2 * 1024 * 1024)
+
+	// Set Request Method
+	if method := context.Request.Form.Get("_method"); method != "" {
+		context.Request.Method = strings.ToUpper(method)
+	}
+
+	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) && strings.ToUpper(context.Request.Method) == "GET" {
 		(&controller{Admin: admin}).Asset(context)
 		return
 	}
@@ -348,6 +369,7 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}()()
 
+	// Set Current User
 	var currentUser qor.CurrentUser
 	if admin.auth != nil {
 		if currentUser = admin.auth.GetCurrentUser(context); currentUser == nil {
@@ -358,12 +380,6 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		context.SetDB(context.GetDB().Set("qor:current_user", context.CurrentUser))
 	}
 	context.Roles = roles.MatchedRoles(req, currentUser)
-
-	// Set Request Method
-	context.Request.ParseMultipartForm(2 * 1024 * 1024)
-	if method := context.Request.Form.Get("_method"); method != "" {
-		context.Request.Method = strings.ToUpper(method)
-	}
 
 	// Call first middleware
 	for _, middleware := range admin.router.middlewares {
