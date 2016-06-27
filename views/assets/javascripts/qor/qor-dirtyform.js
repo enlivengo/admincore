@@ -13,7 +13,7 @@
 
   'use strict';
 
-  var hasChanged = function (ele, options) {
+  var dirtyForm = function (ele, options) {
     var hasChangedObj = false;
 
     if (this instanceof jQuery) {
@@ -28,7 +28,7 @@
         var $ele = $(element);
 
         if ($ele.is('form')) {
-            hasChangedObj = hasChanged($ele.find('input:not([type="hidden"]):not(".search-field input"):not(".chosen-search input"), textarea, select'), options);
+            hasChangedObj = dirtyForm($ele.find('input:not([type="hidden"]):not(".search-field input"):not(".chosen-search input"):not("#globalSearch"), textarea, select'), options);
             if (hasChangedObj) {
                 return false;
             }
@@ -75,18 +75,18 @@
     };
 
     $.fn.extend({
-        hasChanged : hasChanged
+        dirtyForm : dirtyForm
     });
 
     $(function () {
         $(document).on('change', 'form:not(".qor-search-container")', function () {
-            console.log('changed')
-            if ($(this).hasChanged()){
-                console.log('hasChanged')
+            if ($(this).dirtyForm()){
+                $.fn.qorSlideoutBeforeHide = true;
                 window.onbeforeunload = function () {
                     return "You have unsaved changes on this page. If you leave this page, you will lose all unsaved changes.";
                 };
             } else {
+                $.fn.qorSlideoutBeforeHide = null;
                 window.onbeforeunload = null;
             }
         });

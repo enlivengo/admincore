@@ -465,12 +465,26 @@
     },
 
     hide: function () {
+
+      if ($.fn.qorSlideoutBeforeHide) {
+        if (window.confirm('You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes!')) {
+          this.hideSlideout();
+        }
+      } else {
+        this.hideSlideout();
+      }
+
+    },
+
+    hideSlideout: function () {
       var $slideout = this.$slideout;
       var hideEvent;
       var $datePicker = $('.qor-datepicker').not('.hidden');
 
       // remove onbeforeunload event
       window.onbeforeunload = null;
+
+      $.fn.qorSlideoutBeforeHide = null;
 
       $('body').removeClass().addClass(this.$bodyClass);
 
@@ -491,6 +505,9 @@
 
       // empty body html when hide slideout
       this.$body.html('');
+
+
+
 
       $slideout.
         one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
