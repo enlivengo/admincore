@@ -28,7 +28,7 @@
         var $ele = $(element);
 
         if ($ele.is('form')) {
-            hasChangedObj = dirtyForm($ele.find('input:not([type="hidden"]):not(".search-field input"):not(".chosen-search input"):not("#globalSearch"), textarea, select'), options);
+            hasChangedObj = dirtyForm($ele.find('input:not([type="hidden"]):not(".search-field input"):not(".chosen-search input"):not(".ignore-dirtyform"), textarea, select'), options);
             if (hasChangedObj) {
                 return false;
             }
