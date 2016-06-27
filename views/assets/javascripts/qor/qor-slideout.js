@@ -469,6 +469,9 @@
       var hideEvent;
       var $datePicker = $('.qor-datepicker').not('.hidden');
 
+      // remove onbeforeunload event
+      window.onbeforeunload = null;
+
       $('body').removeClass().addClass(this.$bodyClass);
 
       if ($datePicker.size()){
