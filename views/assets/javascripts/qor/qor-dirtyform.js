@@ -28,6 +28,9 @@
         var $ele = $(element);
 
         if ($ele.is('form')) {
+            if ($ele.hasClass('ignore-dirtyform')) {
+                return false;
+            }
             hasChangedObj = dirtyForm($ele.find('input:not([type="hidden"]):not(".search-field input"):not(".chosen-search input"):not(".ignore-dirtyform"), textarea, select'), options);
             if (hasChangedObj) {
                 return false;
@@ -79,7 +82,12 @@
     });
 
     $(function () {
-        $(document).on('change', 'form:not(".qor-search-container")', function () {
+        $(document).on('submit', 'form', function () {
+            window.onbeforeunload = null;
+            $.fn.qorSlideoutBeforeHide = null;
+        });
+
+        $(document).on('change', 'form', function () {
             if ($(this).dirtyForm()){
                 $.fn.qorSlideoutBeforeHide = true;
                 window.onbeforeunload = function () {

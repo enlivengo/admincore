@@ -217,6 +217,7 @@
           contentType: false,
           beforeSend: function () {
             $submit.prop('disabled', true);
+            $.fn.qorSlideoutBeforeHide = null;
           },
           success: function (html) {
             var returnUrl = $form.data('returnUrl');

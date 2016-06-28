@@ -1,6 +1,6 @@
 {{if .Resource.SearchHandler}}
   {{ $keyword := .Context.Request.URL.Query.Get "keyword" }}
-  <form class="qor-search-container" method="GET">
+  <form class="qor-search-container ignore-dirtyform" method="GET">
     {{range $key, $values := .Context.Request.URL.Query}}
       {{if (and (ne $key "keyword") (ne $key "page"))}}
         {{range $value := $values}}
