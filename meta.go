@@ -257,7 +257,6 @@ func (meta *Meta) updateMeta() {
 
 				if result != nil {
 					res := meta.baseResource.GetAdmin().NewResource(result)
-					res.configure()
 					meta.Resource = res
 					meta.Meta.Permission = meta.Meta.Permission.Concat(res.Config.Permission)
 				}
