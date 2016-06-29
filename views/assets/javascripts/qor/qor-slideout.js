@@ -317,7 +317,9 @@
 
               $content = $response.find(CLASS_MAIN_CONTENT);
 
-              this.slideoutType = $content.find('.qor-form-container').data().slideoutType;
+              if ($content.find('.qor-form-container').size()) {
+                this.slideoutType = $content.find('.qor-form-container').data().slideoutType;
+              }
 
               if (!$content.length) {
                 return;
