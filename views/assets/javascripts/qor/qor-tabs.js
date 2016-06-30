@@ -21,7 +21,7 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var CLASS_TAB = '.qor-layout__tab-button';
   var CLASS_TAB_CONTENT = '.qor-layout__tab-content';
-  var CLASS_TAB_BAR = '.qor-layout__tab-bar';
+  var CLASS_TAB_BAR = '.mdl-layout__tab-bar-container';
   var CLASS_TAB_BAR_RIGHT = '.qor-layout__tab-right';
   var CLASS_TAB_BAR_LEFT = '.qor-layout__tab-left';
   var CLASS_ACTIVE = 'is-active';
@@ -143,14 +143,14 @@
           beforeSend: function () {
             $('.qor-layout__tab-spinner').remove();
             var $spinner = '<div class="mdl-spinner mdl-js-spinner is-active qor-layout__tab-spinner"></div>';
-            $element.find(CLASS_TAB_CONTENT).hide().before($spinner);
+            $(CLASS_TAB_CONTENT).hide().before($spinner);
             window.componentHandler.upgradeElement($('.qor-layout__tab-spinner')[0]);
           },
           success: function (html) {
             $('.qor-layout__tab-spinner').remove();
             $body.data('tabScopeActive',$target.data('name'));
             var $content = $(html).find(CLASS_TAB_CONTENT).html();
-            $element.find(CLASS_TAB_CONTENT).show().html($content).trigger('enable');
+            $(CLASS_TAB_CONTENT).show().html($content).trigger('enable');
 
           },
           error: function () {
