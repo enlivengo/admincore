@@ -398,7 +398,7 @@
                 var qorSliderAfterShow = $.fn.qorSliderAfterShow;
 
                 for (var name in qorSliderAfterShow) {
-                  if (qorSliderAfterShow.hasOwnProperty(name)) {
+                  if (qorSliderAfterShow.hasOwnProperty(name) && $.isFunction(qorSliderAfterShow[name])) {
                     qorSliderAfterShow[name].call(this, url, response);
                   }
                 }
