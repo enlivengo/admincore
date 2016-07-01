@@ -127,7 +127,7 @@
     },
 
     removeSelectedClass: function () {
-      this.$element.find('tbody > tr[data-url],a[data-url]').removeClass(CLASS_IS_SELECTED);
+      this.$element.find('[data-url]').removeClass(CLASS_IS_SELECTED);
     },
 
     click: function (e) {
@@ -138,7 +138,7 @@
       var data;
 
       function toggleClass() {
-        $this.find('tbody > tr[data-url],a[data-url]').removeClass(CLASS_IS_SELECTED);
+        $this.find('[data-url]').removeClass(CLASS_IS_SELECTED);
         $target.addClass(CLASS_IS_SELECTED);
       }
 
@@ -159,7 +159,7 @@
           this.hide();
           this.removeSelectedClass();
           break;
-        } else if ($target.is('table.qor-table > tbody > tr[data-url]')) {
+        } else if ($target.is('.qor-table tr[data-url]')) {
           if ($(e.target).parents('.qor-table__actions').size() > 0) {
             return;
           }
@@ -186,6 +186,7 @@
             this.load(data.url, data);
           }
           break;
+
         } else {
           if ($target.is('a')) {
             break;
@@ -223,6 +224,12 @@
           },
           success: function (html) {
             var returnUrl = $form.data('returnUrl');
+            var refreshUrl = $form.data('refreshUrl');
+
+            if (refreshUrl) {
+              window.location.href = refreshUrl;
+              return;
+            }
 
             if (returnUrl == 'refresh') {
               _this.refresh();
