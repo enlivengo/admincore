@@ -39,4 +39,8 @@ $(function () {
     $('.qor-page').addClass("has-header");
   }
 
+  if ($('.qor-page .qor-page__header').height() > 48) {
+    $('.qor-page').css('padding-top',$('.qor-page .qor-page__header').height());
+  }
+
 });
