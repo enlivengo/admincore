@@ -40,6 +40,14 @@
   QorTimepicker.prototype = {
     init: function () {
       this.bind();
+      this.oldValue = this.$targetInput.val();
+
+      var dateNow = new Date();
+      var month = dateNow.getMonth();
+      month = (month < 8) ? '0' + (month + 1) : month;
+
+      this.dateValueNow = dateNow.getFullYear() + '-' + month + '-' + dateNow.getDate();
+
     },
 
     bind: function () {
@@ -76,14 +84,14 @@
     },
 
     focus: function () {
-      this.oldValue = this.$targetInput.val();
+
     },
 
     blur: function () {
       var inputValue = this.$targetInput.val();
       var inputArr = inputValue.split(' ');
       var inputArrLen = inputArr.length;
-      var dateNow = new Date();
+
       var tempValue;
       var newDateValue;
       var newTimeValue;
@@ -94,10 +102,6 @@
       var timeReg = /\d{1,2}:\d{1,2}/;
       var dateReg = /^\d{4}-\d{1,2}-\d{1,2}/;
 
-      if (!inputValue || inputArrLen == 0) {
-        return;
-      }
-
       if (inputArrLen == 1) {
         if (dateReg.test(inputArr[0])) {
           newDateValue = inputArr[0];
@@ -105,10 +109,7 @@
         }
 
         if (timeReg.test(inputArr[0])) {
-          var month = dateNow.getMonth();
-          month = (month < 8) ? '0' + (month + 1) : month;
-
-          newDateValue = dateNow.getFullYear() + '-' + month + '-' + dateNow.getDate();
+          newDateValue = this.dateValueNow;
           newTimeValue = inputArr[0];
         }
 
@@ -179,17 +180,13 @@
 
       var oldValue = this.oldValue;
       var timeReg = /\d{1,2}:\d{1,2}/;
-      var dateReg = /^\d{4}-\d{1,2}-\d{1,2}/;
-      var hasDate = dateReg.test(oldValue);
       var hasTime = timeReg.test(oldValue);
       var selectedTime = $targetInput.data().timepickerList.find(CLASS_TIME_SELECTED).html();
       var newValue;
 
-      if (!oldValue || !hasDate || !selectedTime) {
-        return;
-      }
-
-      if (hasTime) {
+      if (!oldValue) {
+        newValue = this.dateValueNow + ' ' + selectedTime;
+      } else if (hasTime) {
         newValue = oldValue.replace(timeReg,selectedTime);
       } else {
         newValue = oldValue + ' ' + selectedTime;
