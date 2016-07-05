@@ -18,19 +18,25 @@ import (
 // Meta meta struct definition
 type Meta struct {
 	Name            string
-	FieldName       string
-	Label           string
 	Type            string
-	FormattedValuer func(interface{}, *qor.Context) interface{}
-	Valuer          func(interface{}, *qor.Context) interface{}
+	Label           string
+	FieldName       string
 	Setter          func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context)
-	Metas           []resource.Metaor
+	Valuer          func(interface{}, *qor.Context) interface{}
+	FormattedValuer func(interface{}, *qor.Context) interface{}
 	Resource        *Resource
-	Collection      interface{}
-	GetCollection   func(interface{}, *qor.Context) [][]string
 	Permission      *roles.Permission
+	Config          MetaConfigInterface
+
+	Metas         []resource.Metaor
+	Collection    interface{}
+	GetCollection func(interface{}, *qor.Context) [][]string
 	resource.Meta
 	baseResource *Resource
+}
+
+type MetaConfigInterface interface {
+	resource.MetaConfigInterface
 }
 
 // GetMetas get sub metas
