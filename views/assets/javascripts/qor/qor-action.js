@@ -23,6 +23,7 @@
   var ACTION_BUTTON = '.qor-action-button';
   var MDL_BODY = '.mdl-layout__content';
   var ACTION_SELECTORS = '.qor-actions';
+  var ACTION_LINK = 'a.qor-action--button';
   var BUTTON_BULKS = '.qor-action-bulk-buttons';
   var QOR_TABLE = '.qor-table-container';
   var QOR_TABLE_BULK = '.qor-table--bulking';
@@ -44,15 +45,27 @@
 
     init: function () {
       this.bind();
+      this.initActions();
     },
 
     bind: function () {
       this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
-      $(document).on(EVENT_CLICK, '.qor-table--bulking tr', this.click);
+      $(document)
+        .on(EVENT_CLICK, '.qor-table--bulking tr', this.click)
+        .on(EVENT_CLICK, ACTION_LINK, this.actionLink);
     },
 
     unbind: function () {
       this.$element.off(EVENT_CLICK, this.check);
+    },
+
+    initActions: function () {
+      this.tables = $(QOR_TABLE).find('table').size();
+      if (!this.tables) {
+        $(BUTTON_BULKS).find('button').attr('disabled', true);
+        $(ACTION_LINK).attr('disabled', true);
+      }
+
     },
 
     collectFormData: function () {
@@ -77,6 +90,12 @@
       return this.ajaxForm;
     },
 
+    actionLink: function () {
+      if (!this.tables) {
+        return false;
+      }
+    },
+
     click : function (e) {
       var $target = $(e.target);
 
@@ -86,6 +105,8 @@
         this.submit();
         return false;
       }
+
+
 
       if ($target.is('.qor-action--bulk')) {
         this.$wrap.removeClass('hidden');
