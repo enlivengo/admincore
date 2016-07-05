@@ -169,7 +169,7 @@ func (ac *controller) Delete(context *Context) {
 	}
 
 	responder.With("html", func() {
-		http.Redirect(context.Writer, context.Request, path.Join(ac.GetRouter().Prefix, res.ToParam()), status)
+		http.Redirect(context.Writer, context.Request, path.Join(ac.GetRouter().Prefix, res.ToParam()), http.StatusFound)
 	}).With("json", func() {
 		context.Writer.WriteHeader(status)
 	}).Respond(context.Request)
