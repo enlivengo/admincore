@@ -12,11 +12,11 @@ import (
 // SelectOneConfig meta configuration used for select one
 type SelectOneConfig struct {
 	Collection    interface{}
-	getCollection func(interface{}, *qor.Context) [][]string
+	getCollection func(interface{}, *Context) [][]string
 }
 
 // GetCollection get collections from select one meta
-func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context *qor.Context) [][]string {
+func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context *Context) [][]string {
 	if selectOneConfig.getCollection != nil {
 		return selectOneConfig.getCollection(value, context)
 	}
@@ -31,23 +31,27 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 		// Set GetCollection
 		if selectOneConfig.Collection != nil {
 			if values, ok := selectOneConfig.Collection.([]string); ok {
-				selectOneConfig.getCollection = func(interface{}, *qor.Context) (results [][]string) {
+				selectOneConfig.getCollection = func(interface{}, *Context) (results [][]string) {
 					for _, value := range values {
 						results = append(results, []string{value, value})
 					}
 					return
 				}
 			} else if maps, ok := selectOneConfig.Collection.([][]string); ok {
-				selectOneConfig.getCollection = func(interface{}, *qor.Context) [][]string {
+				selectOneConfig.getCollection = func(interface{}, *Context) [][]string {
 					return maps
 				}
-			} else if f, ok := selectOneConfig.Collection.(func(interface{}, *qor.Context) [][]string); ok {
-				selectOneConfig.getCollection = f
+			} else if fc, ok := selectOneConfig.Collection.(func(interface{}, *qor.Context) [][]string); ok {
+				selectOneConfig.getCollection = func(record interface{}, context *Context) [][]string {
+					return fc(record, context.Context)
+				}
+			} else if fc, ok := selectOneConfig.Collection.(func(interface{}, *Context) [][]string); ok {
+				selectOneConfig.getCollection = fc
 			} else {
 				utils.ExitWithMsg("Unsupported Collection format for meta %v of resource %v", meta.Name, reflect.TypeOf(meta.baseResource.Value))
 			}
 		} else if selectOneConfig.getCollection == nil {
-			selectOneConfig.getCollection = func(_ interface{}, context *qor.Context) (results [][]string) {
+			selectOneConfig.getCollection = func(_ interface{}, context *Context) (results [][]string) {
 				fieldType := meta.FieldStruct.Struct.Type
 				for fieldType.Kind() == reflect.Ptr || fieldType.Kind() == reflect.Slice {
 					fieldType = fieldType.Elem()
