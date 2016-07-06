@@ -35,6 +35,7 @@ type Meta struct {
 	baseResource *Resource
 }
 
+// MetaConfigInterface meta config interface
 type MetaConfigInterface interface {
 	resource.MetaConfigInterface
 }
