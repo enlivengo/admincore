@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"runtime/debug"
 	"sort"
 	"strings"
 
@@ -221,6 +222,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	if content, err := context.Asset(fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Name), fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Type)); err == nil {
 		defer func() {
 			if r := recover(); r != nil {
+				debug.PrintStack()
 				writer.Write([]byte(fmt.Sprintf("Get error when render template for meta %v: %v", meta.Name, r)))
 			}
 		}()
@@ -243,10 +245,11 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 			"InputName":     strings.Join(prefix, "."),
 		}
 
-		if meta.GetCollection != nil {
-			data["CollectionValue"] = func() [][]string {
-				return meta.GetCollection(value, context.Context)
-			}
+		data["CollectionValue"] = func() [][]string {
+			fmt.Printf("%v: Call .CollectionValue from views already Deprecated, get the value with `.Meta.Config.GetCollection .ResourceValue .Context.Context`", meta.Name)
+			return meta.Config.(interface {
+				GetCollection(value interface{}, context *qor.Context) [][]string
+			}).GetCollection(value, context.Context)
 		}
 
 		err = tmpl.Execute(writer, data)
