@@ -160,10 +160,11 @@ func (meta *Meta) updateMeta() {
 		Name:            meta.Name,
 		FieldName:       meta.FieldName,
 		Setter:          meta.Setter,
-		FormattedValuer: meta.FormattedValuer,
 		Valuer:          meta.Valuer,
-		Permission:      newPermission,
+		FormattedValuer: meta.FormattedValuer,
 		Resource:        meta.baseResource,
+		Permission:      newPermission,
+		Config:          meta.Config,
 	}
 
 	meta.PreInitialize()
