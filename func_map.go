@@ -246,6 +246,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		}
 
 		data["CollectionValue"] = func() [][]string {
+			fmt.Println("Call .CollectionValue from views already Deprecated, get the value with `.Meta.Config.GetCollection .ResourceValue .Context.Context`")
 			return meta.Config.(interface {
 				GetCollection(value interface{}, context *qor.Context) [][]string
 			}).GetCollection(value, context.Context)
