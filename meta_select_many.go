@@ -19,15 +19,18 @@ func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metao
 	if meta, ok := metaor.(*Meta); ok {
 		selectManyConfig.SelectOneConfig.Collection = selectManyConfig.Collection
 		selectManyConfig.SelectOneConfig.ConfigureQorMeta(meta)
+		meta.Type = "select_many"
 
 		// Set FormattedValuer
-		meta.SetFormattedValuer(func(record interface{}, context *qor.Context) interface{} {
-			reflectValues := reflect.Indirect(reflect.ValueOf(meta.GetValuer()(record, context)))
-			var results []string
-			for i := 0; i < reflectValues.Len(); i++ {
-				results = append(results, utils.Stringify(reflectValues.Index(i).Interface()))
-			}
-			return results
-		})
+		if meta.FormattedValuer == nil {
+			meta.SetFormattedValuer(func(record interface{}, context *qor.Context) interface{} {
+				reflectValues := reflect.Indirect(reflect.ValueOf(meta.GetValuer()(record, context)))
+				var results []string
+				for i := 0; i < reflectValues.Len(); i++ {
+					results = append(results, utils.Stringify(reflectValues.Index(i).Interface()))
+				}
+				return results
+			})
+		}
 	}
 }

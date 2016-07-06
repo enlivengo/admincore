@@ -92,10 +92,14 @@ var metaConfigorMaps = map[string]func(*Meta){
 	},
 
 	"select_one": func(meta *Meta) {
-		meta.Config = &SelectOneConfig{Collection: meta.Collection}
+		if meta.Config == nil {
+			meta.Config = &SelectOneConfig{Collection: meta.Collection}
+		}
 	},
 
 	"select_many": func(meta *Meta) {
-		meta.Config = &SelectManyConfig{Collection: meta.Collection}
+		if meta.Config == nil {
+			meta.Config = &SelectManyConfig{Collection: meta.Collection}
+		}
 	},
 }

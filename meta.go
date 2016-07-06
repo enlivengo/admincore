@@ -28,9 +28,8 @@ type Meta struct {
 	Permission      *roles.Permission
 	Config          MetaConfigInterface
 
-	Metas         []resource.Metaor
-	Collection    interface{}
-	GetCollection func(interface{}, *qor.Context) [][]string
+	Metas      []resource.Metaor
+	Collection interface{}
 	resource.Meta
 	baseResource *Resource
 }
@@ -278,78 +277,7 @@ func (meta *Meta) updateMeta() {
 		}
 	}
 
-	scope := &gorm.Scope{Value: meta.baseResource.Value}
-	scopeField, _ := scope.FieldByName(meta.GetFieldName())
-
-	{ // Format Meta FormattedValueOf
-		if meta.FormattedValuer == nil {
-			if meta.Type == "select_one" {
-				meta.SetFormattedValuer(func(value interface{}, context *qor.Context) interface{} {
-					return utils.Stringify(meta.GetValuer()(value, context))
-				})
-			} else if meta.Type == "select_many" {
-				meta.SetFormattedValuer(func(value interface{}, context *qor.Context) interface{} {
-					reflectValue := reflect.Indirect(reflect.ValueOf(meta.GetValuer()(value, context)))
-					var results []string
-					for i := 0; i < reflectValue.Len(); i++ {
-						results = append(results, utils.Stringify(reflectValue.Index(i).Interface()))
-					}
-					return results
-				})
-			}
-		}
-	}
-
-	{ // Format Meta Collection
-		if meta.Collection != nil {
-			if maps, ok := meta.Collection.([]string); ok {
-				meta.GetCollection = func(interface{}, *qor.Context) (results [][]string) {
-					for _, value := range maps {
-						results = append(results, []string{value, value})
-					}
-					return
-				}
-			} else if maps, ok := meta.Collection.([][]string); ok {
-				meta.GetCollection = func(interface{}, *qor.Context) [][]string {
-					return maps
-				}
-			} else if f, ok := meta.Collection.(func(interface{}, *qor.Context) [][]string); ok {
-				meta.GetCollection = f
-			} else {
-				utils.ExitWithMsg("Unsupported Collection format for meta %v of resource %v", meta.Name, reflect.TypeOf(meta.baseResource.Value))
-			}
-		} else if meta.Type == "select_one" || meta.Type == "select_many" {
-			if scopeField.Relationship != nil {
-				fieldType := scopeField.StructField.Struct.Type
-				if fieldType.Kind() == reflect.Slice {
-					fieldType = fieldType.Elem()
-				}
-
-				meta.GetCollection = func(value interface{}, context *qor.Context) (results [][]string) {
-					values := reflect.New(reflect.SliceOf(fieldType)).Interface()
-					context.GetDB().Find(values)
-					reflectValues := reflect.Indirect(reflect.ValueOf(values))
-					for i := 0; i < reflectValues.Len(); i++ {
-						scope := scope.New(reflectValues.Index(i).Interface())
-						primaryKey := fmt.Sprintf("%v", scope.PrimaryKeyValue())
-						results = append(results, []string{primaryKey, utils.Stringify(reflectValues.Index(i).Interface())})
-					}
-					return
-				}
-			} else {
-				utils.ExitWithMsg("%v meta type %v needs Collection", meta.Name, meta.Type)
-			}
-		}
-	}
-
 	meta.FieldName = meta.GetFieldName()
-
-	// call ConfigureMetaInterface
-	if meta.FieldStruct != nil {
-		if injector, ok := reflect.New(meta.FieldStruct.Struct.Type).Interface().(resource.ConfigureMetaInterface); ok {
-			injector.ConfigureQorMeta(meta)
-		}
-	}
 
 	// run meta configors
 	if baseResource := meta.baseResource; baseResource != nil {
@@ -357,6 +285,18 @@ func (meta *Meta) updateMeta() {
 			if key == meta.Type {
 				fc(meta)
 			}
+		}
+	}
+
+	// call meta config's ConfigureMetaInterface
+	if meta.Config != nil {
+		meta.Config.ConfigureQorMeta(meta)
+	}
+
+	// call field's ConfigureMetaInterface
+	if meta.FieldStruct != nil {
+		if injector, ok := reflect.New(meta.FieldStruct.Struct.Type).Interface().(resource.ConfigureMetaInterface); ok {
+			injector.ConfigureQorMeta(meta)
 		}
 	}
 }

@@ -243,10 +243,10 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 			"InputName":     strings.Join(prefix, "."),
 		}
 
-		if meta.GetCollection != nil {
-			data["CollectionValue"] = func() [][]string {
-				return meta.GetCollection(value, context.Context)
-			}
+		data["CollectionValue"] = func() [][]string {
+			return meta.Config.(interface {
+				GetCollection(value interface{}, context *qor.Context) [][]string
+			}).GetCollection(value, context.Context)
 		}
 
 		err = tmpl.Execute(writer, data)

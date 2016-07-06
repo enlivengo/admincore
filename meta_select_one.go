@@ -26,6 +26,8 @@ func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context 
 // ConfigureQorMeta configure select one meta
 func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
+		meta.Type = "select_one"
+
 		// Set GetCollection
 		if meta.Collection != nil {
 			if values, ok := meta.Collection.([]string); ok {
@@ -61,8 +63,10 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 		}
 
 		// Set FormattedValuer
-		meta.SetFormattedValuer(func(record interface{}, context *qor.Context) interface{} {
-			return utils.Stringify(meta.GetValuer()(record, context))
-		})
+		if meta.FormattedValuer == nil {
+			meta.SetFormattedValuer(func(record interface{}, context *qor.Context) interface{} {
+				return utils.Stringify(meta.GetValuer()(record, context))
+			})
+		}
 	}
 }
