@@ -49,6 +49,9 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 		} else if selectOneConfig.getCollection == nil {
 			selectOneConfig.getCollection = func(_ interface{}, context *qor.Context) (results [][]string) {
 				fieldType := meta.FieldStruct.Struct.Type
+				for fieldType.Kind() == reflect.Ptr || fieldType.Kind() == reflect.Slice {
+					fieldType = fieldType.Elem()
+				}
 				values := reflect.New(reflect.SliceOf(fieldType)).Interface()
 				context.GetDB().Find(values)
 
