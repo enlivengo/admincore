@@ -29,19 +29,19 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 		meta.Type = "select_one"
 
 		// Set GetCollection
-		if meta.Collection != nil {
-			if values, ok := meta.Collection.([]string); ok {
+		if selectOneConfig.Collection != nil {
+			if values, ok := selectOneConfig.Collection.([]string); ok {
 				selectOneConfig.getCollection = func(interface{}, *qor.Context) (results [][]string) {
 					for _, value := range values {
 						results = append(results, []string{value, value})
 					}
 					return
 				}
-			} else if maps, ok := meta.Collection.([][]string); ok {
+			} else if maps, ok := selectOneConfig.Collection.([][]string); ok {
 				selectOneConfig.getCollection = func(interface{}, *qor.Context) [][]string {
 					return maps
 				}
-			} else if f, ok := meta.Collection.(func(interface{}, *qor.Context) [][]string); ok {
+			} else if f, ok := selectOneConfig.Collection.(func(interface{}, *qor.Context) [][]string); ok {
 				selectOneConfig.getCollection = f
 			} else {
 				utils.ExitWithMsg("Unsupported Collection format for meta %v of resource %v", meta.Name, reflect.TypeOf(meta.baseResource.Value))
