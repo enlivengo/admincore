@@ -102,4 +102,10 @@ var metaConfigorMaps = map[string]func(*Meta){
 			meta.Config = &SelectManyConfig{Collection: meta.Collection}
 		}
 	},
+
+	"rich_editor": func(meta *Meta) {
+		if meta.Config == nil {
+			meta.Config = &RichEditorConfig{}
+		}
+	},
 }

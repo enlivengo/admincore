@@ -8,13 +8,13 @@ import (
 	"github.com/qor/qor/utils"
 )
 
-// SelectManyConfig meta configuration used for select one
+// SelectManyConfig meta configuration used for select many
 type SelectManyConfig struct {
 	Collection interface{}
 	SelectOneConfig
 }
 
-// ConfigureQorMeta configure select one meta
+// ConfigureQorMeta configure select many meta
 func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
 		selectManyConfig.SelectOneConfig.Collection = selectManyConfig.Collection
