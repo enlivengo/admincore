@@ -11,7 +11,10 @@ import (
 
 // SelectOneConfig meta configuration used for select one
 type SelectOneConfig struct {
-	Collection    interface{}
+	Collection interface{}
+	RemoteData struct {
+		Resource *Resource
+	}
 	getCollection func(interface{}, *Context) [][]string
 }
 
@@ -26,6 +29,26 @@ func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context 
 // ConfigureQorMeta configure select one meta
 func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
+		if remoteDataResource := selectOneConfig.RemoteData.Resource; remoteDataResource != nil {
+			// GET  /admin/!meta_selector/:resource_name/:field_name/search?keyword=:keyword
+			// GET  /admin/!meta_selector/:resource_name/:field_name/new
+			// POST /admin/!meta_selector/:resource_name/:field_name
+
+			baseResource := meta.GetBaseResource().(*Resource)
+			Admin := baseResource.GetAdmin()
+			Admin.GetRouter().Get(fmt.Sprint("!meta_selector/%v/%v/search", baseResource.ToParam(), meta.GetName()), nil, RouteConfig{
+				Resource: remoteDataResource,
+			})
+
+			Admin.GetRouter().Get(fmt.Sprint("!meta_selector/%v/%v/new", baseResource.ToParam(), meta.GetName()), nil, RouteConfig{
+				Resource: remoteDataResource,
+			})
+
+			Admin.GetRouter().Post(fmt.Sprint("!meta_selector/%v/%v", baseResource.ToParam(), meta.GetName()), nil, RouteConfig{
+				Resource: remoteDataResource,
+			})
+		}
+
 		meta.Type = "select_one"
 
 		// Set GetCollection
