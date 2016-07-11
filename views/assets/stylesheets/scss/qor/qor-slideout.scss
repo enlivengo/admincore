@@ -17,6 +17,7 @@
   background-color: #fff;
   overflow: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   @include shadow-16dp();
 
   &.is-shown {
