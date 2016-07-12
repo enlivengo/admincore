@@ -61,6 +61,9 @@ and (max-device-width : 736px) {
   /* Header */
 
   header{
+    .qor-mobile--show-actions{
+      display: none;
+    }
     .mdl-layout__header-row{
       padding-left: 56px;
       .qor-mobile--show-actions{
@@ -71,6 +74,11 @@ and (max-device-width : 736px) {
       font-size: 16px;
     }
 
+    &.has-action{
+      .qor-mobile--show-actions{
+        display: inline-block;
+      }
+    }
     &.has-search{
       .qor-mobile--show-actions{
         margin-right: 48px;
