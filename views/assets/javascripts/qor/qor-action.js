@@ -61,6 +61,7 @@
 
     initActions: function () {
       this.tables = $(QOR_TABLE).find('table').size();
+
       if (!this.tables) {
         $(BUTTON_BULKS).find('button').attr('disabled', true);
         $(ACTION_LINK).attr('disabled', true);
@@ -91,7 +92,7 @@
     },
 
     actionLink: function () {
-      if (!this.tables) {
+      if (!$(QOR_TABLE).find('table').size()) {
         return false;
       }
     },
