@@ -32,49 +32,10 @@
     init: function () {
       var $this = this.$element;
 
-      if (!$this.prop('multiple')) {
-        if ($this.children('[selected]').length) {
-          $this.prepend('<option value=""></option>');
-        } else {
-          $this.prepend('<option value="" selected></option>');
-        }
-      }
-
-      $this.chosen({
-        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        allow_single_deselect: true,
-        search_contains: true,
-        disable_search_threshold: 10,
-        width: '100%',
-        display_selected_options: false
-      })
-      .on('change', function (e,params) {
-        var $target = $(e.target);
-        var $chosenMulti = $target.next(CLASS_MULTI);
-
-        if (!$chosenMulti.size()){
-          return;
-        }
-
-        if (params.deselected){
-          setTimeout(function () {
-            if (!$chosenMulti.find(CLASS_CHOSE).size()){
-              $chosenMulti.addClass(CLASS_DEFAULT);
-            }
-          }, 10);
-        } else if (params.selected){
-          $chosenMulti.removeClass(CLASS_DEFAULT);
-        }
-
+      $this.select2({
+        minimumResultsForSearch: 20,//Infinity
+        allowClear: true
       });
-
-      // init multiple selector layout
-      if ($this.prop('multiple')){
-        var $thisChosenMulti = $this.next(CLASS_MULTI);
-        if (!$thisChosenMulti.find(CLASS_CHOSE).size()){
-          $thisChosenMulti.addClass(CLASS_DEFAULT);
-        }
-      }
 
     },
 
