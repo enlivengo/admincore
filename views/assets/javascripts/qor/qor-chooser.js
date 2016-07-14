@@ -33,12 +33,10 @@
         minimumResultsForSearch: 20,//Infinity
         allowClear: true
       });
-
-
     },
 
     destroy: function () {
-      this.$element.chosen('destroy').removeData(NAMESPACE);
+      this.$element.select2('destroy').removeData(NAMESPACE);
     }
   };
 
