@@ -30,8 +30,9 @@
       var $this = this.$element;
 
       $this.select2({
-        minimumResultsForSearch: 20,//Infinity
-        allowClear: true
+        minimumResultsForSearch: 20,
+        allowClear: true,
+        dropdownParent: $this.parent()
       });
     },
 
