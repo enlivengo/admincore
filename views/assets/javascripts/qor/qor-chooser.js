@@ -16,9 +16,6 @@
   var NAMESPACE = 'qor.chooser';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var CLASS_MULTI = '.chosen-container-multi';
-  var CLASS_DEFAULT = 'chosen-default';
-  var CLASS_CHOSE = '.search-choice';
 
   function QorChooser(element, options) {
     this.$element = $(element);
@@ -36,6 +33,7 @@
         minimumResultsForSearch: 20,//Infinity
         allowClear: true
       });
+
 
     },
 
