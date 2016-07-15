@@ -29,23 +29,22 @@ func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context 
 func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
 		if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
-			// GET  /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
-			// POST /admin/!meta_selector/:resource_name/:field_name
-			// GET  /admin/!meta_selector/:resource_name/:field_name/new
-
 			baseResource := meta.GetBaseResource().(*Resource)
 			Admin := baseResource.GetAdmin()
 
 			remoteDataSearcherController := &controller{Admin: Admin}
 			remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
+			// GET /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
 			Admin.GetRouter().Get(remoteDataSearcherPrefix, remoteDataSearcherController.Index, RouteConfig{
 				Resource: remoteDataResource,
 			})
 
+			// POST /admin/!meta_selector/:resource_name/:field_name
 			Admin.GetRouter().Post(remoteDataSearcherPrefix, remoteDataSearcherController.Create, RouteConfig{
 				Resource: remoteDataResource,
 			})
 
+			// GET /admin/!meta_selector/:resource_name/:field_name/new
 			Admin.GetRouter().Get(path.Join(remoteDataSearcherPrefix, "new"), remoteDataSearcherController.New, RouteConfig{
 				Resource: remoteDataResource,
 			})

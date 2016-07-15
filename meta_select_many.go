@@ -10,7 +10,8 @@ import (
 
 // SelectManyConfig meta configuration used for select many
 type SelectManyConfig struct {
-	Collection interface{}
+	Collection         interface{}
+	RemoteDataResource *Resource
 	SelectOneConfig
 }
 
@@ -18,6 +19,8 @@ type SelectManyConfig struct {
 func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
 		selectManyConfig.SelectOneConfig.Collection = selectManyConfig.Collection
+		selectManyConfig.SelectOneConfig.RemoteDataResource = selectManyConfig.RemoteDataResource
+
 		selectManyConfig.SelectOneConfig.ConfigureQorMeta(meta)
 		meta.Type = "select_many"
 
