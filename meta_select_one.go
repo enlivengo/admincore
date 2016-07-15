@@ -2,6 +2,7 @@ package admin
 
 import (
 	"fmt"
+	"path"
 	"reflect"
 
 	"github.com/qor/qor"
@@ -11,11 +12,9 @@ import (
 
 // SelectOneConfig meta configuration used for select one
 type SelectOneConfig struct {
-	Collection interface{}
-	RemoteData struct {
-		Resource *Resource
-	}
-	getCollection func(interface{}, *Context) [][]string
+	Collection         interface{}
+	RemoteDataResource *Resource
+	getCollection      func(interface{}, *Context) [][]string
 }
 
 // GetCollection get collections from select one meta
@@ -29,22 +28,25 @@ func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context 
 // ConfigureQorMeta configure select one meta
 func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
-		if remoteDataResource := selectOneConfig.RemoteData.Resource; remoteDataResource != nil {
-			// GET  /admin/!meta_selector/:resource_name/:field_name/search?keyword=:keyword
-			// GET  /admin/!meta_selector/:resource_name/:field_name/new
+		if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
+			// GET  /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
 			// POST /admin/!meta_selector/:resource_name/:field_name
+			// GET  /admin/!meta_selector/:resource_name/:field_name/new
 
 			baseResource := meta.GetBaseResource().(*Resource)
 			Admin := baseResource.GetAdmin()
-			Admin.GetRouter().Get(fmt.Sprint("!meta_selector/%v/%v/search", baseResource.ToParam(), meta.GetName()), nil, RouteConfig{
+
+			remoteDataSearcherController := &controller{Admin: Admin}
+			remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
+			Admin.GetRouter().Get(remoteDataSearcherPrefix, remoteDataSearcherController.Index, RouteConfig{
 				Resource: remoteDataResource,
 			})
 
-			Admin.GetRouter().Get(fmt.Sprint("!meta_selector/%v/%v/new", baseResource.ToParam(), meta.GetName()), nil, RouteConfig{
+			Admin.GetRouter().Post(remoteDataSearcherPrefix, remoteDataSearcherController.Create, RouteConfig{
 				Resource: remoteDataResource,
 			})
 
-			Admin.GetRouter().Post(fmt.Sprint("!meta_selector/%v/%v", baseResource.ToParam(), meta.GetName()), nil, RouteConfig{
+			Admin.GetRouter().Get(path.Join(remoteDataSearcherPrefix, "new"), remoteDataSearcherController.New, RouteConfig{
 				Resource: remoteDataResource,
 			})
 		}
