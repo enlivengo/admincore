@@ -32,6 +32,16 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 			baseResource := meta.GetBaseResource().(*Resource)
 			Admin := baseResource.GetAdmin()
 
+			remoteDataResource.Meta(&Meta{Name: "SelectorPrimaryKey", Valuer: func(record interface{}, context *qor.Context) interface{} {
+				return context.GetDB().NewScope(record).PrimaryKeyValue()
+			}})
+
+			remoteDataResource.Meta(&Meta{Name: "SelectorHumanizeString", Valuer: func(record interface{}, context *qor.Context) interface{} {
+				return utils.Stringify(record)
+			}})
+
+			remoteDataResource.IndexAttrs("SelectorPrimaryKey", "SelectorHumanizeString", remoteDataResource.IndexAttrs())
+
 			remoteDataSearcherController := &controller{Admin: Admin}
 			remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
 			// GET /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
