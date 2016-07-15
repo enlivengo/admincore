@@ -2,6 +2,9 @@
 
 .select2-container{
   width: 100% !important;
+  .select2-selection{
+    margin-top: 7px;
+  }
   .select2-selection--single,.select2-selection--multiple{
     height: 32px;
     min-height: 30px;
@@ -35,6 +38,7 @@
     border-radius: 2px;
     border: 2px solid #2196f3;
     height: auto;
+    margin-top: 0;
     .select2-selection__clear{
       font-size: 20px;
       padding: 0 8px;
@@ -69,6 +73,7 @@
     .select2-selection__arrow{
       height: 30px;
       width: 24px;
+      top: 8px;
       &:hover{
         background-color: #2196f3;
         b{
