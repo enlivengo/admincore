@@ -103,6 +103,16 @@ func (res *Resource) UseTheme(theme interface{}) []ThemeInterface {
 	return res.Config.Themes
 }
 
+// GetTheme get registered theme with name
+func (res *Resource) GetTheme(name string) ThemeInterface {
+	for _, theme := range res.Config.Themes {
+		if theme.GetName() == name {
+			return theme
+		}
+	}
+	return nil
+}
+
 // Decode decode context into a value
 func (res *Resource) Decode(context *qor.Context, value interface{}) error {
 	return resource.Decode(context, value, res)
