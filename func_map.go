@@ -535,7 +535,7 @@ func (context *Context) themesClass() (result string) {
 	var results []string
 	if context.Resource != nil {
 		for _, theme := range context.Resource.Config.Themes {
-			results = append(results, "qor-theme-"+theme)
+			results = append(results, "qor-theme-"+theme.GetName())
 		}
 	}
 	return strings.Join(results, " ")
@@ -561,7 +561,9 @@ func (context *Context) styleSheetTag(names ...string) template.HTML {
 
 func (context *Context) getThemes() (themes []string) {
 	if context.Resource != nil {
-		themes = append(themes, context.Resource.Config.Themes...)
+		for _, theme := range context.Resource.Config.Themes {
+			themes = append(themes, theme.GetName())
+		}
 	}
 	return
 }

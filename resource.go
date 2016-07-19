@@ -83,15 +83,22 @@ func (res Resource) ToParam() string {
 }
 
 // UseTheme use them for resource, will auto load the theme's javascripts, stylesheets for this resource
-func (res Resource) UseTheme(theme string) []string {
-	if res.Config != nil {
-		for _, t := range res.Config.Themes {
-			if t == theme {
-				return res.Config.Themes
-			}
-		}
+func (res *Resource) UseTheme(theme interface{}) []ThemeInterface {
+	var themeInterface ThemeInterface
+	if ti, ok := theme.(ThemeInterface); ok {
+		themeInterface = ti
+	} else if str, ok := theme.(string); ok {
+		themeInterface = Theme{Name: str}
+	}
 
-		res.Config.Themes = append(res.Config.Themes, theme)
+	if themeInterface != nil {
+		res.Config.Themes = append(res.Config.Themes, themeInterface)
+
+		// Config Admin Theme
+		for _, pth := range themeInterface.GetViewPaths() {
+			res.GetAdmin().RegisterViewPath(pth)
+		}
+		themeInterface.ConfigAdminTheme(res)
 	}
 	return res.Config.Themes
 }

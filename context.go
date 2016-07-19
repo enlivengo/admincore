@@ -69,7 +69,9 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 	}
 
 	if len(themes) == 0 && context.Resource != nil {
-		themes = append(themes, context.Resource.Config.Themes...)
+		for _, theme := range context.Resource.Config.Themes {
+			themes = append(themes, theme.GetName())
+		}
 	}
 
 	if resourcePath := context.resourcePath(); resourcePath != "" {
