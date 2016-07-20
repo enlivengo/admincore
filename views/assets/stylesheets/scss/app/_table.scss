@@ -112,3 +112,28 @@
   position: relative;
   margin-top: 24px;
 }
+
+
+/* media library */
+.qor-table--medialibrary{
+  margin-left: 24px;
+  display: flex;
+  .mdl-card{
+    width: 240px;
+  }
+  .mdl-card__supporting-text{
+    width: auto;
+    > p{
+      margin-bottom: 4px;
+    }
+  }
+  tr{
+    display: inline-flex;
+    vertical-align: top;
+    margin-right: 24px;
+    margin-bottom: 24px;
+  }
+  img{
+    max-width: 100%;
+  }
+}
