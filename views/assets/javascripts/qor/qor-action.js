@@ -232,17 +232,23 @@
       $('.qor-page__body .mdl-data-table__select').each(function (i, e) { $(e).parents('td').remove(); });
       $('.qor-page__body .mdl-data-table__select').each(function (i, e) { $(e).parents('th').remove(); });
       $('.qor-table-container tr.is-selected').removeClass('is-selected');
-
       $('.qor-page__body table').addClass('mdl-data-table--selectable');
 
       // init google material
       new window.MaterialDataTable($('.qor-page__body table').get(0));
+      $('thead.is-hidden tr th:not(".mdl-data-table__cell--non-numeric")').clone().prependTo($('thead:not(".is-hidden") tr'));
 
+      var $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input');
+      var isMediaLibrary = $('.qor-table--medialibrary').size();
 
-      // The clone one doesn't bind event, so binding event manual
-      var $fixedHeadCheckBox = $('thead .mdl-checkbox__input');
+      isMediaLibrary && ($fixedHeadCheckBox = $('thead .mdl-checkbox__input'));
 
       $fixedHeadCheckBox.on('click', function () {
+
+        if (!isMediaLibrary) {
+          $('thead.is-fixed tr th').eq(0).find('label').click();
+          $(this).closest('label').toggleClass('is-checked');
+        }
 
         var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
         var slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
