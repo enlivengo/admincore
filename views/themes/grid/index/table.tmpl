@@ -8,7 +8,7 @@
 		<table class="qor-js-table qor-table--medialibrary">
             <thead>
                 <tr>
-                    <th></td>
+                    <th>&nbsp;</td>
                 </tr>
             </thead>
             <tbody>
@@ -28,7 +28,7 @@
 
     					{{$allowed_actions := allowed_actions $resource.Actions "menu_item" $result}}
     					{{if $allowed_actions}}
-                            <div class="mdl-card__menu">
+                            <div class="mdl-card__menu qor-table__actions">
         						<button id="actions-for-{{$primaryKey}}" class="mdl-button mdl-js-button mdl-button--icon qor-button--actions">
         							<i class="material-icons">more_vert</i>
         						</button>
