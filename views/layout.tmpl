@@ -34,6 +34,11 @@
           <span class="mdl-layout-title">{{page_title}}</span>
           {{render "shared/navbar"}}
         </div>
+
+        {{$actions := load_actions "header" }}
+        {{if $actions}}
+          {{$actions}}
+        {{end}}
       </header>
 
       <div class="mdl-layout__drawer">
