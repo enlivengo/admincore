@@ -101,20 +101,15 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 }
 
 // RenderText render template based on context
-func (context *Context) renderText(text string, results ...interface{}) template.HTML {
+func (context *Context) renderText(text string, data interface{}) template.HTML {
 	var (
 		err    error
 		tmpl   *template.Template
-		clone  = context.clone()
 		result = bytes.NewBufferString("")
 	)
 
-	if len(results) > 0 {
-		clone.Result = results[0]
-	}
-
-	if tmpl, err = template.New("").Funcs(clone.FuncMap()).Parse(text); err == nil {
-		if err = tmpl.Execute(result, clone); err == nil {
+	if tmpl, err = template.New("").Funcs(context.FuncMap()).Parse(text); err == nil {
+		if err = tmpl.Execute(result, data); err == nil {
 			return template.HTML(result.String())
 		}
 	}
@@ -137,7 +132,12 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 	}()
 
 	if content, err = context.Asset(name + ".tmpl"); err == nil {
-		return context.renderText(string(content), results...)
+		clone := context.clone()
+
+		if len(results) > 0 {
+			clone.Result = results[0]
+		}
+		return context.renderText(string(content), clone)
 	}
 
 	return template.HTML(err.Error())
