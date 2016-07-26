@@ -620,11 +620,20 @@ func (context *Context) loadAdminStyleSheets() template.HTML {
 
 func (context *Context) loadActions(action string) template.HTML {
 	var (
-		actionKeys, actionFiles []string
-		actions                 = map[string]string{}
+		actionPatterns, actionKeys, actionFiles []string
+		actions                                 = map[string]string{}
 	)
 
-	for _, pattern := range []string{"actions/*.tmpl", filepath.Join("actions", action, "*.tmpl")} {
+	switch action {
+	case "index", "show", "edit", "new":
+		actionPatterns = []string{"actions/*.tmpl", filepath.Join("actions", action, "*.tmpl")}
+	case "global":
+		actionPatterns = []string{"actions/*.tmpl"}
+	default:
+		actionPatterns = []string{filepath.Join("actions", action, "*.tmpl")}
+	}
+
+	for _, pattern := range actionPatterns {
 		if matches, err := context.Admin.AssetFS.Glob(pattern); err == nil {
 			actionFiles = append(actionFiles, matches...)
 		}

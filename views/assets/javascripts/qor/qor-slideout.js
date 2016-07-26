@@ -249,7 +249,7 @@
                 }
               });
               if (flashStructs.length > 0) {
-                document.cookie = 'qor-flashes=' + btoa(JSON.stringify(flashStructs)) + '; path=' + prefix;
+                document.cookie = 'qor-flashes=' + btoa(unescape(encodeURIComponent(JSON.stringify(flashStructs)))) + '; path=' + prefix;
               }
               _this.refresh();
             }
