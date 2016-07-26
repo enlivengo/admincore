@@ -45,7 +45,7 @@
 
   .mdl-layout__header{
     .qor-search-container{
-      float: none;
+      /* float: none; */
       .qor-search{
         height: 64px;
         line-height: 64px;
@@ -60,7 +60,7 @@
         }
         .qor-search__label{
           color: #fff;
-          top: 16px;
+          top: 17px;
         }
       }
     }

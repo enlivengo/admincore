@@ -1,6 +1,7 @@
 @media only screen
 and (min-device-width : 320px)
 and (max-device-width : 736px) {
+
   .qor-layout .mdl-layout__content{
     padding-top: 0 !important;
   }
@@ -37,10 +38,23 @@ and (max-device-width : 736px) {
     margin-right: 8px;
     margin-bottom: 8px;
   }
+
+  .mdl-textfield.is-dirty .mdl-textfield__expandable-holder, .mdl-textfield.is-focused .mdl-textfield__expandable-holder{
+    max-width: 100px;
+  }
+
   .qor-search{
+    height: 56px !important;
+    line-height: 56px !important;
+    .qor-search__label{
+      top: 13px !important;
+    }
     &.is-focused{
-      width: 360px;
       background-color: #0277bd;
+      position: absolute;
+      left: 54px;
+      top: 0;
+      right: 8px;
     }
     .mdl-textfield__expandable-holder{
       width: calc(100% - 64px);
@@ -81,7 +95,7 @@ and (max-device-width : 736px) {
     }
     &.has-search{
       .qor-mobile--show-actions{
-        margin-right: 48px;
+        margin-right: 16px;
       }
     }
 
