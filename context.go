@@ -100,6 +100,28 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 	return []byte(""), fmt.Errorf("template not found: %v", layouts)
 }
 
+// RenderText render template based on context
+func (context *Context) renderText(text string, results ...interface{}) template.HTML {
+	var (
+		err    error
+		tmpl   *template.Template
+		clone  = context.clone()
+		result = bytes.NewBufferString("")
+	)
+
+	if len(results) > 0 {
+		clone.Result = results[0]
+	}
+
+	if tmpl, err = template.New("").Funcs(clone.FuncMap()).Parse(text); err == nil {
+		if err = tmpl.Execute(result, clone); err == nil {
+			return template.HTML(result.String())
+		}
+	}
+
+	return template.HTML(err.Error())
+}
+
 // Render render template based on context
 func (context *Context) Render(name string, results ...interface{}) template.HTML {
 	var (
@@ -115,19 +137,7 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 	}()
 
 	if content, err = context.Asset(name + ".tmpl"); err == nil {
-		var clone = context.clone()
-		var result = bytes.NewBufferString("")
-
-		if len(results) > 0 {
-			clone.Result = results[0]
-		}
-
-		var tmpl *template.Template
-		if tmpl, err = template.New(filepath.Base(name)).Funcs(clone.FuncMap()).Parse(string(content)); err == nil {
-			if err = tmpl.Execute(result, clone); err == nil {
-				return template.HTML(result.String())
-			}
-		}
+		return context.renderText(string(content), results...)
 	}
 
 	return template.HTML(err.Error())

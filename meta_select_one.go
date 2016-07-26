@@ -12,8 +12,9 @@ import (
 
 // SelectOneConfig meta configuration used for select one
 type SelectOneConfig struct {
+	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	AllowBlank         bool
-	Collection         interface{}
+	SelectionTemplate  string
 	RemoteDataResource *Resource
 	getCollection      func(interface{}, *Context) [][]string
 }
