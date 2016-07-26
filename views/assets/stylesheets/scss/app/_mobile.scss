@@ -98,18 +98,6 @@ and (max-device-width : 736px) {
       & > div{
         display: block;
       }
-      .qor-search-container{
-        background-color: #0277bd;
-      }
-    }
-    .qor-search-container {
-      position: absolute;
-      top: -52px;
-      right: 8px;
-      z-index: 9999;
-      .material-icons{
-        color: #fff;
-      }
     }
   }
 }

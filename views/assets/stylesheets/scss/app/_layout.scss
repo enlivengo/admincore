@@ -43,6 +43,29 @@
     background-color: $color-main-header;
   }
 
+  .mdl-layout__header{
+    .qor-search-container{
+      float: none;
+      .qor-search{
+        height: 64px;
+        line-height: 64px;
+        padding: 0;
+        &.is-focused{
+          .mdl-textfield__label::after{
+            background-color: #fff;
+          }
+          .mdl-button.mdl-button--colored{
+            color: #fff;
+          }
+        }
+        .qor-search__label{
+          color: #fff;
+          top: 16px;
+        }
+      }
+    }
+  }
+
   &.mdl-layout.is-upgraded .mdl-layout__tab.is-active::after{
     background: unquote("rgb(#{$color-white})");
   }
