@@ -31,7 +31,6 @@
 
       $this.select2({
         minimumResultsForSearch: 20,
-        allowClear: true,
         dropdownParent: $this.parent()
       });
     },
