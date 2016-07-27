@@ -1,11 +1,11 @@
-<div class="qor-field">
-  <label class="qor-field__label" for="{{.InputId}}">
-    {{meta_label .Meta}}
-  </label>
+{{if .Meta.Config.SelectionTemplate}}
+  {{render_text .Meta.Config.SelectionTemplate .}}
+{{else}}
+  <div class="qor-field">
+    <label class="qor-field__label" for="{{.InputId}}">
+      {{meta_label .Meta}}
+    </label>
 
-  {{if .Meta.Config.SelectionTemplate}}
-    {{render_text .Meta.Config.SelectionTemplate .}}
-  {{else}}
     <div class="qor-field__show">
       {{.Value}}
     </div>
@@ -22,5 +22,5 @@
         {{end}}
       </select>
     </div>
-  {{end}}
-</div>
+  </div>
+{{end}}

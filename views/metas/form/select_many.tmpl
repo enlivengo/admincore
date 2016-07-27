@@ -1,11 +1,11 @@
-<div class="qor-field">
-  <label class="qor-field__label" for="{{.InputId}}">
-    {{meta_label .Meta}}
-  </label>
+{{if .Meta.Config.SelectionTemplate}}
+  {{render_text .Meta.Config.SelectionTemplate .}}
+{{else}}
+  <div class="qor-field">
+    <label class="qor-field__label" for="{{.InputId}}">
+      {{meta_label .Meta}}
+    </label>
 
-  {{if .Meta.Config.SelectionTemplate}}
-    {{render_text .Meta.Config.SelectionTemplate .}}
-  {{else}}
     {{$current_values := (raw_value_of .ResourceValue .Meta)}}
     <div class="qor-field__show">
       {{range $value := $current_values}}
@@ -25,5 +25,5 @@
       </select>
       <input type="hidden" name="{{.InputName}}" value="">
     </div>
-  {{end}}
-</div>
+  </div>
+{{end}}

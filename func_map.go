@@ -844,6 +844,7 @@ func (context *Context) FuncMap() template.FuncMap {
 
 		"render":      context.Render,
 		"render_text": context.renderText,
+		"render_with": context.renderWith,
 		"render_form": context.renderForm,
 		"render_meta": func(value interface{}, meta *Meta, types ...string) template.HTML {
 			var (

@@ -100,7 +100,7 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 	return []byte(""), fmt.Errorf("template not found: %v", layouts)
 }
 
-// RenderText render template based on context
+// renderText render text based on data
 func (context *Context) renderText(text string, data interface{}) template.HTML {
 	var (
 		err    error
@@ -117,30 +117,34 @@ func (context *Context) renderText(text string, data interface{}) template.HTML 
 	return template.HTML(err.Error())
 }
 
-// Render render template based on context
-func (context *Context) Render(name string, results ...interface{}) template.HTML {
+// renderWith render template based on data
+func (context *Context) renderWith(name string, data interface{}) template.HTML {
 	var (
 		err     error
 		content []byte
 	)
 
+	if content, err = context.Asset(name + ".tmpl"); err == nil {
+		return context.renderText(string(content), data)
+	}
+	return template.HTML(err.Error())
+}
+
+// Render render template based on context
+func (context *Context) Render(name string, results ...interface{}) template.HTML {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Get error when render file %v: %v", name, r))
+			err := errors.New(fmt.Sprintf("Get error when render file %v: %v", name, r))
 			utils.ExitWithMsg(err)
 		}
 	}()
 
-	if content, err = context.Asset(name + ".tmpl"); err == nil {
-		clone := context.clone()
-
-		if len(results) > 0 {
-			clone.Result = results[0]
-		}
-		return context.renderText(string(content), clone)
+	clone := context.clone()
+	if len(results) > 0 {
+		clone.Result = results[0]
 	}
 
-	return template.HTML(err.Error())
+	return context.renderWith(name, clone)
 }
 
 // Execute execute template with layout
