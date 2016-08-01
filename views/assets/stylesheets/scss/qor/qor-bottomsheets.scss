@@ -1,0 +1,73 @@
+// Bottomsheets
+// --------------------------------------------------
+
+
+// Class for body element to prevent scroll
+.qor-bottomsheets-open {
+  overflow: hidden;
+}
+
+
+.qor-bottomsheets {
+  position: fixed;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  left: 50%;
+  z-index: $zindex-bottomsheets;
+  display: none;
+  -webkit-overflow-scrolling: touch;
+  @include shadow-16dp();
+  &.is-shown {
+    display: block;
+    width: 360px;
+    margin-left: -180px;
+    transition: height 0.3s ease;
+    .qor-bottomsheets__body {
+      padding: 16px 24px;
+      background-color: #fff;
+      height: 100%;
+    }
+    &::after{
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      content: '';
+      background-color: rgba(0, 0, 0, 0.54);
+      z-index: $zindex-bottomsheets - 10;
+    }
+  }
+
+  &.is-slided{
+    height: 400px;
+  }
+
+  .qor-error {
+    margin-right: 0;
+    margin-left: 0;
+    box-shadow: none;
+  }
+}
+
+.qor-bottomsheets__body {
+  position: relative;
+  box-sizing: border-box;
+  z-index: $zindex-bottomsheets;
+
+  .qor-action-forms{
+    display: block !important;
+    margin-top: 0;
+    .qor-form__actions{
+      margin-top: 0;
+    }
+  }
+
+}
+
+.qor-bottomsheets .qor-page__body .qor-form-container {
+  padding: 0;
+  margin: 20px 0;
+  box-shadow: none;
+}

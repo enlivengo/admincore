@@ -16,36 +16,30 @@
   var $document = $(document);
   var FormData = window.FormData;
   var _ = window._;
-  var NAMESPACE = 'qor.slideout';
+  var NAMESPACE = 'qor.bottomsheets';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var EVENT_KEYUP = 'keyup.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var EVENT_SHOW = 'show.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
   var EVENT_HIDE = 'hide.' + NAMESPACE;
   var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
-  var EVENT_TRANSITIONEND = 'transitionend';
-  var CLASS_OPEN = 'qor-slideout-open';
-  var CLASS_MINI = 'qor-slideout-mini';
+  var CLASS_OPEN = 'qor-bottomsheets-open';
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
   var CLASS_IS_SELECTED = 'is-selected';
   var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
-  var CLASS_HEADER_LOCALE = '.qor-actions__locale';
 
-  function QorSlideout(element, options) {
+  function QorBottomSheets(element, options) {
     this.$element = $(element);
-    this.options = $.extend({}, QorSlideout.DEFAULTS, $.isPlainObject(options) && options);
-    this.slided = false;
+    this.options = $.extend({}, QorBottomSheets.DEFAULTS, $.isPlainObject(options) && options);
     this.disabled = false;
-    this.slideoutType = false;
     this.init();
   }
 
-  QorSlideout.prototype = {
-    constructor: QorSlideout,
+  QorBottomSheets.prototype = {
+    constructor: QorBottomSheets,
 
     init: function () {
       this.build();
@@ -53,43 +47,29 @@
     },
 
     build: function () {
-      var $slideout;
+      var $bottomsheets;
 
-      this.$slideout = $slideout = $(QorSlideout.TEMPLATE).appendTo('body');
-      this.$title = $slideout.find('.qor-slideout__title');
-      this.$body = $slideout.find('.qor-slideout__body');
+      this.$bottomsheets = $bottomsheets = $(QorBottomSheets.TEMPLATE).appendTo('body');
+      this.$body = $bottomsheets.find('.qor-bottomsheets__body');
       this.$bodyClass = $('body').prop('class');
     },
 
     unbuild: function () {
-      this.$title = null;
       this.$body = null;
-      this.$slideout.remove();
+      this.bottomsheets.remove();
     },
 
     bind: function () {
-      this.$slideout.
-        on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this));
+      this.$bottomsheets.on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this));
 
-      $document.
-        on(EVENT_KEYUP, $.proxy(this.keyup, this)).
-        on(EVENT_CLICK, $.proxy(this.click, this));
+      $document.on(EVENT_CLICK, $.proxy(this.click, this));
     },
 
     unbind: function () {
-      this.$slideout.
+      this.$bottomsheets.
         off(EVENT_SUBMIT, this.submit);
 
-      $document.
-        off(EVENT_KEYUP, this.keyup).
-        off(EVENT_CLICK, this.click);
-    },
-
-    keyup: function (e) {
-      if (e.which === 27 && !$('.qor-bottomsheets').hasClass('is-shown')) {
-        this.hide();
-        this.removeSelectedClass();
-      }
+      $document.off(EVENT_CLICK, this.click);
     },
 
     loadScript: function (src, url, response) {
@@ -97,12 +77,12 @@
       var script = document.createElement('script');
       script.src = src;
       script.onload = function () {
-        // exec qorSliderAfterShow after script loaded
+        // exec qorBottomsheetsAfterShow after script loaded
         if (options.afterShow){
-          var qorSliderAfterShow = $.fn.qorSliderAfterShow;
-          for (var name in qorSliderAfterShow) {
-            if (qorSliderAfterShow.hasOwnProperty(name)) {
-              qorSliderAfterShow[name].call(this, url, response);
+          var qorBottomsheetsAfterShow = $.fn.qorBottomsheetsAfterShow;
+          for (var name in qorBottomsheetsAfterShow) {
+            if (qorBottomsheetsAfterShow.hasOwnProperty(name)) {
+              qorBottomsheetsAfterShow[name].call(this, url, response);
             }
           }
         }
@@ -127,18 +107,18 @@
     },
 
     removeSelectedClass: function () {
-      this.$element.find('[data-url]').removeClass(CLASS_IS_SELECTED);
+      this.$element.find('[data-bs-url]').removeClass(CLASS_IS_SELECTED);
     },
 
     click: function (e) {
       var $this = this.$element;
-      var slideout = this.$slideout.get(0);
+      var bottomsheets = this.$bottomsheets.get(0);
       var target = e.target;
       var $target;
       var data;
 
       function toggleClass() {
-        $this.find('[data-url]').removeClass(CLASS_IS_SELECTED);
+        $this.find('[data-bs-url]').removeClass(CLASS_IS_SELECTED);
         $target.addClass(CLASS_IS_SELECTED);
       }
 
@@ -153,40 +133,18 @@
           break;
         }
 
-        if (target === slideout) {
+        if (target === bottomsheets) {
           break;
-        } else if ($target.data('dismiss') === 'slideout') {
+        } else if ($target.data('dismiss') === 'bottomsheets') {
           this.hide();
           this.removeSelectedClass();
           break;
-        } else if ($target.is('.qor-table tr[data-url]')) {
-          if ($(e.target).parents('.qor-table__actions').size() > 0) {
-            return;
-          }
-
-          if ($target.hasClass(CLASS_IS_SELECTED)) {
-            this.hide();
-            this.removeSelectedClass();
-          } else {
-            toggleClass();
-            data = $target.data();
-            this.load(data.url);
-          }
-
-          break;
-        } else if ($target.data('url')) {
+        } else if ($target.data('bs-url')) {
           e.preventDefault();
-
-          if ($target.hasClass(CLASS_IS_SELECTED)) {
-            this.hide();
-            this.removeSelectedClass();
-          } else {
-            toggleClass();
-            data = $target.data();
-            this.load(data.url, data);
-          }
+          toggleClass();
+          data = $target.data();
+          this.load(data.bsUrl, data);
           break;
-
         } else {
           if ($target.is('a')) {
             break;
@@ -202,7 +160,7 @@
     },
 
     submit: function (e) {
-      var $slideout = this.$slideout;
+      var $bottomsheets = this.$bottomsheets;
       var $body = this.$body;
       var form = e.target;
       var $form = $(form);
@@ -220,7 +178,6 @@
           contentType: false,
           beforeSend: function () {
             $submit.prop('disabled', true);
-            $.fn.qorSlideoutBeforeHide = null;
           },
           success: function (html) {
             var returnUrl = $form.data('returnUrl');
@@ -281,7 +238,7 @@
               });
 
               // Scroll to top to view the errors
-              $slideout.scrollTop(0);
+              $bottomsheets.scrollTop(0);
             } else {
               window.alert([textStatus, errorThrown].join(': '));
             }
@@ -324,9 +281,6 @@
 
               $content = $response.find(CLASS_MAIN_CONTENT);
 
-              if ($content.find('.qor-form-container').size()) {
-                this.slideoutType = $content.find('.qor-form-container').data().slideoutType;
-              }
 
               if (!$content.length) {
                 return;
@@ -382,31 +336,29 @@
 
               // end
 
-              $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
-              this.$title.html($response.find(options.title).html());
+              $content.find('.qor-button--cancel').attr('data-dismiss', 'bottomsheets').removeAttr('href');
               this.$body.html($content.html());
-              this.$body.find(CLASS_HEADER_LOCALE).remove();
 
-              this.$slideout.one(EVENT_SHOWN, function () {
+              this.$bottomsheets.one(EVENT_SHOWN, function () {
 
-                // Enable all Qor components within the slideout
+                // Enable all Qor components within the bottomSheets
                 $(this).trigger('enable');
               }).one(EVENT_HIDDEN, function () {
 
-                // Destroy all Qor components within the slideout
+                // Destroy all Qor components within the bottomSheets
                 $(this).trigger('disable');
 
               });
 
               this.show();
 
-              // callback for after slider loaded HTML
+              // callback for after bottomSheets loaded HTML
               if (options.afterShow){
-                var qorSliderAfterShow = $.fn.qorSliderAfterShow;
+                var qorBottomsheetsAfterShow = $.fn.qorBottomsheetsAfterShow;
 
-                for (var name in qorSliderAfterShow) {
-                  if (qorSliderAfterShow.hasOwnProperty(name) && $.isFunction(qorSliderAfterShow[name])) {
-                    qorSliderAfterShow[name].call(this, url, response);
+                for (var name in qorBottomsheetsAfterShow) {
+                  if (qorBottomsheetsAfterShow.hasOwnProperty(name) && $.isFunction(qorBottomsheetsAfterShow[name])) {
+                    qorBottomsheetsAfterShow[name].call(this, url, response);
                   }
                 }
 
@@ -439,72 +391,34 @@
         });
       }, this);
 
-      if (this.slided) {
-        this.hide();
-        this.$slideout.one(EVENT_HIDDEN, load);
-      } else {
-        load();
-      }
+      load();
+
     },
 
     show: function () {
-      var $slideout = this.$slideout;
+      var $bottomsheets = this.$bottomsheets;
       var showEvent;
 
-      if (this.slided) {
-        return;
-      }
-
       showEvent = $.Event(EVENT_SHOW);
-      $slideout.trigger(showEvent);
+      $bottomsheets.trigger(showEvent);
 
       if (showEvent.isDefaultPrevented()) {
         return;
       }
 
-      if (this.slideoutType == 'mini') {
-        $slideout.addClass(CLASS_MINI);
-      } else {
-        $slideout.removeClass(CLASS_MINI);
-      }
+      $bottomsheets.addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
+      $bottomsheets.
+        trigger(EVENT_SHOWN).
+        addClass(CLASS_IS_SLIDED);
 
-      $slideout.addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
-      $slideout.
-        one(EVENT_TRANSITIONEND, $.proxy(this.shown, this)).
-        addClass(CLASS_IS_SLIDED).
-        scrollTop(0);
-    },
-
-    shown: function () {
-      this.slided = true;
-
-      // Disable to scroll body element
       $('body').addClass(CLASS_OPEN);
 
-      this.$slideout.trigger(EVENT_SHOWN);
     },
 
     hide: function () {
-
-      if ($.fn.qorSlideoutBeforeHide) {
-        if (window.confirm('You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes!')) {
-          this.hideSlideout();
-        }
-      } else {
-        this.hideSlideout();
-      }
-
-    },
-
-    hideSlideout: function () {
-      var $slideout = this.$slideout;
+      var $bottomsheets = this.$bottomsheets;
       var hideEvent;
       var $datePicker = $('.qor-datepicker').not('.hidden');
-
-      // remove onbeforeunload event
-      window.onbeforeunload = null;
-
-      $.fn.qorSlideoutBeforeHide = null;
 
       $('body').removeClass().addClass(this.$bodyClass);
 
@@ -512,12 +426,8 @@
         $datePicker.addClass('hidden');
       }
 
-      if (!this.slided) {
-        return;
-      }
-
       hideEvent = $.Event(EVENT_HIDE);
-      $slideout.trigger(hideEvent);
+      $bottomsheets.trigger(hideEvent);
 
       if (hideEvent.isDefaultPrevented()) {
         return;
@@ -526,21 +436,12 @@
       // empty body html when hide slideout
       this.$body.html('');
 
+      $bottomsheets.
+        removeClass(CLASS_IS_SLIDED).
+        removeClass(CLASS_IS_SHOWN).
+        trigger(EVENT_HIDDEN);
 
-
-
-      $slideout.
-        one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
-        removeClass(CLASS_IS_SLIDED);
-    },
-
-    hidden: function () {
-      this.slided = false;
-
-      // Enable to scroll body element
       $('body').removeClass(CLASS_OPEN);
-
-      this.$slideout.removeClass(CLASS_IS_SHOWN).trigger(EVENT_HIDDEN);
     },
 
     refresh: function () {
@@ -558,24 +459,18 @@
     }
   };
 
-  QorSlideout.DEFAULTS = {
+  QorBottomSheets.DEFAULTS = {
     title: false,
     content: false
   };
 
-  QorSlideout.TEMPLATE = (
-    '<div class="qor-slideout">' +
-      '<div class="qor-slideout__header">' +
-        '<button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">' +
-          '<span class="material-icons">close</span>' +
-        '</button>' +
-        '<h3 class="qor-slideout__title"></h3>' +
-      '</div>' +
-      '<div class="qor-slideout__body"></div>' +
+  QorBottomSheets.TEMPLATE = (
+    '<div class="qor-bottomsheets">' +
+      '<div class="qor-bottomsheets__body"></div>' +
     '</div>'
   );
 
-  QorSlideout.plugin = function (options) {
+  QorBottomSheets.plugin = function (options) {
     return this.each(function () {
       var $this = $(this);
       var data = $this.data(NAMESPACE);
@@ -586,7 +481,7 @@
           return;
         }
 
-        $this.data(NAMESPACE, (data = new QorSlideout(this, options)));
+        $this.data(NAMESPACE, (data = new QorBottomSheets(this, options)));
       }
 
       if (typeof options === 'string' && $.isFunction(fn = data[options])) {
@@ -596,28 +491,28 @@
   };
 
   $(function () {
-    var selector = '.qor-theme-slideout';
+    var selector = '.qor-theme-bottomsheets';
     var options = {
           title: '.qor-form-title, .mdl-layout-title',
-          afterShow: $.fn.qorSliderAfterShow ? $.fn.qorSliderAfterShow : null
+          afterShow: $.fn.qorBottomsheetsAfterShow ? $.fn.qorBottomsheetsAfterShow : null
         };
 
     $(document).
       on(EVENT_ENABLE, function (e) {
 
-        if (/slideout/.test(e.namespace)) {
-          QorSlideout.plugin.call($(selector, e.target), options);
+        if (/bottomsheets/.test(e.namespace)) {
+          QorBottomSheets.plugin.call($(selector, e.target), options);
         }
       }).
       on(EVENT_DISABLE, function (e) {
 
-        if (/slideout/.test(e.namespace)) {
-          QorSlideout.plugin.call($(selector, e.target), 'destroy');
+        if (/bottomsheets/.test(e.namespace)) {
+          QorBottomSheets.plugin.call($(selector, e.target), 'destroy');
         }
       }).
       triggerHandler(EVENT_ENABLE);
   });
 
-  return QorSlideout;
+  return QorBottomSheets;
 
 });
