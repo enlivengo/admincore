@@ -103,6 +103,18 @@ var metaConfigorMaps = map[string]func(*Meta){
 		}
 	},
 
+	"single_edit": func(meta *Meta) {
+		if meta.Config == nil {
+			meta.Config = &SingleEditConfig{}
+		}
+	},
+
+	"collection_edit": func(meta *Meta) {
+		if meta.Config == nil {
+			meta.Config = &CollectionEditConfig{}
+		}
+	},
+
 	"rich_editor": func(meta *Meta) {
 		if meta.Config == nil {
 			meta.Config = &RichEditorConfig{}
