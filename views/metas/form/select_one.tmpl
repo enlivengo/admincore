@@ -1,5 +1,5 @@
-{{if .Meta.Config.SelectionTemplate}}
-  {{render_text .Meta.Config.SelectionTemplate .}}
+{{if .Meta.Config.Template}}
+  {{render_text .Meta.Config.Template .}}
 {{else}}
   <div class="qor-field">
     <label class="qor-field__label" for="{{.InputId}}">

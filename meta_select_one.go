@@ -14,7 +14,7 @@ import (
 type SelectOneConfig struct {
 	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	AllowBlank         bool
-	SelectionTemplate  string
+	Template           string
 	RemoteDataResource *Resource
 	getCollection      func(interface{}, *Context) [][]string
 }
