@@ -16,7 +16,8 @@ type SelectOneConfig struct {
 	AllowBlank         bool
 	Template           string
 	RemoteDataResource *Resource
-	getCollection      func(interface{}, *Context) [][]string
+	metaConfig
+	getCollection func(interface{}, *Context) [][]string
 }
 
 // GetCollection get collections from select one meta

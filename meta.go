@@ -2,6 +2,7 @@ package admin
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -34,9 +35,19 @@ type Meta struct {
 	baseResource *Resource
 }
 
+// metaConfig meta config
+type metaConfig struct {
+}
+
+// GetTemplate get customized template for meta
+func (metaConfig) GetTemplate(context *Context, metaType string) ([]byte, error) {
+	return nil, errors.New("not implemented")
+}
+
 // MetaConfigInterface meta config interface
 type MetaConfigInterface interface {
 	resource.MetaConfigInterface
+	GetTemplate(context *Context, metaType string) ([]byte, error)
 }
 
 // GetMetas get sub metas
