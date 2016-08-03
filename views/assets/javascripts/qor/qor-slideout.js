@@ -17,8 +17,6 @@
   var FormData = window.FormData;
   var _ = window._;
   var NAMESPACE = 'qor.slideout';
-  var EVENT_ENABLE = 'enable.' + NAMESPACE;
-  var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_KEYUP = 'keyup.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
@@ -28,7 +26,6 @@
   var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
   var EVENT_TRANSITIONEND = 'transitionend';
   var CLASS_OPEN = 'qor-slideout-open';
-  var CLASS_MINI = 'qor-slideout-mini';
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
   var CLASS_IS_SELECTED = 'is-selected';
@@ -40,7 +37,6 @@
     this.options = $.extend({}, QorSlideout.DEFAULTS, $.isPlainObject(options) && options);
     this.slided = false;
     this.disabled = false;
-    this.slideoutType = false;
     this.init();
   }
 
@@ -69,11 +65,11 @@
 
     bind: function () {
       this.$slideout.
-        on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this));
+        on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
+        .on(EVENT_CLICK, '[data-dismiss="slideout"]', $.proxy(this.hide, this));
 
       $document.
-        on(EVENT_KEYUP, $.proxy(this.keyup, this)).
-        on(EVENT_CLICK, $.proxy(this.click, this));
+        on(EVENT_KEYUP, $.proxy(this.keyup, this));
     },
 
     unbind: function () {
@@ -93,19 +89,18 @@
     },
 
     loadScript: function (src, url, response) {
-      var options = this.options;
       var script = document.createElement('script');
       script.src = src;
       script.onload = function () {
+
         // exec qorSliderAfterShow after script loaded
-        if (options.afterShow){
-          var qorSliderAfterShow = $.fn.qorSliderAfterShow;
-          for (var name in qorSliderAfterShow) {
-            if (qorSliderAfterShow.hasOwnProperty(name)) {
-              qorSliderAfterShow[name].call(this, url, response);
-            }
+        var qorSliderAfterShow = $.fn.qorSliderAfterShow;
+        for (var name in qorSliderAfterShow) {
+          if (qorSliderAfterShow.hasOwnProperty(name)) {
+            qorSliderAfterShow[name].call(this, url, response);
           }
         }
+
       };
       document.body.appendChild(script);
     },
@@ -131,16 +126,14 @@
     },
 
     click: function (e) {
-      var $this = this.$element;
       var slideout = this.$slideout.get(0);
       var target = e.target;
       var $target;
-      var data;
 
-      function toggleClass() {
-        $this.find('[data-url]').removeClass(CLASS_IS_SELECTED);
-        $target.addClass(CLASS_IS_SELECTED);
-      }
+      // function toggleClass() {
+      //   $this.find('[data-url]').removeClass(CLASS_IS_SELECTED);
+      //   $target.addClass(CLASS_IS_SELECTED);
+      // }
 
       if (e.isDefaultPrevented()) {
         return;
@@ -159,46 +152,58 @@
           this.hide();
           this.removeSelectedClass();
           break;
-        } else if ($target.is('.qor-table tr[data-url]')) {
-          if ($(e.target).parents('.qor-table__actions').size() > 0) {
-            return;
-          }
-
-          if ($target.hasClass(CLASS_IS_SELECTED)) {
-            this.hide();
-            this.removeSelectedClass();
-          } else {
-            toggleClass();
-            data = $target.data();
-            this.load(data.url);
-          }
-
-          break;
-        } else if ($target.data('url')) {
-          e.preventDefault();
-
-          if ($target.hasClass(CLASS_IS_SELECTED)) {
-            this.hide();
-            this.removeSelectedClass();
-          } else {
-            toggleClass();
-            data = $target.data();
-            this.load(data.url, data);
-          }
-          break;
-
-        } else {
-          if ($target.is('a')) {
-            break;
-          }
-
-          if (target) {
-            target = target.parentNode;
-          } else {
-            break;
-          }
         }
+
+        // if (target === slideout) {
+        //   break;
+        // } else if ($target.data('dismiss') === 'slideout') {
+        //   this.hide();
+        //   this.removeSelectedClass();
+        //   break;
+        // } else if ($target.is('.qor-table tr[data-url]')) {
+        //   if ($(e.target).parents('.qor-table__actions').size() > 0) {
+        //     return;
+        //   }
+
+        //   if ($target.hasClass(CLASS_IS_SELECTED)) {
+        //     this.hide();
+        //     this.removeSelectedClass();
+        //   } else {
+        //     toggleClass();
+        //     data = $target.data();
+        //     this.load(data.url);
+        //   }
+
+        //   break;
+        // } else if ($target.data('url')) {
+        //   e.preventDefault();
+
+        //   if ($target.hasClass(CLASS_IS_SELECTED)) {
+        //     this.hide();
+        //     this.removeSelectedClass();
+        //   } else {
+        //     toggleClass();
+        //     data = $target.data();
+        //     this.load(data.url, data);
+        //   }
+        //   break;
+
+        // } else {
+        //   if ($target.is('a')) {
+        //     break;
+        //   }
+
+        //   if (target) {
+        //     target = target.parentNode;
+        //   } else {
+        //     break;
+        //   }
+        // }
+        //
+        //
       }
+
+
     },
 
     submit: function (e) {
@@ -324,10 +329,6 @@
 
               $content = $response.find(CLASS_MAIN_CONTENT);
 
-              if ($content.find('.qor-form-container').size()) {
-                this.slideoutType = $content.find('.qor-form-container').data().slideoutType;
-              }
-
               if (!$content.length) {
                 return;
               }
@@ -341,7 +342,7 @@
                 dataBody  = dataBody.replace(/<\s*body/gi, '<div');
                 dataBody  = dataBody.replace(/<\s*\/body/gi, '</div');
                 var bodyClass = $(dataBody).prop('class');
-                $('body').removeClass().addClass(bodyClass);
+                $('body').addClass(bodyClass);
 
                 // Get links and scripts, compare slideout and inline, load style and script if has new style or script.
                 var $slideoutStyles = $response.filter('link');
@@ -401,16 +402,16 @@
               this.show();
 
               // callback for after slider loaded HTML
-              if (options.afterShow){
-                var qorSliderAfterShow = $.fn.qorSliderAfterShow;
+              var qorSliderAfterShow = $.fn.qorSliderAfterShow;
 
+              if (qorSliderAfterShow) {
                 for (var name in qorSliderAfterShow) {
                   if (qorSliderAfterShow.hasOwnProperty(name) && $.isFunction(qorSliderAfterShow[name])) {
                     qorSliderAfterShow[name].call(this, url, response);
                   }
                 }
-
               }
+
 
             } else {
               if (data.returnUrl) {
@@ -447,6 +448,10 @@
       }
     },
 
+    open: function (options) {
+      this.load(options.url,options.data);
+    },
+
     show: function () {
       var $slideout = this.$slideout;
       var showEvent;
@@ -460,12 +465,6 @@
 
       if (showEvent.isDefaultPrevented()) {
         return;
-      }
-
-      if (this.slideoutType == 'mini') {
-        $slideout.addClass(CLASS_MINI);
-      } else {
-        $slideout.removeClass(CLASS_MINI);
       }
 
       $slideout.addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
@@ -506,8 +505,6 @@
 
       $.fn.qorSlideoutBeforeHide = null;
 
-      $('body').removeClass().addClass(this.$bodyClass);
-
       if ($datePicker.size()){
         $datePicker.addClass('hidden');
       }
@@ -525,9 +522,6 @@
 
       // empty body html when hide slideout
       this.$body.html('');
-
-
-
 
       $slideout.
         one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
@@ -559,20 +553,20 @@
   };
 
   QorSlideout.DEFAULTS = {
-    title: false,
+    title: '.qor-form-title, .mdl-layout-title',
     content: false
   };
 
   QorSlideout.TEMPLATE = (
-    '<div class="qor-slideout">' +
-      '<div class="qor-slideout__header">' +
-        '<button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">' +
-          '<span class="material-icons">close</span>' +
-        '</button>' +
-        '<h3 class="qor-slideout__title"></h3>' +
-      '</div>' +
-      '<div class="qor-slideout__body"></div>' +
-    '</div>'
+      '<div class="qor-slideout">' +
+        '<div class="qor-slideout__header">' +
+          '<button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">' +
+            '<span class="material-icons">close</span>' +
+          '</button>' +
+          '<h3 class="qor-slideout__title"></h3>' +
+        '</div>' +
+        '<div class="qor-slideout__body"></div>' +
+      '</div>'
   );
 
   QorSlideout.plugin = function (options) {
@@ -595,28 +589,7 @@
     });
   };
 
-  $(function () {
-    var selector = '.qor-theme-slideout';
-    var options = {
-          title: '.qor-form-title, .mdl-layout-title',
-          afterShow: $.fn.qorSliderAfterShow ? $.fn.qorSliderAfterShow : null
-        };
-
-    $(document).
-      on(EVENT_ENABLE, function (e) {
-
-        if (/slideout/.test(e.namespace)) {
-          QorSlideout.plugin.call($(selector, e.target), options);
-        }
-      }).
-      on(EVENT_DISABLE, function (e) {
-
-        if (/slideout/.test(e.namespace)) {
-          QorSlideout.plugin.call($(selector, e.target), 'destroy');
-        }
-      }).
-      triggerHandler(EVENT_ENABLE);
-  });
+  $.fn.qorSlideout = QorSlideout.plugin;
 
   return QorSlideout;
 

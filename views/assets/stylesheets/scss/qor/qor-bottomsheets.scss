@@ -26,7 +26,7 @@
     .qor-bottomsheets__body {
       padding: 16px 24px;
       background-color: #fff;
-      height: 100%;
+      height: calc(100% - 48px);
     }
     &::after{
       position: fixed;
@@ -51,6 +51,15 @@
   }
 }
 
+.qor-bottomsheets__title{
+  position: relative;
+  box-sizing: border-box;
+  z-index: $zindex-bottomsheets;
+  background-color: #fff;
+  padding: 24px 24px 0;
+  font-size: 24px;
+  line-height: 1;
+}
 .qor-bottomsheets__body {
   position: relative;
   box-sizing: border-box;

@@ -17,8 +17,6 @@
   var FormData = window.FormData;
   var _ = window._;
   var NAMESPACE = 'qor.bottomsheets';
-  var EVENT_ENABLE = 'enable.' + NAMESPACE;
-  var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var EVENT_SHOW = 'show.' + NAMESPACE;
@@ -28,7 +26,6 @@
   var CLASS_OPEN = 'qor-bottomsheets-open';
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
-  var CLASS_IS_SELECTED = 'is-selected';
   var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
 
   function QorBottomSheets(element, options) {
@@ -51,7 +48,9 @@
 
       this.$bottomsheets = $bottomsheets = $(QorBottomSheets.TEMPLATE).appendTo('body');
       this.$body = $bottomsheets.find('.qor-bottomsheets__body');
+      this.$title = $bottomsheets.find('.qor-bottomsheets__title');
       this.$bodyClass = $('body').prop('class');
+
     },
 
     unbuild: function () {
@@ -60,9 +59,11 @@
     },
 
     bind: function () {
-      this.$bottomsheets.on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this));
+      this.$bottomsheets
+        .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
+        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', $.proxy(this.hide, this));
 
-      $document.on(EVENT_CLICK, $.proxy(this.click, this));
+      // $document.;
     },
 
     unbind: function () {
@@ -106,21 +107,10 @@
       return array;
     },
 
-    removeSelectedClass: function () {
-      this.$element.find('[data-bs-url]').removeClass(CLASS_IS_SELECTED);
-    },
-
     click: function (e) {
-      var $this = this.$element;
       var bottomsheets = this.$bottomsheets.get(0);
       var target = e.target;
       var $target;
-      var data;
-
-      function toggleClass() {
-        $this.find('[data-bs-url]').removeClass(CLASS_IS_SELECTED);
-        $target.addClass(CLASS_IS_SELECTED);
-      }
 
       if (e.isDefaultPrevented()) {
         return;
@@ -137,25 +127,9 @@
           break;
         } else if ($target.data('dismiss') === 'bottomsheets') {
           this.hide();
-          this.removeSelectedClass();
           break;
-        } else if ($target.data('bs-url')) {
-          e.preventDefault();
-          toggleClass();
-          data = $target.data();
-          this.load(data.bsUrl, data);
-          break;
-        } else {
-          if ($target.is('a')) {
-            break;
-          }
-
-          if (target) {
-            target = target.parentNode;
-          } else {
-            break;
-          }
         }
+
       }
     },
 
@@ -295,7 +269,7 @@
                 dataBody  = dataBody.replace(/<\s*body/gi, '<div');
                 dataBody  = dataBody.replace(/<\s*\/body/gi, '</div');
                 var bodyClass = $(dataBody).prop('class');
-                $('body').removeClass().addClass(bodyClass);
+                $('body').addClass(bodyClass);
 
                 // Get links and scripts, compare slideout and inline, load style and script if has new style or script.
                 var $slideoutStyles = $response.filter('link');
@@ -338,6 +312,7 @@
 
               $content.find('.qor-button--cancel').attr('data-dismiss', 'bottomsheets').removeAttr('href');
               this.$body.html($content.html());
+              this.$title.html($response.find(options.title).html());
 
               this.$bottomsheets.one(EVENT_SHOWN, function () {
 
@@ -395,6 +370,10 @@
 
     },
 
+    open: function (options) {
+      this.load(options.url,options.data);
+    },
+
     show: function () {
       var $bottomsheets = this.$bottomsheets;
       var showEvent;
@@ -419,8 +398,6 @@
       var $bottomsheets = this.$bottomsheets;
       var hideEvent;
       var $datePicker = $('.qor-datepicker').not('.hidden');
-
-      $('body').removeClass().addClass(this.$bodyClass);
 
       if ($datePicker.size()){
         $datePicker.addClass('hidden');
@@ -460,12 +437,13 @@
   };
 
   QorBottomSheets.DEFAULTS = {
-    title: false,
+    title: '.qor-form-title, .mdl-layout-title',
     content: false
   };
 
   QorBottomSheets.TEMPLATE = (
     '<div class="qor-bottomsheets">' +
+      '<div class="qor-bottomsheets__title"></div>' +
       '<div class="qor-bottomsheets__body"></div>' +
     '</div>'
   );
@@ -490,28 +468,7 @@
     });
   };
 
-  $(function () {
-    var selector = '.qor-theme-bottomsheets';
-    var options = {
-          title: '.qor-form-title, .mdl-layout-title',
-          afterShow: $.fn.qorBottomsheetsAfterShow ? $.fn.qorBottomsheetsAfterShow : null
-        };
-
-    $(document).
-      on(EVENT_ENABLE, function (e) {
-
-        if (/bottomsheets/.test(e.namespace)) {
-          QorBottomSheets.plugin.call($(selector, e.target), options);
-        }
-      }).
-      on(EVENT_DISABLE, function (e) {
-
-        if (/bottomsheets/.test(e.namespace)) {
-          QorBottomSheets.plugin.call($(selector, e.target), 'destroy');
-        }
-      }).
-      triggerHandler(EVENT_ENABLE);
-  });
+  $.fn.qorBottomSheets = QorBottomSheets.plugin;
 
   return QorBottomSheets;
 
