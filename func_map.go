@@ -2,6 +2,7 @@ package admin
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -139,7 +140,14 @@ func (context *Context) RawValueOf(value interface{}, meta *Meta) interface{} {
 
 // FormattedValueOf return formatted value of a meta for current resource
 func (context *Context) FormattedValueOf(value interface{}, meta *Meta) interface{} {
-	return context.valueOf(meta.GetFormattedValuer(), value, meta)
+	result := context.valueOf(meta.GetFormattedValuer(), value, meta)
+	if resultValuer, ok := result.(driver.Valuer); ok {
+		if result, err := resultValuer.Value(); err == nil {
+			return result
+		}
+	}
+
+	return result
 }
 
 func (context *Context) renderForm(value interface{}, sections []*Section) template.HTML {
