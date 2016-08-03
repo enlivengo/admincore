@@ -1,11 +1,23 @@
 package admin
 
-import "github.com/qor/qor/resource"
+import (
+	"errors"
+
+	"github.com/qor/qor/resource"
+)
 
 // CollectionEditConfig meta configuration used for collection edit
 type CollectionEditConfig struct {
 	Template string
 	metaConfig
+}
+
+// GetTemplate get template for collection edit
+func (collectionEditConfig CollectionEditConfig) GetTemplate(context *Context, metaType string) ([]byte, error) {
+	if metaType == "form" && collectionEditConfig.Template != "" {
+		return context.Asset(collectionEditConfig.Template)
+	}
+	return nil, errors.New("not implemented")
 }
 
 // ConfigureQorMeta configure collection edit meta

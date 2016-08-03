@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"reflect"
@@ -14,10 +15,18 @@ import (
 type SelectOneConfig struct {
 	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	AllowBlank         bool
-	Template           string
+	SelectionTemplate  string
 	RemoteDataResource *Resource
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
+}
+
+// GetTemplate get template for selection template
+func (selectOneConfig SelectOneConfig) GetTemplate(context *Context, metaType string) ([]byte, error) {
+	if metaType == "form" && selectOneConfig.SelectionTemplate != "" {
+		return context.Asset(selectOneConfig.SelectionTemplate)
+	}
+	return nil, errors.New("not implemented")
 }
 
 // GetCollection get collections from select one meta
