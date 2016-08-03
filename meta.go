@@ -188,6 +188,10 @@ func (meta *Meta) updateMeta() {
 		for fieldType.Kind() == reflect.Ptr {
 			fieldType = fieldType.Elem()
 		}
+
+		if _, ok := reflect.New(fieldType).Interface().(sql.Scanner); ok {
+			fieldType = reflect.Indirect(reflect.New(fieldType)).Field(0).Type()
+		}
 	}
 
 	// Set Meta Type
