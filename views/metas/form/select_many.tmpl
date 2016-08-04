@@ -11,9 +11,11 @@
   </div>
 
   <div class="qor-field__edit qor-field__block">
-    <select class="qor-field__input" id="{{.InputId}}" data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}}>
+    <select class="qor-field__input" id="{{.InputId}}" data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.RemoteDataURL}}data-remote-data-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}"{{end}}>
       {{if .Meta.Config.RemoteDataURL}}
-        <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
+        {{range $value := $current_values}}
+          <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
+        {{end}}
       {{else}}
         {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
           {{if (is_included $current_values (index $values 0))}}
