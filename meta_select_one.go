@@ -69,27 +69,30 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 			}
 		}
 
-		// Set Collection based on relationship
+		// Set GetCollection if normal select2 mode
 		if selectOneConfig.getCollection == nil {
-			selectOneConfig.SelectMode = "select2_remote"
 			if selectOneConfig.RemoteDataResource == nil {
 				fieldType := meta.FieldStruct.Struct.Type
-				selectOneConfig.RemoteDataResource = context.Admin.NewResource(reflect.New(fieldType))
+				selectOneConfig.RemoteDataResource = meta.baseResource.GetAdmin().NewResource(reflect.New(fieldType))
 			}
 
-			selectOneConfig.getCollection = func(_ interface{}, context *Context) (results [][]string) {
-				cloneContext := context.clone()
-				cloneContext.setResource(selectOneConfig.RemoteDataResource)
-				searcher := &Searcher{Context: cloneContext}
-				searchResults, _ := searcher.FindMany()
+			if selectOneConfig.SelectMode == "select2" {
+				selectOneConfig.getCollection = func(_ interface{}, context *Context) (results [][]string) {
+					cloneContext := context.clone()
+					cloneContext.setResource(selectOneConfig.RemoteDataResource)
+					searcher := &Searcher{Context: cloneContext}
+					searchResults, _ := searcher.FindMany()
 
-				reflectValues := reflect.Indirect(reflect.ValueOf(searchResults))
-				for i := 0; i < reflectValues.Len(); i++ {
-					value := reflectValues.Index(i).Interface()
-					scope := context.GetDB().NewScope(value)
-					results = append(results, []string{fmt.Sprint(scope.PrimaryKeyValue()), utils.Stringify(value)})
+					reflectValues := reflect.Indirect(reflect.ValueOf(searchResults))
+					for i := 0; i < reflectValues.Len(); i++ {
+						value := reflectValues.Index(i).Interface()
+						scope := context.GetDB().NewScope(value)
+						results = append(results, []string{fmt.Sprint(scope.PrimaryKeyValue()), utils.Stringify(value)})
+					}
+					return
 				}
-				return
+			} else if selectOneConfig.SelectMode == "" {
+				selectOneConfig.SelectMode = "select2_remote"
 			}
 		}
 
