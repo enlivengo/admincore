@@ -17,6 +17,7 @@ type SelectOneConfig struct {
 	AllowBlank         bool
 	SelectionTemplate  string
 	RemoteDataResource *Resource
+	SelectMode         string // select2, select2_remote, bottom_sheet
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
 }
@@ -40,36 +41,30 @@ func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context 
 // ConfigureQorMeta configure select one meta
 func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
-		if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
-			baseResource := meta.GetBaseResource().(*Resource)
-			Admin := baseResource.GetAdmin()
+		if selectOneConfig.SelectMode == "select2_remote" || selectOneConfig.SelectMode == "bottom_sheet" {
+			if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
+				baseResource := meta.GetBaseResource().(*Resource)
+				Admin := baseResource.GetAdmin()
 
-			remoteDataResource.Meta(&Meta{Name: "SelectorPrimaryKey", Valuer: func(record interface{}, context *qor.Context) interface{} {
-				return context.GetDB().NewScope(record).PrimaryKeyValue()
-			}})
+				remoteDataSearcherController := &controller{Admin: Admin}
+				remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
+				// GET /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
+				Admin.GetRouter().Get(remoteDataSearcherPrefix, remoteDataSearcherController.Index, RouteConfig{
+					Resource: remoteDataResource,
+				})
 
-			remoteDataResource.Meta(&Meta{Name: "SelectorHumanizeString", Valuer: func(record interface{}, context *qor.Context) interface{} {
-				return utils.Stringify(record)
-			}})
+				// POST /admin/!meta_selector/:resource_name/:field_name
+				Admin.GetRouter().Post(remoteDataSearcherPrefix, remoteDataSearcherController.Create, RouteConfig{
+					Resource: remoteDataResource,
+				})
 
-			remoteDataResource.IndexAttrs("SelectorPrimaryKey", "SelectorHumanizeString", remoteDataResource.IndexAttrs())
-
-			remoteDataSearcherController := &controller{Admin: Admin}
-			remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
-			// GET /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
-			Admin.GetRouter().Get(remoteDataSearcherPrefix, remoteDataSearcherController.Index, RouteConfig{
-				Resource: remoteDataResource,
-			})
-
-			// POST /admin/!meta_selector/:resource_name/:field_name
-			Admin.GetRouter().Post(remoteDataSearcherPrefix, remoteDataSearcherController.Create, RouteConfig{
-				Resource: remoteDataResource,
-			})
-
-			// GET /admin/!meta_selector/:resource_name/:field_name/new
-			Admin.GetRouter().Get(path.Join(remoteDataSearcherPrefix, "new"), remoteDataSearcherController.New, RouteConfig{
-				Resource: remoteDataResource,
-			})
+				// GET /admin/!meta_selector/:resource_name/:field_name/new
+				Admin.GetRouter().Get(path.Join(remoteDataSearcherPrefix, "new"), remoteDataSearcherController.New, RouteConfig{
+					Resource: remoteDataResource,
+				})
+			} else {
+				utils.ExitWithMsg("RemoteDataResource not configured for meta %v", meta.Name)
+			}
 		}
 
 		meta.Type = "select_one"
