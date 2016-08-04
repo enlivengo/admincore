@@ -83,17 +83,34 @@ func (res Resource) ToParam() string {
 }
 
 // UseTheme use them for resource, will auto load the theme's javascripts, stylesheets for this resource
-func (res Resource) UseTheme(theme string) []string {
-	if res.Config != nil {
-		for _, t := range res.Config.Themes {
-			if t == theme {
-				return res.Config.Themes
-			}
-		}
+func (res *Resource) UseTheme(theme interface{}) []ThemeInterface {
+	var themeInterface ThemeInterface
+	if ti, ok := theme.(ThemeInterface); ok {
+		themeInterface = ti
+	} else if str, ok := theme.(string); ok {
+		themeInterface = Theme{Name: str}
+	}
 
-		res.Config.Themes = append(res.Config.Themes, theme)
+	if themeInterface != nil {
+		res.Config.Themes = append(res.Config.Themes, themeInterface)
+
+		// Config Admin Theme
+		for _, pth := range themeInterface.GetViewPaths() {
+			res.GetAdmin().RegisterViewPath(pth)
+		}
+		themeInterface.ConfigAdminTheme(res)
 	}
 	return res.Config.Themes
+}
+
+// GetTheme get registered theme with name
+func (res *Resource) GetTheme(name string) ThemeInterface {
+	for _, theme := range res.Config.Themes {
+		if theme.GetName() == name {
+			return theme
+		}
+	}
+	return nil
 }
 
 // Decode decode context into a value
@@ -131,12 +148,10 @@ func (res *Resource) convertObjectToJSONMap(context *Context, value interface{},
 		values := map[string]interface{}{}
 		for _, meta := range metas {
 			if meta.HasPermission(roles.Read, context.Context) {
-				if valuer := meta.GetFormattedValuer(); valuer != nil {
-					value := valuer(value, context.Context)
-					if meta.Resource != nil {
-						value = meta.Resource.convertObjectToJSONMap(context, value, kind)
-					}
-					values[meta.GetName()] = value
+				if meta.Resource != nil {
+					values[meta.GetName()] = meta.Resource.convertObjectToJSONMap(context, context.RawValueOf(value, meta), kind)
+				} else {
+					values[meta.GetName()] = context.FormattedValueOf(value, meta)
 				}
 			}
 		}

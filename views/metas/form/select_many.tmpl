@@ -1,9 +1,9 @@
 <div class="qor-field">
-  {{$current_values := (raw_value_of .ResourceValue .Meta)}}
   <label class="qor-field__label" for="{{.InputId}}">
     {{meta_label .Meta}}
   </label>
 
+  {{$current_values := (raw_value_of .ResourceValue .Meta)}}
   <div class="qor-field__show">
     {{range $value := $current_values}}
       {{stringify $value}}
@@ -11,12 +11,18 @@
   </div>
 
   <div class="qor-field__edit qor-field__block">
-    <select class="qor-field__input" id="{{.InputId}}" data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}}>
-      {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
-        {{if (is_included $current_values (index $values 0))}}
-          <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
-        {{else}}
-          <option value="{{index $values 0}}">{{index $values 1}}</option>
+    <select class="qor-field__input" id="{{.InputId}}" data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.RemoteDataURL}}data-remote-data-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}"{{end}}>
+      {{if .Meta.Config.RemoteDataURL}}
+        {{range $value := $current_values}}
+          <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
+        {{end}}
+      {{else}}
+        {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
+          {{if (is_included $current_values (index $values 0))}}
+            <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
+          {{else}}
+            <option value="{{index $values 0}}">{{index $values 1}}</option>
+          {{end}}
         {{end}}
       {{end}}
     </select>

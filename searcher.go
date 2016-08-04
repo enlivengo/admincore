@@ -124,7 +124,7 @@ func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 			}
 		}
 	}
-	
+
 	context.SetDB(db)
 
 	// call search

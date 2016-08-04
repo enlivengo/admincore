@@ -232,37 +232,42 @@
       $('.qor-page__body .mdl-data-table__select').each(function (i, e) { $(e).parents('td').remove(); });
       $('.qor-page__body .mdl-data-table__select').each(function (i, e) { $(e).parents('th').remove(); });
       $('.qor-table-container tr.is-selected').removeClass('is-selected');
-
       $('.qor-page__body table').addClass('mdl-data-table--selectable');
-      window.newQorMaterialDataTable = new window.MaterialDataTable($('.qor-page__body table').get(0));
 
-      // The fixed head have checkbox but the visiual one doesn't, clone the head with checkbox from the fixed one
+      // init google material
+      new window.MaterialDataTable($('.qor-page__body table').get(0));
       $('thead.is-hidden tr th:not(".mdl-data-table__cell--non-numeric")').clone().prependTo($('thead:not(".is-hidden") tr'));
 
-      // The clone one doesn't bind event, so binding event manual
-      var $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input').parents('label');
-      $fixedHeadCheckBox.find('span').remove();
-      window.newQorMaterialCheckbox = new window.MaterialCheckbox($fixedHeadCheckBox.get(0));
+      var $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input');
+      var isMediaLibrary = $('.qor-table--medialibrary').size();
+
+      isMediaLibrary && ($fixedHeadCheckBox = $('thead .mdl-checkbox__input'));
+
       $fixedHeadCheckBox.on('click', function () {
-        $('thead.is-fixed tr th').eq(0).find('label').click();
-        $(this).toggleClass('is-checked');
+
+        if (!isMediaLibrary) {
+          $('thead.is-fixed tr th').eq(0).find('label').click();
+          $(this).closest('label').toggleClass('is-checked');
+        }
 
         var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
         var slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
 
-        slideroutActionFormPrimaryValues.remove();
-        if ($(this).hasClass('is-checked') && slideroutActionForm.size() && $('.qor-slideout').is(':visible')){
-          var allPrimaryValues = $('.qor-table--bulking tbody tr');
-          allPrimaryValues.each(function () {
-            var primaryValue = $(this).data('primary-key');
-            if (primaryValue){
-              slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
-            }
-          });
+        if (slideroutActionForm.size() && $('.qor-slideout').is(':visible')){
 
+          if ($(this).is(':checked')) {
+            var allPrimaryValues = $('.qor-table--bulking tbody tr');
+            allPrimaryValues.each(function () {
+              var primaryValue = $(this).data('primary-key');
+              if (primaryValue){
+                slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
+              }
+            });
+          } else {
+            slideroutActionFormPrimaryValues.remove();
+          }
         }
 
-        return false;
       });
     }
 

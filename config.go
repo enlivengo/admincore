@@ -8,7 +8,7 @@ type Config struct {
 	Menu       []string
 	Invisible  bool
 	Permission *roles.Permission
-	Themes     []string
+	Themes     []ThemeInterface
 	PageCount  int
 	Singleton  bool
 }
