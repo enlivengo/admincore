@@ -13,6 +13,7 @@ import (
 type SelectManyConfig struct {
 	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	SelectionTemplate  string
+	SelectMode         string // select2, select2_remote, bottom_sheet
 	RemoteDataResource *Resource
 	SelectOneConfig
 }
@@ -29,6 +30,7 @@ func (selectManyConfig SelectManyConfig) GetTemplate(context *Context, metaType 
 func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metaor) {
 	if meta, ok := metaor.(*Meta); ok {
 		selectManyConfig.SelectOneConfig.Collection = selectManyConfig.Collection
+		selectManyConfig.SelectOneConfig.SelectMode = selectManyConfig.SelectMode
 		selectManyConfig.SelectOneConfig.RemoteDataResource = selectManyConfig.RemoteDataResource
 
 		selectManyConfig.SelectOneConfig.ConfigureQorMeta(meta)
