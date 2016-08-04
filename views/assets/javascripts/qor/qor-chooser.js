@@ -67,7 +67,7 @@
 
         option.templateSelection = function(data) {
           if (data.loading) return data.text;
-          return data.Name || data.Title || data.Code;
+          return data.text || data.Name || data.Title || data.Code;
         };
       }
 

@@ -74,7 +74,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 		if selectOneConfig.getCollection == nil {
 			if selectOneConfig.RemoteDataResource == nil {
 				fieldType := meta.FieldStruct.Struct.Type
-				selectOneConfig.RemoteDataResource = meta.baseResource.GetAdmin().NewResource(reflect.New(fieldType))
+				selectOneConfig.RemoteDataResource = meta.baseResource.GetAdmin().NewResource(reflect.New(fieldType).Interface())
 			}
 
 			if selectOneConfig.SelectMode == "select2" {

@@ -39,7 +39,11 @@ func (context *Context) NewResourceContext(name ...interface{}) *Context {
 }
 
 func (context *Context) primaryKeyOf(value interface{}) interface{} {
-	return context.GetDB().NewScope(value).PrimaryKeyValue()
+	if reflect.Indirect(reflect.ValueOf(value)).Kind() == reflect.Struct {
+		scope := &gorm.Scope{Value: value}
+		return fmt.Sprint(scope.PrimaryKeyValue())
+	}
+	return fmt.Sprint(hasValue)
 }
 
 func (context *Context) isNewRecord(value interface{}) bool {
