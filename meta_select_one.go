@@ -74,26 +74,29 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 		if selectOneConfig.getCollection == nil {
 			if selectOneConfig.RemoteDataResource == nil {
 				fieldType := meta.FieldStruct.Struct.Type
+				for fieldType.Kind() == reflect.Ptr || fieldType.Kind() == reflect.Slice {
+					fieldType = fieldType.Elem()
+				}
 				selectOneConfig.RemoteDataResource = meta.baseResource.GetAdmin().NewResource(reflect.New(fieldType).Interface())
 			}
 
-			if selectOneConfig.SelectMode == "select2" {
-				selectOneConfig.getCollection = func(_ interface{}, context *Context) (results [][]string) {
-					cloneContext := context.clone()
-					cloneContext.setResource(selectOneConfig.RemoteDataResource)
-					searcher := &Searcher{Context: cloneContext}
-					searchResults, _ := searcher.FindMany()
-
-					reflectValues := reflect.Indirect(reflect.ValueOf(searchResults))
-					for i := 0; i < reflectValues.Len(); i++ {
-						value := reflectValues.Index(i).Interface()
-						scope := context.GetDB().NewScope(value)
-						results = append(results, []string{fmt.Sprint(scope.PrimaryKeyValue()), utils.Stringify(value)})
-					}
-					return
-				}
-			} else if selectOneConfig.SelectMode == "" {
+			if selectOneConfig.SelectMode == "" {
 				selectOneConfig.SelectMode = "select2_remote"
+			}
+
+			selectOneConfig.getCollection = func(_ interface{}, context *Context) (results [][]string) {
+				cloneContext := context.clone()
+				cloneContext.setResource(selectOneConfig.RemoteDataResource)
+				searcher := &Searcher{Context: cloneContext}
+				searchResults, _ := searcher.FindMany()
+
+				reflectValues := reflect.Indirect(reflect.ValueOf(searchResults))
+				for i := 0; i < reflectValues.Len(); i++ {
+					value := reflectValues.Index(i).Interface()
+					scope := context.GetDB().NewScope(value)
+					results = append(results, []string{fmt.Sprint(scope.PrimaryKeyValue()), utils.Stringify(value)})
+				}
+				return
 			}
 		}
 

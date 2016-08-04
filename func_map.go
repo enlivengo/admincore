@@ -43,7 +43,7 @@ func (context *Context) primaryKeyOf(value interface{}) interface{} {
 		scope := &gorm.Scope{Value: value}
 		return fmt.Sprint(scope.PrimaryKeyValue())
 	}
-	return fmt.Sprint(hasValue)
+	return fmt.Sprint(value)
 }
 
 func (context *Context) isNewRecord(value interface{}) bool {
