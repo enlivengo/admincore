@@ -148,12 +148,10 @@ func (res *Resource) convertObjectToJSONMap(context *Context, value interface{},
 		values := map[string]interface{}{}
 		for _, meta := range metas {
 			if meta.HasPermission(roles.Read, context.Context) {
-				if valuer := meta.GetFormattedValuer(); valuer != nil {
-					value := valuer(value, context.Context)
-					if meta.Resource != nil {
-						value = meta.Resource.convertObjectToJSONMap(context, value, kind)
-					}
-					values[meta.GetName()] = value
+				if meta.Resource != nil {
+					values[meta.GetName()] = meta.Resource.convertObjectToJSONMap(context, context.RawValueOf(value, meta), kind)
+				} else {
+					values[meta.GetName()] = context.FormattedValueOf(value, meta)
 				}
 			}
 		}
