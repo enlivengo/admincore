@@ -68,20 +68,14 @@
         };
 
         option.templateResult =  function(data) {
-          var template = $this.parents(".qor-field").find("[name='select2-result-template']");
-          if (template.length > 0) {
-            return Mustache.render(template.html().replace(/{{(.*?)}}/g, "[[$1]]"), data);
-          }
-          return data.text || data.Name || data.Title || data.Code;
+          var tmpl = $this.parents(".qor-field").find("[name='select2-result-template']");
+          return QorChooser.formatResult(data, tmpl);
         };
 
         option.templateSelection = function(data) {
           if (data.loading) return data.text;
-          var template = $this.parents(".qor-field").find("[name='select2-selection-template']");
-          if (template.length > 0) {
-            return Mustache.render(template.html().replace(/{{(.*?)}}/g, "[[$1]]"), data);
-          }
-          return data.text || data.Name || data.Title || data.Code;
+          var tmpl = $this.parents(".qor-field").find("[name='select2-selection-template']");
+          return QorChooser.formatResult(data, tmpl);
         };
       }
 
@@ -117,6 +111,21 @@
         fn.apply(data);
       }
     });
+  };
+
+  QorChooser.formatResult = function (data, tmpl) {
+    var result = "";
+    if (tmpl.length > 0) {
+      result = Mustache.render(tmpl.html().replace(/{{(.*?)}}/g, "[[$1]]"), data);
+    } else {
+      result = data.text || data.Name || data.Title || data.Code;
+    }
+
+    // if is HTML
+    if (/<(.*)(\/>|<\/.+>)/.test(result)) {
+      return $(result);
+    }
+    return result;
   };
 
   $(function () {
