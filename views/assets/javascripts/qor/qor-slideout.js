@@ -121,6 +121,50 @@
       return array;
     },
 
+    loadExtraResource: function ($body,$response,url,response) {
+      var dataBody = $body;
+      dataBody  = dataBody.join('');
+      dataBody  = dataBody.replace(/<\s*body/gi, '<div');
+      dataBody  = dataBody.replace(/<\s*\/body/gi, '</div');
+      var bodyClass = $(dataBody).prop('class');
+      $('body').addClass(bodyClass);
+
+      // Get links and scripts, compare slideout and inline, load style and script if has new style or script.
+      var $slideoutStyles = $response.filter('link');
+      var $currentPageStyles = $('link');
+      var $slideoutScripts = $response.filter('script');
+      var $currentPageScripts = $('script');
+
+      var slideoutStylesUrls = this.pushArrary($slideoutStyles, 'href');
+      var currentPageStylesUrls = this.pushArrary($currentPageStyles, 'href');
+
+      var slideoutScriptsUrls = this.pushArrary($slideoutScripts, 'src');
+      var currentPageScriptsUrls = this.pushArrary($currentPageScripts, 'src');
+
+      var styleDifferenceUrl  = _.difference(slideoutStylesUrls, currentPageStylesUrls);
+      var scriptDifferenceUrl = _.difference(slideoutScriptsUrls, currentPageScriptsUrls);
+
+      var styleDifferenceUrlLength = styleDifferenceUrl.length;
+      var scriptDifferenceUrlLength = scriptDifferenceUrl.length;
+
+      if (styleDifferenceUrlLength === 1){
+        this.loadStyle(styleDifferenceUrl);
+      } else if (styleDifferenceUrlLength > 1){
+        for (var i = styleDifferenceUrlLength - 1; i >= 0; i--) {
+          this.loadStyle(styleDifferenceUrl[i]);
+        }
+      }
+
+      if (scriptDifferenceUrlLength === 1){
+        this.loadScript(scriptDifferenceUrl, url, response);
+      } else if (scriptDifferenceUrlLength > 1){
+        for (var j = scriptDifferenceUrlLength - 1; j >= 0; j--) {
+          this.loadScript(scriptDifferenceUrl[j], url, response);
+        }
+      }
+
+    },
+
     removeSelectedClass: function () {
       this.$element.find('[data-url]').removeClass(CLASS_IS_SELECTED);
     },
@@ -334,53 +378,11 @@
               }
 
               // Get response body tag: http://stackoverflow.com/questions/7001926/cannot-get-body-element-from-ajax-response
-              var dataBody = response.match(/<\s*body.*>[\s\S]*<\s*\/body\s*>/ig);
+              var bodyHtml = response.match(/<\s*body.*>[\s\S]*<\s*\/body\s*>/ig);
               // if no body tag return
-              if (dataBody) {
-
-                dataBody  = dataBody.join('');
-                dataBody  = dataBody.replace(/<\s*body/gi, '<div');
-                dataBody  = dataBody.replace(/<\s*\/body/gi, '</div');
-                var bodyClass = $(dataBody).prop('class');
-                $('body').addClass(bodyClass);
-
-                // Get links and scripts, compare slideout and inline, load style and script if has new style or script.
-                var $slideoutStyles = $response.filter('link');
-                var $currentPageStyles = $('link');
-                var $slideoutScripts = $response.filter('script');
-                var $currentPageScripts = $('script');
-
-                var slideoutStylesUrls = this.pushArrary($slideoutStyles, 'href');
-                var currentPageStylesUrls = this.pushArrary($currentPageStyles, 'href');
-
-                var slideoutScriptsUrls = this.pushArrary($slideoutScripts, 'src');
-                var currentPageScriptsUrls = this.pushArrary($currentPageScripts, 'src');
-
-                var styleDifferenceUrl  = _.difference(slideoutStylesUrls, currentPageStylesUrls);
-                var scriptDifferenceUrl = _.difference(slideoutScriptsUrls, currentPageScriptsUrls);
-
-                var styleDifferenceUrlLength = styleDifferenceUrl.length;
-                var scriptDifferenceUrlLength = scriptDifferenceUrl.length;
-
-                if (styleDifferenceUrlLength === 1){
-                  this.loadStyle(styleDifferenceUrl);
-                } else if (styleDifferenceUrlLength > 1){
-                  for (var i = styleDifferenceUrlLength - 1; i >= 0; i--) {
-                    this.loadStyle(styleDifferenceUrl[i]);
-                  }
-                }
-
-                if (scriptDifferenceUrlLength === 1){
-                  this.loadScript(scriptDifferenceUrl, url, response);
-                } else if (scriptDifferenceUrlLength > 1){
-                  for (var j = scriptDifferenceUrlLength - 1; j >= 0; j--) {
-                    this.loadScript(scriptDifferenceUrl[j], url, response);
-                  }
-                }
-
+              if (bodyHtml) {
+                this.loadExtraResource(bodyHtml,$response,url,response);
               }
-
-
               // end
 
               $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
