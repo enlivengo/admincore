@@ -78,7 +78,7 @@
 
       $document.
         off(EVENT_KEYUP, this.keyup).
-        off(EVENT_CLICK, this.click);
+        off(EVENT_CLICK, this.hide);
     },
 
     keyup: function (e) {
@@ -167,87 +167,6 @@
 
     removeSelectedClass: function () {
       this.$element.find('[data-url]').removeClass(CLASS_IS_SELECTED);
-    },
-
-    click: function (e) {
-      var slideout = this.$slideout.get(0);
-      var target = e.target;
-      var $target;
-
-      // function toggleClass() {
-      //   $this.find('[data-url]').removeClass(CLASS_IS_SELECTED);
-      //   $target.addClass(CLASS_IS_SELECTED);
-      // }
-
-      if (e.isDefaultPrevented()) {
-        return;
-      }
-
-      while (target !== document) {
-        $target = $(target);
-
-        if ($target.prop('disabled')) {
-          break;
-        }
-
-        if (target === slideout) {
-          break;
-        } else if ($target.data('dismiss') === 'slideout') {
-          this.hide();
-          this.removeSelectedClass();
-          break;
-        }
-
-        // if (target === slideout) {
-        //   break;
-        // } else if ($target.data('dismiss') === 'slideout') {
-        //   this.hide();
-        //   this.removeSelectedClass();
-        //   break;
-        // } else if ($target.is('.qor-table tr[data-url]')) {
-        //   if ($(e.target).parents('.qor-table__actions').size() > 0) {
-        //     return;
-        //   }
-
-        //   if ($target.hasClass(CLASS_IS_SELECTED)) {
-        //     this.hide();
-        //     this.removeSelectedClass();
-        //   } else {
-        //     toggleClass();
-        //     data = $target.data();
-        //     this.load(data.url);
-        //   }
-
-        //   break;
-        // } else if ($target.data('url')) {
-        //   e.preventDefault();
-
-        //   if ($target.hasClass(CLASS_IS_SELECTED)) {
-        //     this.hide();
-        //     this.removeSelectedClass();
-        //   } else {
-        //     toggleClass();
-        //     data = $target.data();
-        //     this.load(data.url, data);
-        //   }
-        //   break;
-
-        // } else {
-        //   if ($target.is('a')) {
-        //     break;
-        //   }
-
-        //   if (target) {
-        //     target = target.parentNode;
-        //   } else {
-        //     break;
-        //   }
-        // }
-        //
-        //
-      }
-
-
     },
 
     submit: function (e) {

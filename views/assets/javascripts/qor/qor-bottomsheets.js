@@ -72,32 +72,6 @@
       $document.off(EVENT_CLICK, this.click);
     },
 
-    click: function (e) {
-      var bottomsheets = this.$bottomsheets.get(0);
-      var target = e.target;
-      var $target;
-
-      if (e.isDefaultPrevented()) {
-        return;
-      }
-
-      while (target !== document) {
-        $target = $(target);
-
-        if ($target.prop('disabled')) {
-          break;
-        }
-
-        if (target === bottomsheets) {
-          break;
-        } else if ($target.data('dismiss') === 'bottomsheets') {
-          this.hide();
-          break;
-        }
-
-      }
-    },
-
     submit: function (e) {
       var $bottomsheets = this.$bottomsheets;
       var $body = this.$body;
