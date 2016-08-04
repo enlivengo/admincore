@@ -13,6 +13,7 @@
 
   'use strict';
 
+  var Mustache = window.Mustache;
   var NAMESPACE = 'qor.chooser';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
@@ -67,11 +68,19 @@
         };
 
         option.templateResult =  function(data) {
+          var template = $this.parents(".qor-field").find("[name='select2-result-template']");
+          if (template.length > 0) {
+            return Mustache.render(template.html().replace(/{{(.*?)}}/g, "[[$1]]"), data);
+          }
           return data.text || data.Name || data.Title || data.Code;
         };
 
         option.templateSelection = function(data) {
           if (data.loading) return data.text;
+          var template = $this.parents(".qor-field").find("[name='select2-selection-template']");
+          if (template.length > 0) {
+            return Mustache.render(template.html().replace(/{{(.*?)}}/g, "[[$1]]"), data);
+          }
           return data.text || data.Name || data.Title || data.Code;
         };
       }

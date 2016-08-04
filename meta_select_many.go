@@ -2,6 +2,7 @@ package admin
 
 import (
 	"errors"
+	"html/template"
 	"reflect"
 
 	"github.com/qor/qor"
@@ -11,10 +12,12 @@ import (
 
 // SelectManyConfig meta configuration used for select many
 type SelectManyConfig struct {
-	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
-	SelectionTemplate  string
-	SelectMode         string // select2, select2_remote, bottom_sheet
-	RemoteDataResource *Resource
+	Collection               interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
+	SelectionTemplate        string
+	SelectMode               string // select2, select2_remote, bottom_sheet
+	Select2ResultTemplate    template.JS
+	Select2SelectionTemplate template.JS
+	RemoteDataResource       *Resource
 	SelectOneConfig
 }
 

@@ -3,6 +3,7 @@ package admin
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"path"
 	"reflect"
 
@@ -13,12 +14,14 @@ import (
 
 // SelectOneConfig meta configuration used for select one
 type SelectOneConfig struct {
-	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
-	AllowBlank         bool
-	SelectionTemplate  string
-	SelectMode         string // select2, select2_remote, bottom_sheet
-	RemoteDataResource *Resource
-	RemoteDataURL      string
+	Collection               interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
+	AllowBlank               bool
+	SelectionTemplate        string
+	SelectMode               string // select2, select2_remote, bottom_sheet
+	Select2ResultTemplate    template.JS
+	Select2SelectionTemplate template.JS
+	RemoteDataResource       *Resource
+	RemoteDataURL            string
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
 }
