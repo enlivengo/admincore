@@ -52,10 +52,15 @@
             // scrolling can be used
             params.page = params.page || 1;
 
+            var processedData = $.map(data, function (obj) {
+              obj.id = obj.Id || obj.ID;
+              return obj;
+            });
+
             return {
-              results: data,
+              results: processedData,
               pagination: {
-                more: data.length >= 20
+                more: processedData.length >= 20
               }
             };
           }
