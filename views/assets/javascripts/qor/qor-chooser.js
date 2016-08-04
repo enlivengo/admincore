@@ -28,11 +28,50 @@
 
     init: function () {
       var $this = this.$element;
-
-      $this.select2({
+      var option = {
         minimumResultsForSearch: 20,
         dropdownParent: $this.parent()
-      });
+      };
+
+      if ($this.data("remote-data-url")) {
+        option.ajax = {
+          url: $this.data("remote-data-url"),
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              keyword: params.term, // search term
+              page: params.page,
+              per_page: 20
+            };
+          },
+          processResults: function (data, params) {
+            // parse the results into the format expected by Select2
+            // since we are using custom formatting functions we do not need to
+            // alter the remote JSON data, except to indicate that infinite
+            // scrolling can be used
+            params.page = params.page || 1;
+
+            return {
+              results: data,
+              pagination: {
+                more: data.length >= 20
+              }
+            };
+          }
+        };
+
+        option.templateResult =  function(data) {
+          return data.text || data.Name || data.Title || data.Code;
+        };
+
+        option.templateSelection = function(data) {
+          if (data.loading) return data.text;
+          return data.Name || data.Title || data.Code;
+        };
+      }
+
+      $this.select2(option);
     },
 
     destroy: function () {

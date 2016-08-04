@@ -16,8 +16,9 @@ type SelectOneConfig struct {
 	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	AllowBlank         bool
 	SelectionTemplate  string
-	RemoteDataResource *Resource
 	SelectMode         string // select2, select2_remote, bottom_sheet
+	RemoteDataResource *Resource
+	RemoteDataURL      string
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
 }
@@ -103,6 +104,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 
 				remoteDataSearcherController := &controller{Admin: Admin}
 				remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
+				selectOneConfig.RemoteDataURL = remoteDataSearcherPrefix
 				// GET /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
 				Admin.GetRouter().Get(remoteDataSearcherPrefix, remoteDataSearcherController.Index, RouteConfig{
 					Resource: remoteDataResource,
