@@ -33,25 +33,39 @@ $(function () {
 
     $(document).on('click.qor.openUrl', '[data-url]', function () {
         var $this = $(this),
-            isNewBottom = $this.hasClass('qor-button--new'),
-            isEditBottom = $this.hasClass('qor-button--edit'),
+            isNewButton = $this.hasClass('qor-button--new'),
+            isEditButton = $this.hasClass('qor-button--edit'),
             isInTable = $this.closest('.qor-js-table').size(),
+            isActionButton = $this.hasClass('qor-action-button'),
             data = $this.data();
 
 
-        // Will open in slideout: table items, new buttom, edit buttom
-        // Will open in bottomsheets: slideout is opened
-        if (isInTable || isNewBottom || isEditBottom || data.openType == 'slideout') {
-            if ($this.hasClass(CLASS_IS_SELECTED)) {
-                Slideout.hide();
-                clearSelectedCss();
+        // Slideout or New Page: table items, new button, edit button
+        if (isInTable || isNewButton || isEditButton || data.openType == 'slideout') {
+            if (hasSlideoutTheme) {
+                if ($this.hasClass(CLASS_IS_SELECTED)) {
+                    Slideout.hide();
+                    clearSelectedCss();
+                } else {
+                    Slideout.open(data);
+                    toggleSelectedCss($this);
+                }
             } else {
-                Slideout.open(data);
-                toggleSelectedCss($this);
+                window.location = data("url");
             }
+            return;
+        }
 
+        // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
+        if (isSlideoutOpened() || isActionButton || data.openType == 'bottom-sheet') {
+            BottomSheets.open(data);
+            return;
+        }
 
-        } else if (isSlideoutOpened() || data.openType == 'bottomsheets') {
+        // Other clicks
+        if (hasSlideoutTheme) {
+            Slideout.open(data);
+        } else {
             BottomSheets.open(data);
         }
 

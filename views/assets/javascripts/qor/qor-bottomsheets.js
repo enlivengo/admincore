@@ -60,7 +60,7 @@
     bind: function () {
       this.$bottomsheets
         .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
-        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', $.proxy(this.hide, this));
+        .on(EVENT_CLICK, '[data-dismiss="bottom-sheet"]', $.proxy(this.hide, this));
 
       // $document.;
     },
@@ -199,7 +199,7 @@
                 return;
               }
 
-              $content.find('.qor-button--cancel').attr('data-dismiss', 'bottomsheets');
+              $content.find('.qor-button--cancel').attr('data-dismiss', 'bottom-sheet');
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
@@ -308,6 +308,7 @@
         trigger(EVENT_HIDDEN);
 
       $('body').removeClass(CLASS_OPEN);
+      return false;
     },
 
     refresh: function () {
