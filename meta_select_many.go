@@ -14,7 +14,7 @@ import (
 type SelectManyConfig struct {
 	Collection               interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	SelectionTemplate        string
-	SelectMode               string // select2, select2_remote, bottom_sheet
+	SelectMode               string // select, select_async, bottom_sheet
 	Select2ResultTemplate    template.JS
 	Select2SelectionTemplate template.JS
 	RemoteDataResource       *Resource
