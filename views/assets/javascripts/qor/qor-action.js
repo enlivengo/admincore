@@ -178,7 +178,11 @@
       var properties = ajaxForm.properties;
 
       if (!ajaxForm.formData.length && properties.fromIndex){
-        window.alert(ajaxForm.properties.errorNoProduct);
+        window.alert(ajaxForm.properties.errorNoItem);
+        return;
+      }
+
+      if (properties.confirm && !window.confirm(properties.confirm)) {
         return;
       }
 

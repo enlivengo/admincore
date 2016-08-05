@@ -35,7 +35,7 @@ $(function () {
         var $this = $(this),
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
-            isInTable = $this.closest('.qor-js-table').size(),
+            isInTable = $this.is('.qor-table tr[data-url]'),
             isActionButton = $this.hasClass('qor-action-button'),
             data = $this.data();
 
