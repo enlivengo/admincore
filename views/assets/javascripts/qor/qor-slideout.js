@@ -26,6 +26,7 @@
   var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
   var EVENT_TRANSITIONEND = 'transitionend';
   var CLASS_OPEN = 'qor-slideout-open';
+  var CLASS_MINI = 'qor-slideout-mini';
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
   var CLASS_IS_SELECTED = 'is-selected';
@@ -37,6 +38,7 @@
     this.options = $.extend({}, QorSlideout.DEFAULTS, $.isPlainObject(options) && options);
     this.slided = false;
     this.disabled = false;
+    this.slideoutType = false;
     this.init();
   }
 
@@ -292,6 +294,8 @@
 
               $content = $response.find(CLASS_MAIN_CONTENT);
 
+              this.slideoutType = $content.find('.qor-form-container').data().slideoutType;
+
               if (!$content.length) {
                 return;
               }
@@ -386,6 +390,12 @@
 
       if (showEvent.isDefaultPrevented()) {
         return;
+      }
+
+      if (this.slideoutType == 'mini') {
+        $slideout.addClass(CLASS_MINI);
+      } else {
+        $slideout.removeClass(CLASS_MINI);
       }
 
       $slideout.addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
