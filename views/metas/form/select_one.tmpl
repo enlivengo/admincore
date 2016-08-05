@@ -7,6 +7,18 @@
     {{.Value}}
   </div>
 
+  {{if .Meta.Config.Select2ResultTemplate}}
+    <script name="select2-result-template" type="x-tmpl-mustache">
+      {{.Meta.Config.Select2ResultTemplate}}
+    </script>
+  {{end}}
+
+  {{if .Meta.Config.Select2SelectionTemplate}}
+    <script name="select2-selection-template" type="x-tmpl-mustache">
+      {{.Meta.Config.Select2SelectionTemplate}}
+    </script>
+  {{end}}
+
   <div class="qor-field__block qor-field__edit">
     <select id="{{.InputId}}" class="qor-field__input" data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_an_option" "Select an Option"}}" name="{{.InputName}}" {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.AllowBlank}}data-allow-clear="true"{{end}} {{if .Meta.Config.RemoteDataURL}}data-remote-data-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}"{{end}}>
       {{$current_values := (raw_value_of .ResourceValue .Meta)}}

@@ -3,6 +3,7 @@ package admin
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"path"
 	"reflect"
 
@@ -13,12 +14,14 @@ import (
 
 // SelectOneConfig meta configuration used for select one
 type SelectOneConfig struct {
-	Collection         interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
-	AllowBlank         bool
-	SelectionTemplate  string
-	SelectMode         string // select2, select2_remote, bottom_sheet
-	RemoteDataResource *Resource
-	RemoteDataURL      string
+	Collection               interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
+	AllowBlank               bool
+	SelectionTemplate        string
+	SelectMode               string // select, select_async, bottom_sheet
+	Select2ResultTemplate    template.JS
+	Select2SelectionTemplate template.JS
+	RemoteDataResource       *Resource
+	RemoteDataURL            string
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
 }
@@ -46,7 +49,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 
 		// Set GetCollection
 		if selectOneConfig.Collection != nil {
-			selectOneConfig.SelectMode = "select2"
+			selectOneConfig.SelectMode = "select"
 
 			if values, ok := selectOneConfig.Collection.([]string); ok {
 				selectOneConfig.getCollection = func(interface{}, *Context) (results [][]string) {
@@ -70,7 +73,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 			}
 		}
 
-		// Set GetCollection if normal select2 mode
+		// Set GetCollection if normal select mode
 		if selectOneConfig.getCollection == nil {
 			if selectOneConfig.RemoteDataResource == nil {
 				fieldType := meta.FieldStruct.Struct.Type
@@ -81,7 +84,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 			}
 
 			if selectOneConfig.SelectMode == "" {
-				selectOneConfig.SelectMode = "select2_remote"
+				selectOneConfig.SelectMode = "select_async"
 			}
 
 			selectOneConfig.getCollection = func(_ interface{}, context *Context) (results [][]string) {
@@ -100,7 +103,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 			}
 		}
 
-		if selectOneConfig.SelectMode == "select2_remote" || selectOneConfig.SelectMode == "bottom_sheet" {
+		if selectOneConfig.SelectMode == "select_async" || selectOneConfig.SelectMode == "bottom_sheet" {
 			if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
 				baseResource := meta.GetBaseResource().(*Resource)
 				Admin := baseResource.GetAdmin()

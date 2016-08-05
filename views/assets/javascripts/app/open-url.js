@@ -2,9 +2,7 @@ $(function () {
 
     'use strict';
 
-    var data,
-        $target,
-        $body = $('body'),
+    var $body = $('body'),
         Slideout,
         BottomSheets,
 
