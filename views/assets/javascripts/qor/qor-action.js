@@ -97,7 +97,7 @@
       }
     },
 
-    click : function (e) {
+    click: function (e) {
       var $target = $(e.target);
 
       if ($target.data().ajaxForm) {
@@ -106,7 +106,6 @@
         this.submit();
         return false;
       }
-
 
 
       if ($target.is('.qor-action--bulk')) {

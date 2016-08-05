@@ -39,38 +39,38 @@ $(function () {
             isActionButton = $this.hasClass('qor-action-button'),
             data = $this.data();
 
-
-        // Slideout or New Page: table items, new button, edit button
-        if (isInTable || isNewButton || isEditButton || data.openType == 'slideout') {
-            if (hasSlideoutTheme) {
-                if ($this.hasClass(CLASS_IS_SELECTED)) {
-                    Slideout.hide();
-                    clearSelectedCss();
+        if (!data.method || data.method.toUpperCase() == "GET") {
+            // Slideout or New Page: table items, new button, edit button
+            if (isInTable || isNewButton || isEditButton || data.openType == 'slideout') {
+                if (hasSlideoutTheme) {
+                    if ($this.hasClass(CLASS_IS_SELECTED)) {
+                        Slideout.hide();
+                        clearSelectedCss();
+                    } else {
+                        Slideout.open(data);
+                        toggleSelectedCss($this);
+                    }
                 } else {
-                    Slideout.open(data);
-                    toggleSelectedCss($this);
+                    window.location = data("url");
                 }
-            } else {
-                window.location = data("url");
+                return;
             }
-            return;
+
+            // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
+            if (isSlideoutOpened() || isActionButton || data.openType == 'bottom-sheet') {
+                BottomSheets.open(data);
+                return;
+            }
+
+            // Other clicks
+            if (hasSlideoutTheme) {
+                Slideout.open(data);
+            } else {
+                BottomSheets.open(data);
+            }
+
+            return false;
         }
-
-        // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
-        if (isSlideoutOpened() || isActionButton || data.openType == 'bottom-sheet') {
-            BottomSheets.open(data);
-            return;
-        }
-
-        // Other clicks
-        if (hasSlideoutTheme) {
-            Slideout.open(data);
-        } else {
-            BottomSheets.open(data);
-        }
-
-        return false;
-
     });
 
 });
