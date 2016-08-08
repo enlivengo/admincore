@@ -52,7 +52,8 @@
       this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
       $(document)
         .on(EVENT_CLICK, '.qor-table--bulking tr', this.click)
-        .on(EVENT_CLICK, ACTION_LINK, this.actionLink);
+        .on(EVENT_CLICK, ACTION_LINK, this.actionLink)
+        .on(EVENT_CLICK, ".qor-table__actions a[data-url]", $.proxy(this.actionSubmit, this));
     },
 
     unbind: function () {
@@ -92,9 +93,15 @@
     },
 
     actionLink: function () {
+      // if not in index page
       if (!$(QOR_TABLE).find('table').size()) {
         return false;
       }
+    },
+
+    actionSubmit: function (e) {
+      this.submit(e);
+      return false;
     },
 
     click: function (e) {
@@ -170,14 +177,14 @@
       return Mustache.render(flashMessageTmpl, data);
     },
 
-    submit: function () {
+    submit: function (e) {
       var self = this;
       var $parent;
 
-      var ajaxForm = this.ajaxForm;
-      var properties = ajaxForm.properties;
+      var ajaxForm = this.ajaxForm || {};
+      var properties = ajaxForm.properties || $(e.target).data();
 
-      if (!ajaxForm.formData.length && properties.fromIndex){
+      if (properties.fromIndex && (!ajaxForm.formData || !ajaxForm.formData.length)){
         window.alert(ajaxForm.properties.errorNoItem);
         return;
       }
@@ -191,14 +198,17 @@
         data: ajaxForm.formData,
         dataType: properties.datatype,
         beforeSend: function () {
-          self.$element.find(ACTION_BUTTON).attr('disabled', true);
+          if (self.$element) {
+            self.$element.find(ACTION_BUTTON).attr('disabled', true);
+          }
         },
         success: function (data) {
-
-          if (properties.fromIndex){
+          if (properties.fromIndex || properties.fromMenu){
             window.location.reload();
           } else {
-            self.$element.find(ACTION_BUTTON).attr('disabled', false);
+            if (self.$element) {
+              self.$element.find(ACTION_BUTTON).attr('disabled', false);
+            }
             if ($(QOR_SLIDEOUT).is(':visible')){
               $parent = $(QOR_SLIDEOUT);
             } else {
@@ -210,7 +220,9 @@
 
         },
         error: function (xhr, textStatus, errorThrown) {
-          self.$element.find(ACTION_BUTTON).attr('disabled', false);
+          if (self.$element) {
+            self.$element.find(ACTION_BUTTON).attr('disabled', false);
+          }
           window.alert([textStatus, errorThrown].join(': '));
         }
       });

@@ -31,13 +31,17 @@ $(function () {
         ele.addClass(CLASS_IS_SELECTED);
     }
 
-    $(document).on('click.qor.openUrl', '[data-url]', function () {
+    $(document).on('click.qor.openUrl', '[data-url]', function (e) {
         var $this = $(this),
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
             isInTable = $this.is('.qor-table tr[data-url]'),
             isActionButton = $this.hasClass('qor-action-button'),
             data = $this.data();
+
+        if ($(e.target).hasClass("material-icons")) {
+            return;
+        }
 
         if (!data.method || data.method.toUpperCase() == "GET") {
             // Slideout or New Page: table items, new button, edit button
