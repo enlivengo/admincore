@@ -51,15 +51,30 @@
   }
 }
 
-.qor-bottomsheets__title{
+.qor-bottomsheets__header {
   position: relative;
   box-sizing: border-box;
   z-index: $zindex-bottomsheets;
   background-color: #fff;
-  padding: 24px 24px 0;
-  font-size: 24px;
-  line-height: 1;
+
+  .qor-bottomsheets__title {
+    position: relative;
+    margin: 0;
+    padding: 20px 24px 14px 56px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    background-color: #fff;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .qor-bottomsheets__close {
+    position: absolute!important;
+    top: 16px;
+    left: 16px;
+    color: rgba(0, 0, 0, 0.54);
+  }
 }
+
 .qor-bottomsheets__body {
   position: relative;
   box-sizing: border-box;

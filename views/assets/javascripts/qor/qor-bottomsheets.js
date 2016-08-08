@@ -60,7 +60,7 @@
     bind: function () {
       this.$bottomsheets
         .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
-        .on(EVENT_CLICK, '[data-dismiss="bottom-sheet"]', $.proxy(this.hide, this));
+        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', $.proxy(this.hide, this));
 
       // $document.;
     },
@@ -199,7 +199,7 @@
                 return;
               }
 
-              $content.find('.qor-button--cancel').attr('data-dismiss', 'bottom-sheet');
+              $content.find('.qor-button--cancel').attr('data-dismiss', 'bottomsheets');
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
@@ -333,7 +333,12 @@
 
   QorBottomSheets.TEMPLATE = (
     '<div class="qor-bottomsheets">' +
-      '<div class="qor-bottomsheets__title"></div>' +
+      '<div class="qor-bottomsheets__header">' +
+        '<h3 class="qor-bottomsheets__title"></h3>' +
+        '<button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-bottomsheets__close" data-dismiss="bottomsheets">' +
+          '<span class="material-icons">close</span>' +
+        '</button>' +
+      '</div>' +
       '<div class="qor-bottomsheets__body"></div>' +
     '</div>'
   );
