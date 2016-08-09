@@ -72,6 +72,13 @@
       $document.off(EVENT_CLICK, this.click);
     },
 
+    renderActionSelectedData: function (actionSelectedData) {
+      var $form = this.$body.find('[data-toggle="qor-action-slideout"]').find('form');
+      for (var i = actionSelectedData.length - 1; i >= 0; i--) {
+        $form.prepend('<input type="hidden" name="primary_values[]" value="' + actionSelectedData[i] + '" />');
+      }
+    },
+
     submit: function (e) {
       var $bottomsheets = this.$bottomsheets;
       var $body = this.$body;
@@ -168,6 +175,7 @@
       var method;
       var dataType;
       var load;
+      var actionSelectedData = data.actionSelectedData;
 
       if (!url) {
         return;
@@ -178,7 +186,7 @@
       method = data.method ? data.method : 'GET';
       dataType = data.datatype ? data.datatype : 'html';
 
-      data.url = data.method = data.datatype = data.ajaxForm = data.upgraded = undefined;
+      data.url = data.method = data.datatype = data.ajaxForm = data.upgraded = data.actionSelectedData = undefined;
 
       load = $.proxy(function () {
         $.ajax(url, {
@@ -202,6 +210,10 @@
               $content.find('.qor-button--cancel').attr('data-dismiss', 'bottomsheets');
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
+
+              if (actionSelectedData.length) {
+                this.renderActionSelectedData(actionSelectedData);
+              }
 
               this.$bottomsheets.one(EVENT_SHOWN, function () {
 
@@ -260,7 +272,7 @@
     },
 
     open: function (options) {
-      this.load(options.url,options.data);
+      this.load(options.url,options);
     },
 
     show: function () {

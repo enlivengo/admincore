@@ -140,6 +140,7 @@
 
         // Manual make checkbox checked or not
         if ($firstTd.find('.mdl-checkbox__input').get(0)) {
+          var hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open');
           var $checkbox = $firstTd.find('.mdl-js-checkbox');
           var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
           var formValueInput = slideroutActionForm.find('.js-primary-value');
@@ -153,7 +154,7 @@
 
           $firstTd.find('input').prop('checked', isChecked);
 
-          if (slideroutActionForm.size() && $('.qor-slideout').is(':visible')){
+          if (slideroutActionForm.size() && hasPopoverForm){
 
             if (isChecked && !$alreadyHaveValue.size()){
               slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
@@ -189,6 +190,7 @@
         window.alert(ajaxForm.properties.errorNoItem);
         return;
       }
+
 
       if (properties.confirm) {
           if (window.confirm(properties.confirm)) {
@@ -270,6 +272,7 @@
 
       var $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input');
       var isMediaLibrary = $('.qor-table--medialibrary').size();
+      var hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open');
 
       isMediaLibrary && ($fixedHeadCheckBox = $('thead .mdl-checkbox__input'));
 
@@ -283,7 +286,7 @@
         var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
         var slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
 
-        if (slideroutActionForm.size() && $('.qor-slideout').is(':visible')){
+        if (slideroutActionForm.size() && hasPopoverForm){
 
           if ($(this).is(':checked')) {
             var allPrimaryValues = $('.qor-table--bulking tbody tr');

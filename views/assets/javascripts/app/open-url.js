@@ -22,13 +22,28 @@ $(function () {
     Slideout = $body.data('qor.slideout');
     BottomSheets = $body.data('qor.bottomsheets');
 
-    function clearSelectedCss(){
+    function clearSelectedCss () {
         $('[data-url]').removeClass(CLASS_IS_SELECTED);
     }
 
-    function toggleSelectedCss(ele){
+    function toggleSelectedCss (ele) {
         $('[data-url]').removeClass(CLASS_IS_SELECTED);
         ele.addClass(CLASS_IS_SELECTED);
+    }
+
+    function collectSelectID () {
+        var $checked = $('.qor-table tbody').find('.mdl-checkbox__input:checked'),
+            IDs = [];
+
+        if (!$checked.size()) {
+            return;
+        }
+
+        $checked.each(function () {
+            IDs.push($(this).closest('tr').data('primary-key'));
+        });
+
+        return IDs;
     }
 
     $(document).on('click.qor.openUrl', '[data-url]', function (e) {
@@ -37,10 +52,18 @@ $(function () {
             isEditButton = $this.hasClass('qor-button--edit'),
             isInTable = $this.is('.qor-table tr[data-url]'),
             isActionButton = $this.hasClass('qor-action-button'),
-            data = $this.data();
+            data = $this.data(),
+            actionSelectedData;
 
         if ($(e.target).hasClass("material-icons")) {
             return;
+        }
+
+        if (isActionButton) {
+            actionSelectedData = collectSelectID();
+            data = $.extend({}, data, {
+              actionSelectedData: actionSelectedData
+            });
         }
 
         if (!data.method || data.method.toUpperCase() == "GET") {
