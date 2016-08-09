@@ -62,7 +62,6 @@
         .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', $.proxy(this.hide, this));
 
-      // $document.;
     },
 
     unbind: function () {

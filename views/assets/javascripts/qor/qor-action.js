@@ -191,8 +191,7 @@
         return;
       }
 
-
-      if (properties.confirm) {
+      if (properties.confirm && !properties.ajaxForm) {
           if (window.confirm(properties.confirm)) {
             properties = $.extend({}, properties, {
               _method: properties.method
@@ -203,10 +202,10 @@
             });
 
             return;
+
           } else {
             return;
           }
-
       }
 
       $.ajax(properties.url, {
