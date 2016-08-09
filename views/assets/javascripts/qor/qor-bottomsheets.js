@@ -210,7 +210,7 @@
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
-              if (actionSelectedData.length) {
+              if (actionSelectedData && actionSelectedData.length) {
                 this.renderActionSelectedData(actionSelectedData);
               }
 
