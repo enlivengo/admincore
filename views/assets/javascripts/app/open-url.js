@@ -53,6 +53,7 @@ $(function () {
                     } else {
                         Slideout.open(data);
                         toggleSelectedCss($this);
+                        return false;
                     }
                 } else {
                     window.location = data("url");
@@ -63,12 +64,13 @@ $(function () {
             // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
             if (isSlideoutOpened() || isActionButton || data.openType == 'bottom-sheet') {
                 BottomSheets.open(data);
-                return;
+                return false;
             }
 
             // Other clicks
             if (hasSlideoutTheme) {
                 Slideout.open(data);
+                return false;
             } else {
                 BottomSheets.open(data);
             }

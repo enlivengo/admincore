@@ -180,6 +180,7 @@
     submit: function (e) {
       var self = this;
       var $parent;
+      var $element = this.$element;
 
       var ajaxForm = this.ajaxForm || {};
       var properties = ajaxForm.properties || $(e.target).data();
@@ -189,8 +190,21 @@
         return;
       }
 
-      if (properties.confirm && !window.confirm(properties.confirm)) {
-        return;
+      if (properties.confirm) {
+          if (window.confirm(properties.confirm)) {
+            properties = $.extend({}, properties, {
+              _method: properties.method
+            });
+
+            $.post(properties.url, properties, function () {
+              window.location.reload();
+            });
+
+            return;
+          } else {
+            return;
+          }
+
       }
 
       $.ajax(properties.url, {
@@ -198,16 +212,17 @@
         data: ajaxForm.formData,
         dataType: properties.datatype,
         beforeSend: function () {
-          if (self.$element) {
-            self.$element.find(ACTION_BUTTON).attr('disabled', true);
+          if ($element) {
+            $element.find(ACTION_BUTTON).attr('disabled', true);
           }
         },
         success: function (data) {
           if (properties.fromIndex || properties.fromMenu){
             window.location.reload();
+            return;
           } else {
-            if (self.$element) {
-              self.$element.find(ACTION_BUTTON).attr('disabled', false);
+            if ($element) {
+              $element.find(ACTION_BUTTON).attr('disabled', false);
             }
             if ($(QOR_SLIDEOUT).is(':visible')){
               $parent = $(QOR_SLIDEOUT);
@@ -220,8 +235,8 @@
 
         },
         error: function (xhr, textStatus, errorThrown) {
-          if (self.$element) {
-            self.$element.find(ACTION_BUTTON).attr('disabled', false);
+          if ($element) {
+            $element.find(ACTION_BUTTON).attr('disabled', false);
           }
           window.alert([textStatus, errorThrown].join(': '));
         }
