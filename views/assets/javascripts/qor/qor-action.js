@@ -208,6 +208,10 @@
           }
       }
 
+      if (properties.confirm && !window.confirm(properties.confirm)) {
+        return;
+      }
+
       $.ajax(properties.url, {
         method: properties.method,
         data: ajaxForm.formData,
