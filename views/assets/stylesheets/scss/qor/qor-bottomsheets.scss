@@ -49,6 +49,16 @@
     margin-left: 0;
     box-shadow: none;
   }
+
+  .qor-page__header,.qor-button--new{
+    display: none;
+  }
+
+  .qor-table{
+    margin: 0;
+  }
+
+
 }
 
 .qor-bottomsheets__header {
