@@ -201,7 +201,6 @@
 
               $content = $response.find(CLASS_MAIN_CONTENT);
 
-
               if (!$content.length) {
                 return;
               }

@@ -84,10 +84,9 @@
             });
           }
         });
-        this.ajaxForm.formData = formData;
-      } else {
-        this.ajaxForm.formData = [];
       }
+
+      this.ajaxForm.formData = formData;
 
       return this.ajaxForm;
     },
@@ -191,7 +190,7 @@
         return;
       }
 
-      if (properties.confirm && !properties.ajaxForm) {
+      if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
           if (window.confirm(properties.confirm)) {
             properties = $.extend({}, properties, {
               _method: properties.method
