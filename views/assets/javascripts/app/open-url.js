@@ -55,7 +55,7 @@ $(function () {
             openData = $this.data(),
             actionSelectedData;
 
-        if ($(e.target).hasClass("material-icons")) {
+        if ($(e.target).hasClass("material-icons") || (!$(e.target).data('url') && $(e.target).is('a'))) {
             return;
         }
 
@@ -80,7 +80,7 @@ $(function () {
                         return false;
                     }
                 } else {
-                    window.location = openData("url");
+                    window.location = openData('url');
                 }
                 return;
             }
