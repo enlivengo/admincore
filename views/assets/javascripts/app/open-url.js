@@ -11,6 +11,9 @@ $(function () {
         hasSlideoutTheme = $body.hasClass('qor-theme-slideout'),
         isSlideoutOpened = function(){
             return $body.hasClass('qor-slideout-open');
+        },
+        isBottomsheetsOpened = function(){
+            return $body.hasClass('qor-bottomsheets-open');
         };
 
 
@@ -55,7 +58,7 @@ $(function () {
             openData = $this.data(),
             actionSelectedData;
 
-        if ($(e.target).hasClass("material-icons") || (!$(e.target).data('url') && $(e.target).is('a'))) {
+        if ($(e.target).hasClass("material-icons") || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
         }
 
@@ -68,7 +71,7 @@ $(function () {
 
         if (!openData.method || openData.method.toUpperCase() == "GET") {
             // Slideout or New Page: table items, new button, edit button
-            if (isInTable || isNewButton || isEditButton || openData.openType == 'slideout') {
+            if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openData.openType == 'slideout') {
                 if (hasSlideoutTheme) {
                     if ($this.hasClass(CLASS_IS_SELECTED)) {
                         Slideout.hide();
@@ -86,7 +89,7 @@ $(function () {
             }
 
             // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
-            if (isSlideoutOpened() || isActionButton || openData.openType == 'bottom-sheet') {
+            if (isSlideoutOpened() || (isNewButton && isBottomsheetsOpened()) || isActionButton || openData.openType == 'bottom-sheet') {
                 BottomSheets.open(openData);
                 return false;
             }

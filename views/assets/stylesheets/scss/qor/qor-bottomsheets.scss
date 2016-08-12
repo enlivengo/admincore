@@ -50,8 +50,19 @@
     box-shadow: none;
   }
 
-  .qor-page__header,.qor-button--new{
+  .qor-page__header{
     display: none;
+  }
+
+  .qor-button--new{
+    position: absolute;
+    top: -52px;
+    right: -20px;
+    bottom: auto;
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    line-height: 42px;
   }
 
   .qor-table{
@@ -70,7 +81,8 @@
   .qor-bottomsheets__title {
     position: relative;
     margin: 0;
-    padding: 20px 24px 14px 56px;
+    padding: 20px 0;
+    margin-left: 54px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     background-color: #fff;
     font-size: 24px;
