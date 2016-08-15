@@ -15,6 +15,7 @@
 
   var $document = $(document);
   var FormData = window.FormData;
+  var Mustache = window.Mustache;
   var NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
@@ -31,6 +32,7 @@
     this.$element = $(element);
     this.options = $.extend({}, QorBottomSheets.DEFAULTS, $.isPlainObject(options) && options);
     this.disabled = false;
+    this.resourseData = {};
     this.init();
   }
 
@@ -59,8 +61,9 @@
 
     bind: function () {
       this.$bottomsheets
-        .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
-        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', $.proxy(this.hide, this));
+        .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
+        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
+        .on(EVENT_CLICK, 'tr', this.tableClick.bind(this));
 
     },
 
@@ -76,6 +79,34 @@
       for (var i = actionSelectedData.length - 1; i >= 0; i--) {
         $form.prepend('<input type="hidden" name="primary_values[]" value="' + actionSelectedData[i] + '" />');
       }
+    },
+
+    selectOneTmpl: function (data) {
+      var tmpl = '<p class="qor-field__selected"><span>[[ value ]]</span><a href="javascripr://" class="qor-selected__remvoe"><i class="material-icons">remove_circle_outline</i></a></p>';
+      return Mustache.render(tmpl, data);
+    },
+
+    tableClick: function (e) {
+      var resourseData = this.resourseData,
+          $this = $(e.target).closest('tr'),
+          valueHtml = $this.find('[data-heading="Name"]')[0] || $this.find('[data-heading="Title"]')[0] || $this.find('[data-heading="Code"]')[0],
+          $target = resourseData.$ele,
+          $targetParent = $target.parent(),
+          selectedName,
+          selectedId,
+          $selector = $(this.resourseData.selectId);
+
+      if (resourseData.selectOne) {
+        selectedName = valueHtml.dataset.value;
+        selectedId = $this.data().primaryKey;
+        $targetParent.find('.qor-field__selected').remove();
+        $target.before(this.selectOneTmpl({value:selectedName}));
+        $selector[0].value = selectedId;
+        this.hide();
+      }
+
+      return false;
+
     },
 
     submit: function (e) {
@@ -115,19 +146,28 @@
             if (returnUrl && returnUrl != 'refresh') {
               _this.load(returnUrl);
             } else {
-              var prefix = '/' + location.pathname.split('/')[1];
-              var flashStructs = [];
-              $(html).find('.qor-alert').each(function (i, e) {
-                var message = $(e).find('.qor-alert-message').text().trim();
-                var type = $(e).data('type');
-                if (message !== '') {
-                  flashStructs.push({ Type: type, Message: message, Keep: true });
-                }
-              });
-              if (flashStructs.length > 0) {
-                document.cookie = 'qor-flashes=' + btoa(unescape(encodeURIComponent(JSON.stringify(flashStructs)))) + '; path=' + prefix;
+
+              if (_this.resourseData.selectOne) {
+
+                var selectId = $(html).find('[name="QorResource.ID"]').val(),
+                    selectName = $(html).find('[name="QorResource.Name"]').val(),
+                    $target = _this.resourseData.$target,
+                    $targetParent = $target.parent(),
+                    $select = $(_this.resourseData.selectId);
+
+                $targetParent.find('.qor-field__selected').remove();
+                $target.before(_this.selectOneTmpl({value:selectName}));
+
+                $select.append('<option value="' + selectId + '" >' + selectName + '</option>');
+
+                $select[0].value = selectId;
+
+                _this.hide();
+
+              } else {
+                _this.refresh();
               }
-              _this.refresh();
+
             }
           },
           error: function (xhr, textStatus, errorThrown) {
@@ -188,7 +228,6 @@
       load = $.proxy(function () {
         $.ajax(url, {
           method: method,
-          // data: data,
           dataType: dataType,
           success: $.proxy(function (response) {
             var $response;
@@ -204,8 +243,15 @@
               }
 
               $content.find('.qor-button--cancel').attr('data-dismiss', 'bottomsheets');
+
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
+
+              if (this.resourseData.selectOne) {
+                this.$body.find('.qor-button--new').data('selectOne',true).data('$target',this.resourseData.$ele).data('selectId',this.resourseData.selectId);
+              }
+
+              this.$title.after(this.$body.find('.qor-button--new'));
 
               if (actionSelectedData && actionSelectedData.length) {
                 this.renderActionSelectedData(actionSelectedData);
@@ -268,6 +314,7 @@
     },
 
     open: function (options) {
+      this.resourseData = options;
       this.load(options.url,options);
     },
 

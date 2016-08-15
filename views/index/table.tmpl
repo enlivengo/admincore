@@ -24,8 +24,8 @@
         {{$primaryKey := primary_key_of $result}}
         <tr data-primary-key="{{$primaryKey}}" data-url="{{url_for $result $resource}}">
           {{range $meta := $metas}}
-            <td class="mdl-data-table__cell--non-numeric" data-heading="{{meta_label $meta}}">
-              {{$value := render_meta $result $meta}}
+            {{$value := render_meta $result $meta}}
+            <td class="mdl-data-table__cell--non-numeric" data-value="{{$value}}" data-heading="{{meta_label $meta}}">
               <div class="qor-table__content" title="{{$value}}">{{$value}}</div>
             </td>
           {{end}}

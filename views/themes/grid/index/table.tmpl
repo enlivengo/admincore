@@ -18,7 +18,7 @@
         <tr data-primary-key="{{$primaryKey}}">
           <td>
             <div class="mdl-card mdl-shadow--2dp">
-              <div class="mdl-card__supporting-text qor-table--ml-slideout" data-url="{{url_for $result $resource}}">
+              <div class="mdl-card__supporting-text qor-table--ml-slideout" data-open-type="slideout" data-url="{{url_for $result $resource}}">
                 {{range $meta := $metas}}
                   <p>
                     {{render_meta $result $meta}}

@@ -34,9 +34,9 @@
         dropdownParent: $this.parent()
       };
 
-      if ($this.data("remote-data-url")) {
+      if ($this.data('remote-data-url')) {
         option.ajax = {
-          url: $this.data("remote-data-url"),
+          url: $this.data('remote-data-url'),
           dataType: 'json',
           delay: 250,
           data: function (params) {
@@ -68,13 +68,13 @@
         };
 
         option.templateResult =  function(data) {
-          var tmpl = $this.parents(".qor-field").find("[name='select2-result-template']");
+          var tmpl = $this.parents('.qor-field').find('[name="select2-result-template"]');
           return QorChooser.formatResult(data, tmpl);
         };
 
         option.templateSelection = function(data) {
           if (data.loading) return data.text;
-          var tmpl = $this.parents(".qor-field").find("[name='select2-selection-template']");
+          var tmpl = $this.parents('.qor-field').find('[name="select2-selection-template"]');
           return QorChooser.formatResult(data, tmpl);
         };
       }
@@ -116,7 +116,7 @@
   QorChooser.formatResult = function (data, tmpl) {
     var result = "";
     if (tmpl.length > 0) {
-      result = Mustache.render(tmpl.html().replace(/{{(.*?)}}/g, "[[$1]]"), data);
+      result = Mustache.render(tmpl.html().replace(/{{(.*?)}}/g, '[[$1]]'), data);
     } else {
       result = data.text || data.Name || data.Title || data.Code;
     }
