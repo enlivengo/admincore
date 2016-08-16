@@ -15,7 +15,6 @@
 
   var $document = $(document);
   var FormData = window.FormData;
-  var Mustache = window.Mustache;
   var NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
@@ -50,6 +49,7 @@
       this.$bottomsheets = $bottomsheets = $(QorBottomSheets.TEMPLATE).appendTo('body');
       this.$body = $bottomsheets.find('.qor-bottomsheets__body');
       this.$title = $bottomsheets.find('.qor-bottomsheets__title');
+      this.$header = $bottomsheets.find('.qor-bottomsheets__header');
       this.$bodyClass = $('body').prop('class');
 
     },
@@ -62,8 +62,7 @@
     bind: function () {
       this.$bottomsheets
         .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
-        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
-        .on(EVENT_CLICK, 'tr', this.tableClick.bind(this));
+        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this));
 
     },
 
@@ -81,35 +80,13 @@
       }
     },
 
-    selectOneTmpl: function (data) {
-      var tmpl = '<p class="qor-field__selected"><span>[[ value ]]</span><a href="javascripr://" class="qor-selected__remvoe"><i class="material-icons">remove_circle_outline</i></a></p>';
-      return Mustache.render(tmpl, data);
-    },
+    submit: function (e) {
 
-    tableClick: function (e) {
-      var resourseData = this.resourseData,
-          $this = $(e.target).closest('tr'),
-          valueHtml = $this.find('[data-heading="Name"]')[0] || $this.find('[data-heading="Title"]')[0] || $this.find('[data-heading="Code"]')[0],
-          $target = resourseData.$ele,
-          $targetParent = $target.parent(),
-          selectedName,
-          selectedId,
-          $selector = $(this.resourseData.selectId);
-
-      if (resourseData.selectOne) {
-        selectedName = valueHtml.dataset.value;
-        selectedId = $this.data().primaryKey;
-        $targetParent.find('.qor-field__selected').remove();
-        $target.before(this.selectOneTmpl({value:selectedName}));
-        $selector[0].value = selectedId;
-        this.hide();
+      // will ingore submit event if need handle with other submit event: like select one, many...
+      if (this.resourseData.ingoreSubmit) {
+        return;
       }
 
-      return false;
-
-    },
-
-    submit: function (e) {
       var $bottomsheets = this.$bottomsheets;
       var $body = this.$body;
       var form = e.target;
@@ -123,13 +100,13 @@
         $.ajax($form.prop('action'), {
           method: $form.prop('method'),
           data: new FormData(form),
-          dataType: 'html',
+          dataType: 'json',
           processData: false,
           contentType: false,
           beforeSend: function () {
             $submit.prop('disabled', true);
           },
-          success: function (html) {
+          success: function () {
             var returnUrl = $form.data('returnUrl');
             var refreshUrl = $form.data('refreshUrl');
 
@@ -146,28 +123,7 @@
             if (returnUrl && returnUrl != 'refresh') {
               _this.load(returnUrl);
             } else {
-
-              if (_this.resourseData.selectOne) {
-
-                var selectId = $(html).find('[name="QorResource.ID"]').val(),
-                    selectName = $(html).find('[name="QorResource.Name"]').val(),
-                    $target = _this.resourseData.$target,
-                    $targetParent = $target.parent(),
-                    $select = $(_this.resourseData.selectId);
-
-                $targetParent.find('.qor-field__selected').remove();
-                $target.before(_this.selectOneTmpl({value:selectName}));
-
-                $select.append('<option value="' + selectId + '" >' + selectName + '</option>');
-
-                $select[0].value = selectId;
-
-                _this.hide();
-
-              } else {
-                _this.refresh();
-              }
-
+              _this.refresh();
             }
           },
           error: function (xhr, textStatus, errorThrown) {
@@ -209,7 +165,7 @@
       }
     },
 
-    load: function (url, data) {
+    load: function (url, data, callback) {
       var options = this.options;
       var method;
       var dataType;
@@ -248,9 +204,10 @@
               this.$title.html($response.find(options.title).html());
 
               if (this.resourseData.selectOne) {
-                this.$body.find('.qor-button--new').data('selectOne',true).data('$target',this.resourseData.$ele).data('selectId',this.resourseData.selectId);
+                this.$body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
               }
 
+              this.$header.find('.qor-button--new').remove();
               this.$title.after(this.$body.find('.qor-button--new'));
 
               if (actionSelectedData && actionSelectedData.length) {
@@ -269,6 +226,11 @@
               });
 
               this.show();
+
+              // handle after opened callback
+              if (callback && $.isFunction(callback)) {
+                callback();
+              }
 
               // callback for after bottomSheets loaded HTML
               if (options.afterShow){
@@ -313,9 +275,9 @@
 
     },
 
-    open: function (options) {
+    open: function (options, callback) {
       this.resourseData = options;
-      this.load(options.url,options);
+      this.load(options.url, options, callback);
     },
 
     show: function () {

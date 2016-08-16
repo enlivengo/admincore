@@ -62,10 +62,6 @@ $(function () {
             return;
         }
 
-        openData = $.extend({}, openData, {
-          $ele: $this
-        });
-
         if (isActionButton) {
             actionSelectedData = collectSelectID();
             openData = $.extend({}, openData, {

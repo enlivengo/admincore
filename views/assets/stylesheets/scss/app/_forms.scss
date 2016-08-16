@@ -145,7 +145,7 @@
 }
 
 .qor-field__selected{
-  > span, > .qor-selected__remvoe{
+  > span, > .qor-selected__remove{
     display: inline-block;
     vertical-align: middle;
   }
@@ -153,7 +153,7 @@
     font-size: 16px;
     color: unquote("rgb(#{$color-primary})");
   }
-  > .qor-selected__remvoe{
+  > .qor-selected__remove{
     color: unquote("rgba(#{$color-black}, 0.54)");
     font-size: 14px;
     line-height: 1;
