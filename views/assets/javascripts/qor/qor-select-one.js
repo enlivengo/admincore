@@ -55,6 +55,7 @@
       $parent.find(CLASS_SELECT_INPUT)[0].value = '';
       $parent.find(CLASS_SELECT_TRIGGER).show();
 
+      return false;
     },
 
     openBottomSheets: function (e) {
