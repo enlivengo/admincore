@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"path"
 	"reflect"
 
 	"github.com/qor/qor"
@@ -21,7 +20,6 @@ type SelectOneConfig struct {
 	Select2ResultTemplate    template.JS
 	Select2SelectionTemplate template.JS
 	RemoteDataResource       *Resource
-	RemoteDataURL            string
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
 }
@@ -107,24 +105,11 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 			if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
 				baseResource := meta.GetBaseResource().(*Resource)
 				Admin := baseResource.GetAdmin()
-
-				remoteDataSearcherController := &controller{Admin: Admin}
-				remoteDataSearcherPrefix := fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
-				selectOneConfig.RemoteDataURL = remoteDataSearcherPrefix
-				// GET /admin/!meta_selector/:resource_name/:field_name?keyword=:keyword
-				Admin.GetRouter().Get(remoteDataSearcherPrefix, remoteDataSearcherController.Index, RouteConfig{
-					Resource: remoteDataResource,
-				})
-
-				// POST /admin/!meta_selector/:resource_name/:field_name
-				Admin.GetRouter().Post(remoteDataSearcherPrefix, remoteDataSearcherController.Create, RouteConfig{
-					Resource: remoteDataResource,
-				})
-
-				// GET /admin/!meta_selector/:resource_name/:field_name/new
-				Admin.GetRouter().Get(path.Join(remoteDataSearcherPrefix, "new"), remoteDataSearcherController.New, RouteConfig{
-					Resource: remoteDataResource,
-				})
+				if remoteDataResource.params == "" {
+					remoteDataResource.params = fmt.Sprintf("!remote_data_searcher/%v/%v", baseResource.ToParam(), meta.GetName())
+					remoteDataSearcherController := &controller{Admin: Admin}
+					Admin.registerResourceToRouter(remoteDataSearcherController, remoteDataResource, "create", "update", "read", "delete")
+				}
 			} else {
 				utils.ExitWithMsg("RemoteDataResource not configured for meta %v", meta.Name)
 			}

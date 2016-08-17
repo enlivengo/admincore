@@ -24,23 +24,22 @@
 
   <div class="qor-field__edit qor-field__block qor-field__selectmany" {{if (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.selectmany" {{end}}>
     {{if (eq .Meta.Config.SelectMode "bottom_sheet")}}
+      {{$value := $current_values}}
 
-    {{$value := $current_values}}
-
-    {{if gt (len $value) 0 }}
-      <ul class="qor-field__selected-many">
-      {{range $value := $current_values}}
-        <li>
-            <span>{{stringify $value}}</span>
-            <a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
-        </li>
+      {{if gt (len $value) 0 }}
+        <ul class="qor-field__selected-many">
+          {{range $value := $current_values}}
+            <li>
+              <span>{{stringify $value}}</span>
+              <a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
+            </li>
+          {{end}}
+        </ul>
       {{end}}
-      </ul>
-    {{end}}
 
-      <a href="javascript://" class="qor-field__selectmany-trigger"  data-select-modal="true" data-select-id="#{{.InputId}}" data-selectmany-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}">{{t "qor_admin.form.select_an_option" "Select an Option"}}</a>
+      <a href="javascript://" class="qor-field__selectmany-trigger"  data-select-modal="true" data-select-id="#{{.InputId}}" data-selectmany-url="{{url_for .Meta.Config.RemoteDataResource}}">{{t "qor_admin.form.select_an_option" "Select an Option"}}</a>
 
-      <select class="qor-field__input qor-field__selectone-input hidden" id="{{.InputId}}" {{if not (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.chooser" {{end}} data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.RemoteDataURL}}data-remote-data-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}"{{end}}>
+      <select class="qor-field__input qor-field__selectone-input hidden" id="{{.InputId}}" {{if not (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.chooser" {{end}} data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.RemoteDataResource}}data-remote-data-url="{{url_for .Meta.Config.RemoteDataResource}}"{{end}}>
         {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
           {{if (is_included $current_values (index $values 0))}}
             <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
@@ -52,24 +51,24 @@
 
     {{else}}
 
-      <select class="qor-field__input hidden" id="{{.InputId}}" {{if not (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.chooser" {{end}} data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.RemoteDataURL}}data-remote-data-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}"{{end}}>
-        {{if .Meta.Config.RemoteDataURL}}
-          {{range $value := $current_values}}
-            <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
-          {{end}}
-        {{else}}
-          {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
-            {{if (is_included $current_values (index $values 0))}}
-              <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
-            {{else}}
-              <option value="{{index $values 0}}">{{index $values 1}}</option>
-            {{end}}
+    <select class="qor-field__input hidden" id="{{.InputId}}" {{if not (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.chooser" {{end}} data-placeholder="{{t "qor_admin.form.select_some_options" "Select some Options"}}" name="{{.InputName}}" multiple {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.RemoteDataResource}}data-remote-data-url="{{url_for .Meta.Config.RemoteDataResource}}"{{end}}>
+      {{if .Meta.Config.RemoteDataResource}}
+        {{range $value := $current_values}}
+          <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
+        {{end}}
+      {{else}}
+        {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
+          {{if (is_included $current_values (index $values 0))}}
+            <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
+          {{else}}
+            <option value="{{index $values 0}}">{{index $values 1}}</option>
           {{end}}
         {{end}}
-      </select>
+      {{end}}
+    </select>
 
-    {{end}}
+  {{end}}
 
-    <input type="hidden" name="{{.InputName}}" value="">
+  <input type="hidden" name="{{.InputName}}" value="">
   </div>
 </div>

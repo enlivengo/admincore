@@ -37,6 +37,8 @@ func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metao
 		selectManyConfig.SelectOneConfig.RemoteDataResource = selectManyConfig.RemoteDataResource
 
 		selectManyConfig.SelectOneConfig.ConfigureQorMeta(meta)
+
+		selectManyConfig.RemoteDataResource = selectManyConfig.SelectOneConfig.RemoteDataResource
 		meta.Type = "select_many"
 
 		// Set FormattedValuer

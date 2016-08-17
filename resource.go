@@ -26,6 +26,7 @@ type Resource struct {
 	SearchHandler func(keyword string, context *qor.Context) *gorm.DB
 
 	admin          *Admin
+	params         string
 	base           *Resource
 	scopes         []*Scope
 	filters        map[string]*Filter
@@ -69,17 +70,20 @@ func (res Resource) ParamIDName() string {
 }
 
 // ToParam used as urls to register routes for resource
-func (res Resource) ToParam() string {
-	if value, ok := res.Value.(interface {
-		ToParam() string
-	}); ok {
-		return value.ToParam()
+func (res *Resource) ToParam() string {
+	if res.params == "" {
+		if value, ok := res.Value.(interface {
+			ToParam() string
+		}); ok {
+			res.params = value.ToParam()
+		} else {
+			if res.Config.Singleton == true {
+				res.params = utils.ToParamString(res.Name)
+			}
+			res.params = utils.ToParamString(inflection.Plural(res.Name))
+		}
 	}
-
-	if res.Config.Singleton == true {
-		return utils.ToParamString(res.Name)
-	}
-	return utils.ToParamString(inflection.Plural(res.Name))
+	return res.params
 }
 
 // UseTheme use them for resource, will auto load the theme's javascripts, stylesheets for this resource
