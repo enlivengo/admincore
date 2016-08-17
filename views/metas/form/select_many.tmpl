@@ -26,16 +26,14 @@
     {{if (eq .Meta.Config.SelectMode "bottom_sheet")}}
       {{$value := $current_values}}
 
-      {{if gt (len $value) 0 }}
-        <ul class="qor-field__selected-many">
-          {{range $value := $current_values}}
-            <li>
-              <span>{{stringify $value}}</span>
-              <a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
-            </li>
-          {{end}}
-        </ul>
-      {{end}}
+      <ul class="qor-field__selected-many">
+        {{range $value := $current_values}}
+          <li>
+            <span>{{stringify $value}}</span>
+            <a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
+          </li>
+        {{end}}
+      </ul>
 
       <a href="javascript://" class="qor-field__selectmany-trigger"  data-select-modal="true" data-select-id="#{{.InputId}}" data-selectmany-url="{{url_for .Meta.Config.RemoteDataResource}}">{{t "qor_admin.form.select_an_option" "Select an Option"}}</a>
 

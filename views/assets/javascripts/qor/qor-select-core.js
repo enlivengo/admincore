@@ -18,7 +18,7 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var CLASS_TABLE_CONTENT = '.qor-table__content';
-  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
+  var CLASS_SELECTED = 'is_selected';
 
   function QorSelectCore(element, options) {
     this.$element = $(element);
@@ -31,18 +31,31 @@
 
     init: function () {
       this.bind();
+      this.options.selectIcon && this.initItems();
     },
 
     bind: function () {
-      $(CLASS_BOTTOMSHEETS).
+      this.$element.
         on(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
         on(EVENT_SUBMIT, 'form', this.submit.bind(this));
     },
 
     unbind: function () {
-      $(CLASS_BOTTOMSHEETS).
+      this.$element.
         off(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
         off(EVENT_SUBMIT, 'form', this.submit.bind(this));
+    },
+
+    initItems: function () {
+      var $ele = this.$element,
+          $tr = $ele.find('tbody tr'),
+          unSelectedIconTmpl = this.options.unSelectedIconTmpl;
+
+      if (unSelectedIconTmpl) {
+        $tr.each(function () {
+          $(this).find('td:first').append(unSelectedIconTmpl);
+        });
+      }
     },
 
     processingData: function (e) {
@@ -51,8 +64,11 @@
           $td,
           data = {},
           name,
-          value;
+          value,
+          options = this.options,
+          formatOnSelect = options.formatOnSelect;
 
+      $this.toggleClass(CLASS_SELECTED);
       data.primaryKey = $this.data('primaryKey');
 
       $tds.each(function () {
@@ -64,8 +80,22 @@
         }
       });
 
-      if (this.options.formatOnSelect && $.isFunction(this.options.formatOnSelect)) {
-        this.options.formatOnSelect(data);
+      if (options.selectIcon) {
+        var $firstTD = $this.find('td:first'),
+            isSelected = $this.hasClass(CLASS_SELECTED),
+            selectedIconTmpl = options.selectedIconTmpl,
+            unSelectedIconTmpl = options.unSelectedIconTmpl;
+
+        if (isSelected) {
+          selectedIconTmpl && $firstTD.html(selectedIconTmpl);
+        } else {
+          unSelectedIconTmpl && $firstTD.html(unSelectedIconTmpl);
+        }
+
+      }
+
+      if (formatOnSelect && $.isFunction(formatOnSelect)) {
+        formatOnSelect(data);
       }
 
       return false;
@@ -143,7 +173,6 @@
 
     destroy: function () {
       this.unbind();
-      this.$element.removeData(NAMESPACE);
     }
 
   };
@@ -155,6 +184,9 @@
       var fn;
 
       if (!data) {
+        if (/destroy/.test(options)) {
+          return;
+        }
         $this.data(NAMESPACE, (data = new QorSelectCore(this, options)));
       }
 

@@ -25,6 +25,7 @@
   var CLASS_SELECT_INPUT = '.qor-field__selectone-input';
   var CLASS_SELECT_TRIGGER = '.qor-field__selectone-trigger';
   var CLASS_PARENT = '.qor-field__selectone';
+  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorSelectOne(element, options) {
     this.$element = $(element);
@@ -41,10 +42,6 @@
 
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this));
-      this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect);
-    },
-
-    unbind: function () {
       this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect);
     },
 
@@ -75,10 +72,12 @@
     },
 
     handleSelectOne: function () {
-      this.$element.qorSelectCore({
-        formatOnSelect: this.formatSelectResults.bind(this),
-        formatOnSubmit: this.formatSubmitResults.bind(this)
-      });
+      var options = {
+        formatOnSelect: this.formatSelectResults.bind(this), //render selected item after click item lists
+        formatOnSubmit: this.formatSubmitResults.bind(this)  //render new items after new item form submitted
+      }
+
+      $(CLASS_BOTTOMSHEETS).qorSelectCore(options);
     },
 
     formatSelectResults: function (data) {
@@ -112,8 +111,7 @@
       }
 
       this.BottomSheets.hide();
-      this.$element.qorSelectCore('destroy');
-    },
+    }
 
   };
 

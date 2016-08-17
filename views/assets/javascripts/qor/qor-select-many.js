@@ -21,10 +21,11 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var CLASS_CLEAR_SELECT = '.qor-selected-many__remove';
-  var CLASS_SELECT_FIELD = '.qor-field__selected';
+  var CLASS_SELECT_FIELD = '.qor-field__selected-many';
   var CLASS_SELECT_INPUT = '.qor-field__selectone-input';
   var CLASS_SELECT_TRIGGER = '.qor-field__selectmany-trigger';
   var CLASS_PARENT = '.qor-field__selectmany';
+  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorSelectMany(element, options) {
     this.$element = $(element);
@@ -41,7 +42,6 @@
 
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this));
-
       this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect);
     },
 
@@ -49,9 +49,9 @@
       var $target = $(e.target),
           $parent = $target.closest(CLASS_PARENT);
 
-      $parent.find(CLASS_SELECT_FIELD).remove();
-      $parent.find(CLASS_SELECT_INPUT)[0].value = '';
-      $parent.find(CLASS_SELECT_TRIGGER).show();
+      // $parent.find(CLASS_SELECT_FIELD).remove();
+      // $parent.find(CLASS_SELECT_INPUT)[0].value = '';
+      // $parent.find(CLASS_SELECT_TRIGGER).show();
 
       return false;
     },
@@ -63,7 +63,7 @@
       this.bottomsheetsData = data;
       data.url = data.selectmanyUrl;
 
-      this.BottomSheets.open(data, this.handleSelectOne.bind(this));
+      this.BottomSheets.open(data, this.handleSelectMany.bind(this));
 
     },
 
@@ -71,11 +71,18 @@
       return Mustache.render(QorSelectMany.SELECT_MANY_TEMPLATE, data);
     },
 
-    handleSelectOne: function () {
-      this.$element.qorSelectCore({
-        formatOnSelect: this.formatSelectResults.bind(this),
-        formatOnSubmit: this.formatSubmitResults.bind(this)
-      });
+    handleSelectMany: function () {
+      var $bottomsheets = $(CLASS_BOTTOMSHEETS),
+          options = {
+            formatOnSelect:     this.formatSelectResults.bind(this),  //render selected item after click item lists
+            formatOnSubmit:     this.formatSubmitResults.bind(this),  //render new items after new item form submitted
+            selectIcon:         true,                                 //show icon indicator when item selected, need 'selectedIconTmpl' and 'unSelectedIconTmpl' options
+            selectedIconTmpl:   QorSelectMany.SELECT_MANY_SELECTED,   // selected item icon template
+            unSelectedIconTmpl: QorSelectMany.SELECT_MANY_UNSELECTED  // unselected item icon template
+          };
+
+      $bottomsheets.qorSelectCore(options);
+
     },
 
     formatSelectResults: function (data) {
@@ -87,7 +94,6 @@
     },
 
     formatResults: function (data, insertData) {
-
       var tmpl,
           bottomsheetsData = this.bottomsheetsData,
           $select = $(bottomsheetsData.selectId),
@@ -97,12 +103,8 @@
       $select[0].value = data.primaryKey;
       tmpl = this.renderSelectOne(data);
 
-      if ($selectFeild.size()) {
-        $selectFeild.remove();
-      }
-
-      $target.prepend(tmpl);
-      $target.find(CLASS_SELECT_TRIGGER).hide();
+      $selectFeild.append(tmpl);
+      // $target.find(CLASS_SELECT_TRIGGER).hide();
 
       if (insertData && data.ID) {
         $select.append('<option value="' + data.ID + '" >' + data.Name + '</option>');
@@ -115,13 +117,17 @@
 
   };
 
+  // For selected icon indicator
+  QorSelectMany.SELECT_MANY_SELECTED = '<i class="material-icons">check_circle</i>';
+
+  // For unselected icon indicator
+  QorSelectMany.SELECT_MANY_UNSELECTED = '<i class="material-icons">panorama_fish_eye</i>';
+
   QorSelectMany.SELECT_MANY_TEMPLATE = (
-    '<ul class="qor-field__selected-many">' +
-      '<li>' +
-        '<span>[[ Name ]]</span>' +
-        '<a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>' +
-      '</li>' +
-    '</ul>'
+    '<li>' +
+      '<span>[[ Name ]]</span>' +
+      '<a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>' +
+    '</li>'
   );
 
   QorSelectMany.plugin = function (options) {

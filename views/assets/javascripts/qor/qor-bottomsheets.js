@@ -26,6 +26,7 @@
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
   var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
+  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorBottomSheets(element, options) {
     this.$element = $(element);
@@ -44,7 +45,11 @@
     },
 
     build: function () {
-      var $bottomsheets;
+      var $bottomsheets = $(CLASS_BOTTOMSHEETS);
+
+      if ($bottomsheets.size()) {
+        $bottomsheets.remove();
+      }
 
       this.$bottomsheets = $bottomsheets = $(QorBottomSheets.TEMPLATE).appendTo('body');
       this.$body = $bottomsheets.find('.qor-bottomsheets__body');
@@ -325,6 +330,10 @@
         trigger(EVENT_HIDDEN);
 
       $('body').removeClass(CLASS_OPEN);
+
+      // reinit bottomsheets template, clear all bind events.
+      this.init();
+
       return false;
     },
 
