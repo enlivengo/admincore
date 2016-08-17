@@ -19,7 +19,7 @@
     </script>
   {{end}}
 
-  <div class="qor-field__block qor-field__edit qor-field__selectone">
+  <div class="qor-field__block qor-field__edit  qor-field__selectone" {{if (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.selectone"{{end}}>
 
     {{$current_values := (raw_value_of .ResourceValue .Meta)}}
 
@@ -32,7 +32,7 @@
           </p>
         {{end}}
 
-        <a href="javascript://" {{if .Value}} style="display:none;" {{end}} class="qor-field__selectone-trigger" data-select-one="true" data-select-id="#{{.InputId}}" data-selectone-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}">{{t "qor_admin.form.select_an_option" "Select an Option"}}</a>
+        <a href="javascript://" {{if .Value}} style="display:none;" {{end}} class="qor-field__selectone-trigger" data-select-modal="true" data-select-id="#{{.InputId}}" data-selectone-url="{{.Context.Admin.GetRouter.Prefix}}/{{.Meta.Config.RemoteDataURL}}">{{t "qor_admin.form.select_an_option" "Select an Option"}}</a>
 
         <select id="{{.InputId}}" class="qor-field__input qor-field__selectone-input hidden" name="{{.InputName}}" {{if not (has_update_permission .Meta)}}disabled{{end}}>
           {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}

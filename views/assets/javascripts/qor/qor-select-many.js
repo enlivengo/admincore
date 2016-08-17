@@ -20,36 +20,33 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var CLASS_CLEAR_SELECT = '.qor-selected__remove';
+  var CLASS_CLEAR_SELECT = '.qor-selected-many__remove';
   var CLASS_SELECT_FIELD = '.qor-field__selected';
   var CLASS_SELECT_INPUT = '.qor-field__selectone-input';
-  var CLASS_SELECT_TRIGGER = '.qor-field__selectone-trigger';
-  var CLASS_PARENT = '.qor-field__selectone';
+  var CLASS_SELECT_TRIGGER = '.qor-field__selectmany-trigger';
+  var CLASS_PARENT = '.qor-field__selectmany';
 
-  function QorSelectOne(element, options) {
+  function QorSelectMany(element, options) {
     this.$element = $(element);
-    this.options = $.extend({}, QorSelectOne.DEFAULTS, $.isPlainObject(options) && options);
+    this.options = $.extend({}, QorSelectMany.DEFAULTS, $.isPlainObject(options) && options);
     this.init();
   }
 
-  QorSelectOne.prototype = {
-    constructor: QorSelectOne,
+  QorSelectMany.prototype = {
+    constructor: QorSelectMany,
 
     init: function () {
       this.bind();
     },
 
     bind: function () {
-      $document.on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this));
+      $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this));
+
       this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect);
     },
 
-    unbind: function () {
-      this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect);
-    },
-
-    clearSelect: function () {
-      var $target = $(this),
+    clearSelect: function (e) {
+      var $target = $(e.target),
           $parent = $target.closest(CLASS_PARENT);
 
       $parent.find(CLASS_SELECT_FIELD).remove();
@@ -64,14 +61,14 @@
 
       this.BottomSheets = $body.data('qor.bottomsheets');
       this.bottomsheetsData = data;
-      data.url = data.selectoneUrl;
+      data.url = data.selectmanyUrl;
 
       this.BottomSheets.open(data, this.handleSelectOne.bind(this));
 
     },
 
     renderSelectOne: function (data) {
-      return Mustache.render(QorSelectOne.SELECT_ONE_SELECTED_TEMPLATE, data);
+      return Mustache.render(QorSelectMany.SELECT_MANY_TEMPLATE, data);
     },
 
     handleSelectOne: function () {
@@ -90,6 +87,7 @@
     },
 
     formatResults: function (data, insertData) {
+
       var tmpl,
           bottomsheetsData = this.bottomsheetsData,
           $select = $(bottomsheetsData.selectId),
@@ -107,26 +105,26 @@
       $target.find(CLASS_SELECT_TRIGGER).hide();
 
       if (insertData && data.ID) {
-        $select.append(Mustache.render(QorSelectOne.SELECT_ONE_OPTION_TEMPLATE, data));
+        $select.append('<option value="' + data.ID + '" >' + data.Name + '</option>');
         $select[0].value = data.ID;
       }
 
-      this.BottomSheets.hide();
-      this.$element.qorSelectCore('destroy');
-    },
+
+      // this.BottomSheets.hide();
+    }
 
   };
 
-  QorSelectOne.SELECT_ONE_OPTION_TEMPLATE = '<option value="[[ ID ]]" >[[ Name ]]</option>';
-
-  QorSelectOne.SELECT_ONE_SELECTED_TEMPLATE = (
-    '<p class="qor-field__selected">' +
-      '<span>[[ Name ]]</span>' +
-      '<a href="javascripr://" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>' +
-    '</p>'
+  QorSelectMany.SELECT_MANY_TEMPLATE = (
+    '<ul class="qor-field__selected-many">' +
+      '<li>' +
+        '<span>[[ Name ]]</span>' +
+        '<a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>' +
+      '</li>' +
+    '</ul>'
   );
 
-  QorSelectOne.plugin = function (options) {
+  QorSelectMany.plugin = function (options) {
     return this.each(function () {
       var $this = $(this);
       var data = $this.data(NAMESPACE);
@@ -137,7 +135,7 @@
           return;
         }
 
-        $this.data(NAMESPACE, (data = new QorSelectOne(this, options)));
+        $this.data(NAMESPACE, (data = new QorSelectMany(this, options)));
       }
 
       if (typeof options === 'string' && $.isFunction(fn = data[options])) {
@@ -147,17 +145,17 @@
   };
 
   $(function () {
-    var selector = '[data-toggle="qor.selectone"]';
+    var selector = '[data-toggle="qor.selectmany"]';
     $(document).
       on(EVENT_DISABLE, function (e) {
-        QorSelectOne.plugin.call($(selector, e.target), 'destroy');
+        QorSelectMany.plugin.call($(selector, e.target), 'destroy');
       }).
       on(EVENT_ENABLE, function (e) {
-        QorSelectOne.plugin.call($(selector, e.target));
+        QorSelectMany.plugin.call($(selector, e.target));
       }).
       triggerHandler(EVENT_ENABLE);
   });
 
-  return QorSelectOne;
+  return QorSelectMany;
 
 });

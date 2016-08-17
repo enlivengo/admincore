@@ -203,7 +203,7 @@
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
-              if (this.resourseData.selectOne) {
+              if (this.resourseData.selectModal) {
                 this.$body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
               }
 

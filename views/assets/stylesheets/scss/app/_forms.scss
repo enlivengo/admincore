@@ -143,24 +143,6 @@
     }
   }
 }
-
-.qor-field__selected{
-  > span, > .qor-selected__remove{
-    display: inline-block;
-    vertical-align: middle;
-  }
-  > span{
-    font-size: 16px;
-    color: unquote("rgb(#{$color-primary})");
-  }
-  > .qor-selected__remove{
-    color: unquote("rgba(#{$color-black}, 0.54)");
-    font-size: 14px;
-    line-height: 1;
-    margin-left: 8px;
-  }
-}
-
 .qor-field {
   padding-top: 4px;
   padding-bottom: 4px;

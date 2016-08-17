@@ -18,6 +18,7 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var CLASS_TABLE_CONTENT = '.qor-table__content';
+  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorSelectCore(element, options) {
     this.$element = $(element);
@@ -33,9 +34,15 @@
     },
 
     bind: function () {
-      this.$element.
+      $(CLASS_BOTTOMSHEETS).
         on(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
         on(EVENT_SUBMIT, 'form', this.submit.bind(this));
+    },
+
+    unbind: function () {
+      $(CLASS_BOTTOMSHEETS).
+        off(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
+        off(EVENT_SUBMIT, 'form', this.submit.bind(this));
     },
 
     processingData: function (e) {
@@ -132,6 +139,11 @@
       setTimeout(function () {
         window.location.reload();
       }, 350);
+    },
+
+    destroy: function () {
+      this.unbind();
+      this.$element.removeData(NAMESPACE);
     }
 
   };
