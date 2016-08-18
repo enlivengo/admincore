@@ -18,7 +18,6 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var CLASS_TABLE_CONTENT = '.qor-table__content';
-  var CLASS_SELECTED = 'is_selected';
 
   function QorSelectCore(element, options) {
     this.$element = $(element);
@@ -31,7 +30,6 @@
 
     init: function () {
       this.bind();
-      this.options.selectIcon && this.initItems();
     },
 
     bind: function () {
@@ -46,60 +44,35 @@
         off(EVENT_SUBMIT, 'form', this.submit.bind(this));
     },
 
-    initItems: function () {
-      var $ele = this.$element,
-          $tr = $ele.find('tbody tr'),
-          unSelectedIconTmpl = this.options.unSelectedIconTmpl;
-
-      if (unSelectedIconTmpl) {
-        $tr.each(function () {
-          $(this).find('td:first').append(unSelectedIconTmpl);
-        });
-      }
-    },
-
     processingData: function (e) {
       var $this = $(e.target).closest('tr'),
           $tds = $this.find('td'),
           $td,
+          $content,
           data = {},
           name,
           value,
           options = this.options,
           formatOnSelect = options.formatOnSelect;
 
-      $this.toggleClass(CLASS_SELECTED);
-      data.primaryKey = $this.data('primaryKey');
+      data.primaryKey = $this.data().primaryKey;
+      data.$clickElement = $this;
 
       $tds.each(function () {
-        $td = $(this);
+        $td = $(this),
+        $content = $td.find(CLASS_TABLE_CONTENT);
         name = $td.data('heading');
-        value = $td.find(CLASS_TABLE_CONTENT).size() ? $td.find(CLASS_TABLE_CONTENT).html() : $td.html();
+        value = $content.size() ? $content.html() : $td.html();
         if (name) {
           data[name] = value;
         }
       });
-
-      if (options.selectIcon) {
-        var $firstTD = $this.find('td:first'),
-            isSelected = $this.hasClass(CLASS_SELECTED),
-            selectedIconTmpl = options.selectedIconTmpl,
-            unSelectedIconTmpl = options.unSelectedIconTmpl;
-
-        if (isSelected) {
-          selectedIconTmpl && $firstTD.html(selectedIconTmpl);
-        } else {
-          unSelectedIconTmpl && $firstTD.html(unSelectedIconTmpl);
-        }
-
-      }
 
       if (formatOnSelect && $.isFunction(formatOnSelect)) {
         formatOnSelect(data);
       }
 
       return false;
-
     },
 
     submit: function (e) {
@@ -107,6 +80,7 @@
       var $form = $(form);
       var _this = this;
       var $submit = $form.find(':submit');
+      var data;
 
       if (FormData) {
         e.preventDefault();
@@ -121,9 +95,11 @@
             $submit.prop('disabled', true);
           },
           success: function (json) {
+            data = json;
+            data.primaryKey = data.ID;
 
             if (_this.options.formatOnSubmit && $.isFunction(_this.options.formatOnSubmit)) {
-              _this.options.formatOnSubmit(json);
+              _this.options.formatOnSubmit(data);
             } else {
               _this.refresh();
             }

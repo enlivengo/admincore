@@ -24,9 +24,9 @@
     margin-left: -180px;
     transition: height 0.3s ease;
     .qor-bottomsheets__body {
-      padding: 16px 24px;
+      padding: 16px 24px 16px 54px;
       background-color: #fff;
-      height: calc(100% - 48px);
+      height: calc(100% - 65px);
     }
     &::after{
       position: fixed;
@@ -65,10 +65,28 @@
     line-height: 42px;
   }
 
+  .qor-pagination-container{
+    margin: 24px 0;
+    .qor-pagination{
+      margin: 0;
+    }
+    .qor-actions{
+      display: none;
+    }
+  }
   .qor-table{
     margin: 0;
+    box-shadow: none;
+    td{
+      padding: 10px;
+    }
+    thead,td.qor-table__actions{
+      display: none;
+    }
+    &::before{
+      display: none;
+    }
   }
-
 
 }
 
@@ -101,7 +119,7 @@
   position: relative;
   box-sizing: border-box;
   z-index: $zindex-bottomsheets;
-  overflow-y: auto;
+  overflow: auto;
 
   .qor-action-forms{
     display: block !important;

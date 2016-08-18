@@ -21,6 +21,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var CLASS_CLEAR_SELECT = '.qor-selected__remove';
+  var CLASS_CHANGE_SELECT = '.qor-selected__change';
   var CLASS_SELECT_FIELD = '.qor-field__selected';
   var CLASS_SELECT_INPUT = '.qor-field__selectone-input';
   var CLASS_SELECT_TRIGGER = '.qor-field__selectone-trigger';
@@ -42,7 +43,10 @@
 
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this));
-      this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect);
+      this.$element.
+        on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect).
+        on(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
+
     },
 
     clearSelect: function () {
@@ -54,6 +58,14 @@
       $parent.find(CLASS_SELECT_TRIGGER).show();
 
       return false;
+    },
+
+    changeSelect: function () {
+      var $target = $(this),
+          $parent = $target.closest(CLASS_PARENT);
+
+      $parent.find(CLASS_SELECT_TRIGGER).trigger('click');
+
     },
 
     openBottomSheets: function (e) {
@@ -75,7 +87,7 @@
       var options = {
         formatOnSelect: this.formatSelectResults.bind(this), //render selected item after click item lists
         formatOnSubmit: this.formatSubmitResults.bind(this)  //render new items after new item form submitted
-      }
+      };
 
       $(CLASS_BOTTOMSHEETS).qorSelectCore(options);
     },
@@ -88,26 +100,26 @@
       this.formatResults(data, true);
     },
 
-    formatResults: function (data, insertData) {
-      var tmpl,
+    formatResults: function (data, isNewData) {
+      var template,
           bottomsheetsData = this.bottomsheetsData,
           $select = $(bottomsheetsData.selectId),
           $target = $select.closest(CLASS_PARENT),
           $selectFeild = $target.find(CLASS_SELECT_FIELD);
 
       $select[0].value = data.primaryKey;
-      tmpl = this.renderSelectOne(data);
+      template = this.renderSelectOne(data);
 
       if ($selectFeild.size()) {
         $selectFeild.remove();
       }
 
-      $target.prepend(tmpl);
+      $target.prepend(template);
       $target.find(CLASS_SELECT_TRIGGER).hide();
 
-      if (insertData && data.ID) {
+      if (isNewData) {
         $select.append(Mustache.render(QorSelectOne.SELECT_ONE_OPTION_TEMPLATE, data));
-        $select[0].value = data.ID;
+        $select[0].value = data.primaryKey;
       }
 
       this.BottomSheets.hide();
@@ -115,11 +127,11 @@
 
   };
 
-  QorSelectOne.SELECT_ONE_OPTION_TEMPLATE = '<option value="[[ ID ]]" >[[ Name ]]</option>';
+  QorSelectOne.SELECT_ONE_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
 
   QorSelectOne.SELECT_ONE_SELECTED_TEMPLATE = (
     '<p class="qor-field__selected">' +
-      '<span>[[ Name ]]</span>' +
+      '<span class="qor-selected__change">[[ Name ]]</span>' +
       '<a href="javascripr://" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>' +
     '</p>'
   );
