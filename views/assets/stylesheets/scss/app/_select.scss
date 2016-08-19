@@ -28,10 +28,11 @@
 
 .qor-field__selectmany{
   .qor-field__selectmany-trigger{
-    margin-left: -16px;
+    float: right;
   }
   .qor-field__selected-many{
     margin-left: 0;
+    margin-bottom: 0;
     padding-left: 0;
     > li{
       border: #E0E1E2 1px solid;
