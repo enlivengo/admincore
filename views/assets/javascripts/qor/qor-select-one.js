@@ -27,6 +27,7 @@
   var CLASS_SELECT_TRIGGER = '.qor-field__selectone-trigger';
   var CLASS_PARENT = '.qor-field__selectone';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
+  var CLASS_SELECTED = 'is_selected';
 
   function QorSelectOne(element, options) {
     this.$element = $(element);
@@ -76,7 +77,15 @@
       data.url = data.selectoneUrl;
 
       this.BottomSheets.open(data, this.handleSelectOne.bind(this));
+    },
 
+    initItem: function (data) {
+      var $selectFeild = $(data.selectId).closest(CLASS_PARENT).find(CLASS_SELECT_FIELD),
+          selectedID = $selectFeild.data().primaryKey;
+
+      if (selectedID) {
+        $(CLASS_BOTTOMSHEETS).find('tr[data-primary-key="' + selectedID + '"]').addClass(CLASS_SELECTED).find('td:first').append(QorSelectOne.SELECT_ONE_SELECTED_ICON);
+      }
     },
 
     renderSelectOne: function (data) {
@@ -90,6 +99,7 @@
       };
 
       $(CLASS_BOTTOMSHEETS).qorSelectCore(options);
+      this.initItem(this.bottomsheetsData);
     },
 
     formatSelectResults: function (data) {
@@ -129,8 +139,11 @@
 
   QorSelectOne.SELECT_ONE_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
 
+  // For selected icon indicator
+  QorSelectOne.SELECT_ONE_SELECTED_ICON = '<span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>';
+
   QorSelectOne.SELECT_ONE_SELECTED_TEMPLATE = (
-    '<p class="qor-field__selected">' +
+    '<p class="qor-field__selected" data-primary-key="[[ primaryKey ]]">' +
       '<span class="qor-selected__change">[[ Name ]]</span>' +
       '<a href="javascripr://" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>' +
     '</p>'

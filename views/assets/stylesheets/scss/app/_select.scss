@@ -85,7 +85,7 @@
   }
 }
 
-.qor-selectmany__select-icon{
+.qor-select__select-icon{
   position: absolute;
   left: -32px;
   top: 11px;
@@ -96,7 +96,7 @@
 }
 
 tr.is_selected{
-  .qor-selectmany__select-icon{
+  .qor-select__select-icon{
     color: unquote("rgb(#{$color-primary})");
     i{
       color: unquote("rgb(#{$color-primary})");

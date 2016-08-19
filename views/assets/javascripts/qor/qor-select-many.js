@@ -238,10 +238,10 @@
   QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
 
   // For selected icon indicator
-  QorSelectMany.SELECT_MANY_SELECTED_ICON = '<span class="qor-selectmany__select-icon"><i class="material-icons">check_circle</i></span>';
+  QorSelectMany.SELECT_MANY_SELECTED_ICON = '<span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>';
 
   // For unselected icon indicator
-  QorSelectMany.SELECT_MANY_UNSELECTED_ICON = '<span class="qor-selectmany__select-icon"><i class="material-icons">panorama_fish_eye</i></span>';
+  QorSelectMany.SELECT_MANY_UNSELECTED_ICON = '<span class="qor-select__select-icon"><i class="material-icons">panorama_fish_eye</i></span>';
 
   // For select many tips
   QorSelectMany.SELECT_MANY_HINT = '<div class="qor-selectmany__hint clearfix"><span>[[ selectedNum ]] items selected</span><a href="javascript://" data-dismiss="bottomsheets">DONE</a></div>';
