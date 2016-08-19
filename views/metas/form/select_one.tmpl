@@ -19,6 +19,19 @@
     </script>
   {{end}}
 
+  <script name="select-one-selected-template" type="x-tmpl-mustache">
+    <p class="qor-field__selected" data-primary-key="[[ primaryKey ]]">
+      <span class="qor-selected__change">[[ Name ]]</span>
+        <a href="#" class="qor-selected__remove"><i class="material-icons">remove_circle_outline</i></a>
+    </p>
+  </script>
+
+  <script name="select-one-selected-icon" type="x-tmpl-mustache">
+    <span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>
+  </script>
+
+
+
   <div class="qor-field__block qor-field__edit  qor-field__selectone" {{if (eq .Meta.Config.SelectMode "bottom_sheet")}} data-toggle="qor.selectone"{{end}}>
 
     {{$current_values := (raw_value_of .ResourceValue .Meta)}}

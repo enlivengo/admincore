@@ -24,7 +24,7 @@
   var CLASS_UNDO_DELETE = '.qor-selected-many__undo';
   var CLASS_DELETED_ITEM = 'qor-selected-many__deleted';
   var CLASS_SELECT_FIELD = '.qor-field__selected-many';
-  var CLASS_SELECT_ICON = '.qor-selectmany__select-icon';
+  var CLASS_SELECT_ICON = '.qor-select__select-icon';
   var CLASS_SELECT_HINT = '.qor-selectmany__hint';
   var CLASS_PARENT = '.qor-field__selectmany';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
@@ -75,8 +75,16 @@
       var data = $(e.target).data();
 
       this.BottomSheets = $body.data('qor.bottomsheets');
+      this.bottomsheetsData = data;
+
       this.$selector = $(data.selectId);
       this.$selectFeild = this.$selector.closest(CLASS_PARENT).find(CLASS_SELECT_FIELD);
+
+      // select many templates
+      this.SELECT_MANY_SELECTED_ICON = $('[name="select-many-selected-icon"]').html();
+      this.SELECT_MANY_UNSELECTED_ICON = $('[name="select-many-unselected-icon"]').html();
+      this.SELECT_MANY_HINT = $('[name="select-many-hint"]').html();
+      this.SELECT_MANY_TEMPLATE = $('[name="select-many-template"]').html();
 
       data.url = data.selectmanyUrl;
 
@@ -85,17 +93,17 @@
     },
 
     renderSelectMany: function (data) {
-      return Mustache.render(QorSelectMany.SELECT_MANY_TEMPLATE, data);
+      return Mustache.render(this.SELECT_MANY_TEMPLATE, data);
     },
 
     renderHint: function (data) {
-      return Mustache.render(QorSelectMany.SELECT_MANY_HINT, data);
+      return Mustache.render(this.SELECT_MANY_HINT, data);
     },
 
     initItems: function () {
       var $tr = $(CLASS_BOTTOMSHEETS).find('tbody tr'),
-          selectedIconTmpl = QorSelectMany.SELECT_MANY_SELECTED_ICON,
-          unSelectedIconTmpl = QorSelectMany.SELECT_MANY_UNSELECTED_ICON,
+          selectedIconTmpl = this.SELECT_MANY_SELECTED_ICON,
+          unSelectedIconTmpl = this.SELECT_MANY_UNSELECTED_ICON,
           selectedIDs = [],
           primaryKey,
           $selectedItems = this.$selectFeild.find('[data-primary-key]').not('.' + CLASS_DELETED_ITEM);
@@ -130,10 +138,13 @@
     },
 
     updateHint: function (data) {
-      var hint = this.renderHint(data);
+      var template;
+
+      $.extend(data, this.bottomsheetsData);
+      template = this.renderHint(data)
 
       $(CLASS_SELECT_HINT).remove();
-      $(CLASS_BOTTOMSHEETS).find('.qor-bottomsheets__body').prepend(hint);
+      $(CLASS_BOTTOMSHEETS).find('.qor-bottomsheets__body').prepend(template);
     },
 
     updateSelectInputData: function ($selectFeild) {
@@ -158,7 +169,7 @@
       var primaryKey = data.primaryKey;
 
       this.$selectFeild.find('[data-primary-key="' + primaryKey + '"]').remove();
-      this.changeIcon(data.$clickElement, QorSelectMany.SELECT_MANY_UNSELECTED_ICON);
+      this.changeIcon(data.$clickElement, this.SELECT_MANY_UNSELECTED_ICON);
     },
 
     addItem: function (data, isNewData) {
@@ -170,7 +181,7 @@
         if ($list.hasClass(CLASS_DELETED_ITEM)) {
           $list.removeClass(CLASS_DELETED_ITEM);
           this.updateSelectInputData();
-          this.changeIcon(data.$clickElement, QorSelectMany.SELECT_MANY_SELECTED_ICON);
+          this.changeIcon(data.$clickElement, this.SELECT_MANY_SELECTED_ICON);
           return;
         } else {
           return;
@@ -188,7 +199,7 @@
         return;
       }
 
-      this.changeIcon(data.$clickElement, QorSelectMany.SELECT_MANY_SELECTED_ICON);
+      this.changeIcon(data.$clickElement, this.SELECT_MANY_SELECTED_ICON);
     },
 
     handleSelectMany: function () {
@@ -236,23 +247,6 @@
   };
 
   QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
-
-  // For selected icon indicator
-  QorSelectMany.SELECT_MANY_SELECTED_ICON = '<span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>';
-
-  // For unselected icon indicator
-  QorSelectMany.SELECT_MANY_UNSELECTED_ICON = '<span class="qor-select__select-icon"><i class="material-icons">panorama_fish_eye</i></span>';
-
-  // For select many tips
-  QorSelectMany.SELECT_MANY_HINT = '<div class="qor-selectmany__hint clearfix"><span>[[ selectedNum ]] items selected</span><a href="javascript://" data-dismiss="bottomsheets">DONE</a></div>';
-
-  QorSelectMany.SELECT_MANY_TEMPLATE = (
-    '<li data-primary-key="[[ primaryKey ]]">' +
-      '<span>[[ Name ]]</span>' +
-      '<a href="javascripr://" class="qor-selected-many__undo">UNDO</a>' +
-      '<a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>' +
-    '</li>'
-  );
 
   QorSelectMany.plugin = function (options) {
     return this.each(function () {
