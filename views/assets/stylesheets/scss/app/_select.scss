@@ -59,6 +59,28 @@
           font-size: 14px;
         }
       }
+
+      .qor-selected-many__undo {
+        color: #03A9F4;
+        padding: 2px;
+        text-decoration: none;
+        display: none;
+      }
+
+      &.deleted {
+        background-color: #F2F2F2;
+        span {
+          text-decoration: line-through;
+          color: unquote("rgba(#{$color-black}, 0.26)");
+        }
+
+        .qor-selected-many__remove {
+          display: none;
+        }
+        .qor-selected-many__undo {
+          display: inline-block;
+        }
+      }
     }
   }
 }

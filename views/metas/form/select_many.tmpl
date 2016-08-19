@@ -28,6 +28,7 @@
         {{range $value := $current_values}}
           <li data-primary-key="{{primary_key_of $value}}">
             <span>{{stringify $value}}</span>
+            <a href="javascripr://" class="qor-selected-many__undo">UNDO</a>
             <a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
           </li>
         {{end}}

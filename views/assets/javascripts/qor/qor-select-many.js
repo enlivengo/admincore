@@ -21,6 +21,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var CLASS_CLEAR_SELECT = '.qor-selected-many__remove';
+  var CLASS_UNDO_DELETE = '.qor-selected-many__undo';
   var CLASS_SELECT_FIELD = '.qor-field__selected-many';
   var CLASS_SELECT_ICON = '.qor-selectmany__select-icon';
   var CLASS_SELECT_HINT = '.qor-selectmany__hint';
@@ -45,13 +46,24 @@
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this));
       this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this));
+      this.$element.on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
     },
 
     clearSelect: function (e) {
       var $target = $(e.target),
           $selectFeild = $target.closest(CLASS_PARENT);
 
-      $target.closest('[data-primary-key]').remove();
+      $target.closest('[data-primary-key]').addClass("deleted");
+      this.updateSelectInputData($selectFeild);
+
+      return false;
+    },
+
+    undoDelete: function (e) {
+      var $target = $(e.target),
+          $selectFeild = $target.closest(CLASS_PARENT);
+
+      $target.closest('[data-primary-key]').removeClass("deleted");
       this.updateSelectInputData($selectFeild);
 
       return false;
@@ -84,7 +96,7 @@
           unSelectedIconTmpl = QorSelectMany.SELECT_MANY_UNSELECTED_ICON,
           selectedIDs = [],
           primaryKey,
-          $selectedItems = this.$selectFeild.find('[data-primary-key]');
+          $selectedItems = this.$selectFeild.find('[data-primary-key]:not(.deleted)');
 
       $selectedItems.each(function () {
         selectedIDs.push($(this).data().primaryKey);
@@ -124,7 +136,7 @@
 
     updateSelectInputData: function ($selectFeild) {
       var $selectList = $selectFeild ?  $selectFeild : this.$selectFeild,
-          $selectedItems = $selectList.find('[data-primary-key]'),
+          $selectedItems = $selectList.find('[data-primary-key]:not(.deleted)'),
           $selector = $selectFeild ? $selectFeild.find('select') : this.$selector,
           options = $selector.find('option');
 
@@ -226,6 +238,7 @@
   QorSelectMany.SELECT_MANY_TEMPLATE = (
     '<li data-primary-key="[[ primaryKey ]]">' +
       '<span>[[ Name ]]</span>' +
+      '<a href="javascripr://" class="qor-selected-many__undo">UNDO</a>' +
       '<a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>' +
     '</li>'
   );
