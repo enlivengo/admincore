@@ -148,7 +148,7 @@ func (res *Resource) convertObjectToJSONMap(context *Context, value interface{},
 		values := map[string]interface{}{}
 		for _, meta := range metas {
 			if meta.HasPermission(roles.Read, context.Context) {
-				if meta.Resource != nil {
+				if relationship := meta.FieldStruct.Relationship; relationship != nil && (relationship.Kind == "has_one" || relationship.Kind == "has_many") && meta.Resource != nil {
 					values[meta.GetName()] = meta.Resource.convertObjectToJSONMap(context, context.RawValueOf(value, meta), kind)
 				} else {
 					values[meta.GetName()] = context.FormattedValueOf(value, meta)
