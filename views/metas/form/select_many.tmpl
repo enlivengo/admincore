@@ -31,13 +31,18 @@
   </script>
 
   <script name="select-many-hint" type="x-tmpl-mustache">
-    <div class="qor-selectmany__hint clearfix"><span>[[ selectedNum ]] {{t "qor_admin.form.select_many_hint" "item(s) selected"}}</span><a href="#" data-dismiss="bottomsheets">{{t "qor_admin.form.select_many_hint_button" "DONE"}}</a></div>
+    <div class="qor-selectmany__hint clearfix">
+      <span>[[ selectedNum ]] {{marshal (t "qor_admin.form.select_many_hint" "item(s) selected")}}</span>
+      <a href="#" data-dismiss="bottomsheets">{{t "qor_admin.form.select_many_hint_button" "DONE"}}</a>
+    </div>
   </script>
 
   <script name="select-many-template" type="x-tmpl-mustache">
     <li data-primary-key="[[ primaryKey ]]">
       <span>[[ Name ]]</span>
-      <a href="javascripr://" class="qor-selected-many__undo">UNDO</a>
+      <a href="javascripr://" class="qor-selected-many__undo">
+        {{marshal (t "qor_admin.form.undo" "UNDO")}}
+      </a>
       <a href="javascripr://" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
     </li>
   </script>

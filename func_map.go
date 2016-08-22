@@ -859,8 +859,15 @@ func (context *Context) FuncMap() template.FuncMap {
 		"plural":     inflection.Plural,
 		"singular":   inflection.Singular,
 		"marshal": func(v interface{}) template.JS {
-			byt, _ := json.Marshal(v)
-			return template.JS(byt)
+			switch value := v.(type) {
+			case string:
+				return template.JS(value)
+			case template.HTML:
+				return template.JS(value)
+			default:
+				byt, _ := json.Marshal(v)
+				return template.JS(byt)
+			}
 		},
 
 		"render":      context.Render,
