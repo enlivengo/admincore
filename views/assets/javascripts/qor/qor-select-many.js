@@ -141,7 +141,7 @@
       var template;
 
       $.extend(data, this.bottomsheetsData);
-      template = this.renderHint(data)
+      template = this.renderHint(data);
 
       $(CLASS_SELECT_HINT).remove();
       $(CLASS_BOTTOMSHEETS).find('.qor-bottomsheets__body').prepend(template);

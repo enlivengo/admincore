@@ -129,13 +129,13 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 					PermissionMode: roles.Create,
 					Resource:       res,
 				})
-
-				// Create
-				router.Post(prefix, adminController.Create, RouteConfig{
-					PermissionMode: roles.Create,
-					Resource:       res,
-				})
 			}
+
+			// Create
+			router.Post(prefix, adminController.Create, RouteConfig{
+				PermissionMode: roles.Create,
+				Resource:       res,
+			})
 		}
 
 		if mode == "update" {
