@@ -205,13 +205,13 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	prefix = append(prefix, meta.Name)
 
 	var generateNestedRenderSections = func(kind string) func(interface{}, []*Section, ...int) template.HTML {
-		return func(value interface{}, sections []*Section, index ...int) template.HTML {
+		return func(value interface{}, sections []*Section, index int) template.HTML {
 			var result = bytes.NewBufferString("")
 			var newPrefix = append([]string{}, prefix...)
 
-			if len(index) > 0 {
+			if index > 0 {
 				last := newPrefix[len(newPrefix)-1]
-				newPrefix = append(newPrefix[:len(newPrefix)-1], fmt.Sprintf("%v[%v]", last, index[0]))
+				newPrefix = append(newPrefix[:len(newPrefix)-1], fmt.Sprintf("%v[%v]", last, index))
 			}
 
 			if len(sections) > 0 {
@@ -228,7 +228,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		}
 	}
 
-	funcsMap["render_form"] = generateNestedRenderSections("form")
+	funcsMap["render_nested_form"] = generateNestedRenderSections("form")
 
 	defer func() {
 		if r := recover(); r != nil {
