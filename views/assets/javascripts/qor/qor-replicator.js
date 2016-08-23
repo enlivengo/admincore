@@ -62,6 +62,7 @@
         }
       } else {
         this.template = $template.filter($this.children(options.childrenClass).children(options.newClass)).prop('outerHTML');
+        $template.remove();
         $template.data(IS_TEMPLATE, true).hide();
         this.parse();
       }

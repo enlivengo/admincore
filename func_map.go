@@ -204,12 +204,12 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	)
 	prefix = append(prefix, meta.Name)
 
-	var generateNestedRenderSections = func(kind string) func(interface{}, []*Section, ...int) template.HTML {
+	var generateNestedRenderSections = func(kind string) func(interface{}, []*Section, int) template.HTML {
 		return func(value interface{}, sections []*Section, index int) template.HTML {
 			var result = bytes.NewBufferString("")
 			var newPrefix = append([]string{}, prefix...)
 
-			if index > 0 {
+			if index >= 0 {
 				last := newPrefix[len(newPrefix)-1]
 				newPrefix = append(newPrefix[:len(newPrefix)-1], fmt.Sprintf("%v[%v]", last, index))
 			}
