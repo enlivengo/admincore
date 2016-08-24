@@ -58,7 +58,8 @@ $(function () {
             openData = $this.data(),
             actionData;
 
-        if ($(e.target).hasClass("material-icons") || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
+        // if clicking item's menu actions
+        if ($(e.target).parents(".qor-button--actions").size() || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
         }
 
