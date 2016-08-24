@@ -268,9 +268,6 @@
             width = height * aspectRatio;
           }
 
-          width *= 0.8;
-          height *= 0.8;
-
           emulateImageData = {
             naturalWidth: naturalWidth,
             naturalHeight: naturalHeight
@@ -346,6 +343,7 @@
         scalable: false,
         rotatable: false,
         checkImageOrigin: false,
+        autoCropArea: 1,
 
         built: function () {
           $modal.find(CLASS_SAVE).one(EVENT_CLICK, function () {
