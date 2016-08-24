@@ -78,10 +78,10 @@
       $document.off(EVENT_CLICK, this.click);
     },
 
-    renderActionSelectedData: function (actionSelectedData) {
+    bindActionData: function (actiondData) {
       var $form = this.$body.find('[data-toggle="qor-action-slideout"]').find('form');
-      for (var i = actionSelectedData.length - 1; i >= 0; i--) {
-        $form.prepend('<input type="hidden" name="primary_values[]" value="' + actionSelectedData[i] + '" />');
+      for (var i = actiondData.length - 1; i >= 0; i--) {
+        $form.prepend('<input type="hidden" name="primary_values[]" value="' + actiondData[i] + '" />');
       }
     },
 
@@ -175,7 +175,7 @@
       var method;
       var dataType;
       var load;
-      var actionSelectedData = data.actionSelectedData;
+      var actionData = data.actionData;
 
       if (!url) {
         return;
@@ -215,8 +215,8 @@
               this.$header.find('.qor-button--new').remove();
               this.$title.after(this.$body.find('.qor-button--new'));
 
-              if (actionSelectedData && actionSelectedData.length) {
-                this.renderActionSelectedData(actionSelectedData);
+              if (actionData && actionData.length) {
+                this.bindActionData(actionData);
               }
 
               this.$bottomsheets.one(EVENT_SHOWN, function () {

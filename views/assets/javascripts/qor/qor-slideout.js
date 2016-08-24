@@ -84,7 +84,11 @@
     },
 
     keyup: function (e) {
-      if (e.which === 27 && !$('.qor-bottomsheets').hasClass('is-shown')) {
+      if (e.which === 27) {
+        if ($('.qor-bottomsheets').is(':visible') || $('.qor-modal').is(':visible')) {
+          return;
+        }
+
         this.hide();
         this.removeSelectedClass();
       }

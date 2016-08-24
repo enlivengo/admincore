@@ -53,19 +53,19 @@ $(function () {
         var $this = $(this),
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
-            isInTable = $this.is('.qor-table tr[data-url]'),
+            isInTable = $this.is('.qor-table tr[data-url]') || $this.closest('.qor-js-table').size(),
             isActionButton = $this.hasClass('qor-action-button'),
             openData = $this.data(),
-            actionSelectedData;
+            actionData;
 
         if ($(e.target).hasClass("material-icons") || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
         }
 
         if (isActionButton) {
-            actionSelectedData = collectSelectID();
+            actionData = collectSelectID();
             openData = $.extend({}, openData, {
-              actionSelectedData: actionSelectedData
+              actionData: actionData
             });
         }
 

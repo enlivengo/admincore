@@ -83,7 +83,13 @@
 
     initItem: function (data) {
       var $selectFeild = $(data.selectId).closest(CLASS_PARENT).find(CLASS_SELECT_FIELD),
-          selectedID = $selectFeild.data().primaryKey;
+          selectedID;
+
+      if (!$selectFeild.size()) {
+        return;
+      }
+
+      selectedID = $selectFeild.data().primaryKey;
 
       if (selectedID) {
         $(CLASS_BOTTOMSHEETS).find('tr[data-primary-key="' + selectedID + '"]').addClass(CLASS_SELECTED).find('td:first').append(this.SELECT_ONE_SELECTED_ICON);

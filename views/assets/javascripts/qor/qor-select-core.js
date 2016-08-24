@@ -18,6 +18,7 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var CLASS_TABLE_CONTENT = '.qor-table__content';
+  var CLASS_CLICK_TABLE = '.qor-table-container tbody tr';
 
   function QorSelectCore(element, options) {
     this.$element = $(element);
@@ -34,7 +35,7 @@
 
     bind: function () {
       this.$element.
-        on(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
+        on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this)).
         on(EVENT_SUBMIT, 'form', this.submit.bind(this));
     },
 
@@ -55,7 +56,7 @@
           options = this.options,
           formatOnSelect = options.formatOnSelect;
 
-      data.primaryKey = $this.data().primaryKey;
+      $.extend(data, $this.data());
       data.$clickElement = $this;
 
       $tds.each(function () {
@@ -81,6 +82,7 @@
       var _this = this;
       var $submit = $form.find(':submit');
       var data;
+      var formatOnSubmit = this.options.formatOnSubmit;
 
       if (FormData) {
         e.preventDefault();
@@ -98,8 +100,8 @@
             data = json;
             data.primaryKey = data.ID;
 
-            if (_this.options.formatOnSubmit && $.isFunction(_this.options.formatOnSubmit)) {
-              _this.options.formatOnSubmit(data);
+            if (formatOnSubmit && $.isFunction(formatOnSubmit)) {
+              formatOnSubmit(data);
             } else {
               _this.refresh();
             }
