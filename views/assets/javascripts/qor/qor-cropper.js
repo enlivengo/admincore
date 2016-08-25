@@ -117,8 +117,20 @@
     },
 
     build: function () {
+      var textData = this.$output.data(),
+          text = {
+            title: textData.cropperTitle,
+            ok: textData.cropperOk,
+            cancel: textData.cropperCancel
+          },
+          replaceTexts = this.options.text;
+
+      if (text.ok && text.title && text.cancel) {
+        replaceTexts = text;
+      }
+
       this.wrap();
-      this.$modal = $(replaceText(QorCropper.MODAL, this.options.text)).appendTo('body');
+      this.$modal = $(replaceText(QorCropper.MODAL, replaceTexts)).appendTo('body');
     },
 
     unbuild: function () {
