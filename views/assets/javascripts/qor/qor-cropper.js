@@ -362,7 +362,7 @@
             var cropData = $clone.cropper('getData', true);
             var syncData = [];
             var url;
-
+            
             data.crop = true;
             data[options.key][sizeName] = cropData;
             _this.imageData = $clone.cropper('getImageData');
@@ -441,7 +441,7 @@
         this.autoCrop(url, data);
       }
 
-      this.$output.val(JSON.stringify(this.data));
+      this.$output.val(JSON.stringify(this.data)).trigger(EVENT_CHANGE);
     },
 
     preview: function ($target, emulateImageData, emulateCropData) {
