@@ -117,7 +117,7 @@
 
       if (fetchUrl) {
         $.getJSON(fetchUrl,function(data){
-          imageData = JSON.parse(data.File);
+          imageData = JSON.parse(data.MediaCropOption);
           _this.$output.val(JSON.stringify(data));
           _this.data = imageData || {};
           _this.build();
@@ -125,9 +125,8 @@
         });
       } else {
         outputValue = $.trim(this.$output.val());
-        
         if (outputValue) {
-          data = JSON.parse(outputValue);  
+          data = JSON.parse(outputValue);
         }
 
         this.data = data || {};
