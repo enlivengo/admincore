@@ -96,6 +96,10 @@
       var $parent = $this.closest(options.parent);
       var $list;
       var data;
+      var outputValue;
+      var fetchUrl;
+      var _this = this;
+      var imageData;
 
       if (!$parent.length) {
         $parent = $this.parent();
@@ -105,15 +109,31 @@
       this.$output = $parent.find(options.output);
       this.$list = $list = $parent.find(options.list);
 
+      fetchUrl = this.$output.data().fetchSizedata;
+
       if (!$list.find('img').attr('src')) {
         $list.find('ul').hide();
       }
 
-      data = JSON.parse($.trim(this.$output.val()));
+      if (fetchUrl) {
+        $.getJSON(fetchUrl,function(data){
+          imageData = JSON.parse(data.File);
+          _this.$output.val(JSON.stringify(data));
+          _this.data = imageData || {};
+          _this.build();
+          _this.bind();
+        });
+      } else {
+        outputValue = $.trim(this.$output.val());
+        
+        if (outputValue) {
+          data = JSON.parse(outputValue);  
+        }
 
-      this.data = data || {};
-      this.build();
-      this.bind();
+        this.data = data || {};
+        this.build();
+        this.bind();
+      }
     },
 
     build: function () {
@@ -335,13 +355,15 @@
       var data = this.data;
       var _this = this;
       var sizeAspectRatio = NaN;
-      var sizeWidth;
-      var sizeHeight;
+      var sizeWidth = sizeData.sizeResolutionWidth;
+      var sizeHeight = sizeData.sizeResolutionHeight;
       var list;
 
       if (sizeResolution) {
-        sizeWidth = getValueByNoCaseKey(sizeResolution, 'width');
-        sizeHeight = getValueByNoCaseKey(sizeResolution, 'height');
+        if (!sizeWidth && !sizeHeight) {
+          sizeWidth = getValueByNoCaseKey(sizeResolution, 'width');
+          sizeHeight = getValueByNoCaseKey(sizeResolution, 'height');
+        }
         sizeAspectRatio = sizeWidth / sizeHeight;
       }
 
@@ -416,12 +438,14 @@
         var data = $(this).data();
         var resolution = data.sizeResolution;
         var name = data.sizeName;
-        var width;
-        var height;
+        var width = data.sizeResolutionWidth;
+        var height = data.sizeResolutionHeight;
 
         if (resolution) {
-          width = getValueByNoCaseKey(resolution, 'width');
-          height = getValueByNoCaseKey(resolution, 'height');
+          if (!width && !height) {
+            width = getValueByNoCaseKey(resolution, 'width');
+            height = getValueByNoCaseKey(resolution, 'height');
+          }
 
           if (width / height === aspectRatio) {
             list.push(
