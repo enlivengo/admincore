@@ -264,12 +264,14 @@
         var emulateImageData = {};
         var emulateCropData = {};
         var aspectRatio;
-        var width;
-        var height;
+        var width = sizeData.sizeResolutionWidth;
+        var height = sizeData.sizeResolutionHeight;
 
         if (sizeResolution) {
-          width = getValueByNoCaseKey(sizeResolution, 'width');
-          height = getValueByNoCaseKey(sizeResolution, 'height');
+          if (!width && !height) {
+            width = getValueByNoCaseKey(sizeResolution, 'width');
+            height = getValueByNoCaseKey(sizeResolution, 'height');
+          }
           aspectRatio = width / height;
 
           if (naturalHeight * aspectRatio > naturalWidth) {
