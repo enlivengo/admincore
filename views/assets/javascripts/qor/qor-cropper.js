@@ -237,13 +237,14 @@
       }
     },
 
-    load: function (url) {
+    load: function (url, callback) {
       var options = this.options;
       var _this = this;
       var $list = this.$list;
       var $ul = $list.find('ul');
       var data = this.data;
       var $image;
+      var imageLength;
 
       if (!$ul.length) {
         $ul  = $(QorCropper.LIST);
@@ -254,6 +255,7 @@
       $ul.show(); // show ul when it is hidden
 
       $image = $list.find('img');
+      imageLength = $image.size();
       $image.one('load', function () {
         var $this = $(this);
         var naturalWidth = this.naturalWidth;
@@ -310,6 +312,13 @@
         }
 
         _this.$output.val(JSON.stringify(data));
+
+        // callback after load complete
+        if (Object.keys(data[options.key]).length >= imageLength) {
+          if (callback && $.isFunction(callback)) {
+            callback();
+          }
+        }
       }).attr('src', url).data('originalUrl', url);
 
       $list.show();
