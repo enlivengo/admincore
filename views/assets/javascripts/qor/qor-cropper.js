@@ -117,7 +117,7 @@
 
       if (fetchUrl) {
         $.getJSON(fetchUrl,function(data){
-          imageData = JSON.parse(data.MediaCropOption);
+          imageData = JSON.parse(data.MediaOption);
           _this.$output.val(JSON.stringify(data));
           _this.data = imageData || {};
           _this.build();
