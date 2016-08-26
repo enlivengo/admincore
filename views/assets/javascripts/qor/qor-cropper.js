@@ -261,7 +261,7 @@
       var _this = this;
       var $list = this.$list;
       var $ul = $list.find('ul');
-      var data = this.data;
+      var data = this.data || {};
       var $image;
       var imageLength;
 
@@ -351,7 +351,7 @@
       var sizeName = sizeData.sizeName || 'original';
       var sizeResolution = sizeData.sizeResolution;
       var $clone = $('<img>').attr('src', sizeData.originalUrl);
-      var data = this.data;
+      var data = this.data || {};
       var _this = this;
       var sizeAspectRatio = NaN;
       var sizeWidth = sizeData.sizeResolutionWidth;
