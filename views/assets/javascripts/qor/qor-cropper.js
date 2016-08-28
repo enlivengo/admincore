@@ -490,6 +490,10 @@
       var canvasHeight = containerHeight;
       var scaledRatio;
 
+      if (canvasWidth == 0) {
+        return;
+      }
+
       if (containerHeight * aspectRatio > containerWidth) {
         canvasHeight = containerWidth / aspectRatio;
       } else {
