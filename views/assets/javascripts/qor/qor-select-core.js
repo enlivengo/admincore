@@ -47,8 +47,8 @@
 
     processingData: function (e) {
       var $this = $(e.target).closest('tr'),
-          $tds = $this.find('td'),
-          $td,
+          $headings = $this.find('[data-heading]'),
+          $heading,
           $content,
           data = {},
           name,
@@ -59,13 +59,13 @@
       $.extend(data, $this.data());
       data.$clickElement = $this;
 
-      $tds.each(function () {
-        $td = $(this),
-        $content = $td.find(CLASS_TABLE_CONTENT);
-        name = $td.data('heading');
-        value = $content.size() ? $content.html() : $td.html();
+      $headings.each(function () {
+        $heading = $(this),
+        $content = $heading.find(CLASS_TABLE_CONTENT);
+        name = $heading.data('heading');
+        value = $content.size() ? $content.html() : $heading.html();
         if (name) {
-          data[name] = value;
+          data[name] = $.trim(value);
         }
       });
 

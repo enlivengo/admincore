@@ -498,18 +498,9 @@
 
       scaledRatio = cropData.width / canvasWidth;
 
-      $canvas.css({
-        width: canvasWidth,
-        height: canvasHeight
-      });
-
       $target.css({
-        maxWidth: 'none',
-        maxHeight: 'none',
-        width: imageData.naturalWidth / scaledRatio,
-        height: imageData.naturalHeight / scaledRatio,
-        marginLeft: -cropData.x / scaledRatio,
-        marginTop: -cropData.y / scaledRatio
+        maxWidth: imageData.naturalWidth / scaledRatio,
+        maxHeight: imageData.naturalHeight / scaledRatio
       });
 
       this.center($target);
