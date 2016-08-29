@@ -88,7 +88,8 @@
 .qor-select__select-icon{
   position: absolute;
   left: -32px;
-  top: 11px;
+  top: 50%;
+  margin-top: -10px;
   color: unquote("rgba(#{$color-black}, 0.26)");
   i{
     color: unquote("rgba(#{$color-black}, 0.26)");
