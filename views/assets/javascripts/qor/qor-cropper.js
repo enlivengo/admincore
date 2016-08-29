@@ -226,10 +226,8 @@
           this.$list.show();
           delete data.Delete;
           this.$output.val(JSON.stringify(data));
-          return false;
         }.bind(this));
         this.$parent.find('.qor-fieldset').append($alert);
-        return false;
       }
 
       if ($target.closest(CLASS_CROP).size()) {
@@ -237,8 +235,6 @@
         this.$target = $target;
         this.$modal.qorModal('show');
       }
-
-
     },
 
     read: function (e) {
@@ -490,7 +486,7 @@
       var canvasHeight = containerHeight;
       var scaledRatio;
 
-      if (canvasWidth == 0) {
+      if (canvasWidth == 0 || imageData.naturalWidth == 0 || imageData.naturalHeight == 0) {
         return;
       }
 
