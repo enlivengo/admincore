@@ -104,30 +104,43 @@ func appendMenu(menus []*Menu, ancestors []string, menu *Menu) []*Menu {
 	}
 
 	var newMenu = generateMenu(ancestors, menu)
+	var added bool
 	if len(menus) == 0 {
 		menus = append(menus, newMenu)
 	} else if newMenu.Priority > 0 {
 		for idx, menu := range menus {
 			if menu.Priority > newMenu.Priority || menu.Priority == 0 {
 				menus = append(menus[0:idx], append([]*Menu{newMenu}, menus[idx:]...)...)
+				added = true
 				break
 			}
 		}
-	} else if newMenu.Priority < 0 {
-		for idx := len(menus) - 1; idx >= 0; idx-- {
-			menu := menus[idx]
-			if menu.Priority > newMenu.Priority || menu.Priority == 0 {
-				menus = append(menus[0:idx+1], append([]*Menu{newMenu}, menus[idx+1:]...)...)
-				break
-			}
+		if !added {
+			menus = append(menus, menu)
 		}
 	} else {
-		for idx := len(menus) - 1; idx >= 0; idx-- {
-			menu := menus[idx]
-			if menu.Priority >= 0 {
-				menus = append(menus[0:idx+1], append([]*Menu{newMenu}, menus[idx+1:]...)...)
-				break
+		if newMenu.Priority < 0 {
+			for idx := len(menus) - 1; idx >= 0; idx-- {
+				menu := menus[idx]
+				if menu.Priority > newMenu.Priority || menu.Priority == 0 {
+					menus = append(menus[0:idx+1], append([]*Menu{newMenu}, menus[idx+1:]...)...)
+					added = true
+					break
+				}
 			}
+		} else {
+			for idx := len(menus) - 1; idx >= 0; idx-- {
+				menu := menus[idx]
+				if menu.Priority >= 0 {
+					menus = append(menus[0:idx+1], append([]*Menu{newMenu}, menus[idx+1:]...)...)
+					added = true
+					break
+				}
+			}
+		}
+
+		if !added {
+			menus = append([]*Menu{menu}, menus...)
 		}
 	}
 
