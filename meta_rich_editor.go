@@ -6,6 +6,7 @@ import (
 
 type RichEditorConfig struct {
 	AssetManager *Resource
+	Settings     map[string]interface{}
 	metaConfig
 }
 
