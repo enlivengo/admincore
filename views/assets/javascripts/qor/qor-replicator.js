@@ -151,7 +151,6 @@
           $item = $(this.template.replace(/\{\{index\}\}/g, ++this.index));
           $target.before($item.show());
         }
-        
       }
 
       if ($item) {
@@ -169,13 +168,12 @@
       $item.children(':visible').addClass('hidden').hide();
       $alert = $(options.alertTemplate.replace('{{name}}', this.parseName($item)));
       $alert.find(options.undoClass).one(EVENT_CLICK, function () {
-        $item.find('.qor-fieldset__alert').remove();
+        $item.find('> .qor-fieldset__alert').remove();
         $item.children('.hidden').removeClass('hidden').show();
 
       });
-      
+
       $item.append($alert);
-      
     },
 
     parseName: function ($item) {
