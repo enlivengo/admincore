@@ -321,9 +321,9 @@
           imageDeleteCallback: function (/*url, image*/) {
             $this.triggerHandler(EVENT_IMAGE_DELETE, arguments[1]);
           }
-        }
+        };
 
-        $.extend(config, $this.data("redactorSettings"))
+        $.extend(config, $this.data("redactorSettings"));
         $this.redactor(config);
       } else {
         if (/destroy/.test(option)) {

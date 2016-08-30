@@ -261,7 +261,7 @@
       var $image;
       var imageLength;
 
-      if (!$ul.length) {
+      if (!$ul.length || !$ul.find('li').length) {
         $ul  = $(QorCropper.LIST);
         $list.html($ul);
         this.wrap();
@@ -329,7 +329,7 @@
         _this.$output.val(JSON.stringify(data));
 
         // callback after load complete
-        if (Object.keys(data[options.key]).length >= imageLength) {
+        if (sizeName && Object.keys(data[options.key]).length >= imageLength) {
           if (callback && $.isFunction(callback)) {
             callback();
           }
@@ -483,16 +483,13 @@
       var cropData = $.extend({}, emulateCropData || this.cropData); // Clone one to avoid changing it
       var aspectRatio = cropData.width / cropData.height;
       var canvasWidth = containerWidth;
-      var canvasHeight = containerHeight;
       var scaledRatio;
 
       if (canvasWidth == 0 || imageData.naturalWidth == 0 || imageData.naturalHeight == 0) {
         return;
       }
 
-      if (containerHeight * aspectRatio > containerWidth) {
-        canvasHeight = containerWidth / aspectRatio;
-      } else {
+      if (containerHeight * aspectRatio <= containerWidth) {
         canvasWidth = containerHeight * aspectRatio;
       }
 
