@@ -23,6 +23,8 @@
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
   var EVENT_SHOW = 'show.' + NAMESPACE;
+  var EVENT_SLIDEOUT_SUBMIT_COMPLEMENT = 'slideoutSubmitComplete.' + NAMESPACE;
+  var EVENT_SLIDEOUT_CLOSED = 'slideoutClosed.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
   var EVENT_HIDE = 'hide.' + NAMESPACE;
   var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
@@ -225,6 +227,8 @@
           success: function (html) {
             var returnUrl = $form.data('returnUrl');
             var refreshUrl = $form.data('refreshUrl');
+
+            $slideout.trigger(EVENT_SLIDEOUT_SUBMIT_COMPLEMENT);
 
             if (refreshUrl) {
               window.location.href = refreshUrl;
@@ -533,6 +537,8 @@
       $slideout.
         one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
         removeClass(CLASS_IS_SLIDED);
+
+      $slideout.trigger(EVENT_SLIDEOUT_CLOSED);
     },
 
     hidden: function () {
