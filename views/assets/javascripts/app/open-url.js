@@ -54,7 +54,7 @@ $(function () {
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
             isInTable = $this.is('.qor-table tr[data-url]') || $this.closest('.qor-js-table').size(),
-            isActionButton = $this.hasClass('qor-action-button'),
+            isActionButton = $this.hasClass('qor-action-button') || $this.hasClass('qor-action--button'),
             openData = $this.data(),
             actionData;
 
@@ -71,6 +71,12 @@ $(function () {
         }
 
         if (!openData.method || openData.method.toUpperCase() == "GET") {
+            // Open in BottmSheet: is action button, open type is bottom-sheet
+             if (isActionButton || openData.openType == 'bottom-sheet') {
+                   BottomSheets.open(openData);
+                   return false;
+             }
+
             // Slideout or New Page: table items, new button, edit button
             if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openData.openType == 'slideout') {
                 if (hasSlideoutTheme) {
@@ -90,7 +96,7 @@ $(function () {
             }
 
             // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
-            if (isSlideoutOpened() || (isNewButton && isBottomsheetsOpened()) || isActionButton || openData.openType == 'bottom-sheet') {
+            if (isSlideoutOpened() || (isNewButton && isBottomsheetsOpened())) {
                 BottomSheets.open(openData);
                 return false;
             }
