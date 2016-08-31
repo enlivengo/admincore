@@ -118,7 +118,7 @@
     if (tmpl.length > 0) {
       result = Mustache.render(tmpl.html().replace(/{{(.*?)}}/g, '[[$1]]'), data);
     } else {
-      result = data.text || data.Name || data.Title || data.Code;
+      result = data.text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]]; ;
     }
 
     // if is HTML
