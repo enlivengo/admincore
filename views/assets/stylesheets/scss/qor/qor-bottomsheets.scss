@@ -41,7 +41,9 @@
   }
 
   &.is-slided{
-    height: 500px;
+    height: calc(100% - 100px);
+    max-height: 600px;
+    min-height: 400px;
   }
 
   .qor-table-container{
