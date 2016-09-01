@@ -18,7 +18,7 @@
   var NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
-  var EVENT_RELOAD = 'reload.' + NAMESPACE; // will trigger this event(relaod.qor.bottomsheets) when bottomsheets reload complete: like pagination, filter, action etc.
+  var EVENT_RELOAD = 'reload.' + NAMESPACE;
   var EVENT_SHOW = 'show.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
   var EVENT_HIDE = 'hide.' + NAMESPACE;
@@ -28,6 +28,7 @@
   var CLASS_IS_SLIDED = 'is-slided';
   var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
   var CLASS_BODY_CONTENT = '.qor-page__body';
+  var CLASS_BODY_HEAD = '.qor-page__header';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorBottomSheets(element, options) {
@@ -70,7 +71,8 @@
       this.$bottomsheets
         .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
-        .on(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this));
+        .on(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this))
+        .on('selectorChanged.qor.selector', this.selectorChanged.bind(this));
     },
 
     unbind: function () {
@@ -87,16 +89,24 @@
       }
     },
 
-    pagination: function (e) {
-      var $ele = $(e.target),
-          url = $ele.prop('href');
+    selectorChanged: function (e, value) {
+      var url = value;
       if (url) {
-        this.loadPaginaton(url);
+        this.reload(url);
       }
       return false;
     },
 
-    loadPaginaton: function (url) {
+    pagination: function (e) {
+      var $ele = $(e.target),
+          url = $ele.prop('href');
+      if (url) {
+        this.reload(url);
+      }
+      return false;
+    },
+
+    reload: function (url) {
       var $bottomsheets = this.$bottomsheets,
           $content = $bottomsheets.find(CLASS_BODY_CONTENT),
           $loading,
@@ -109,9 +119,10 @@
         var $response = $(response).find(CLASS_MAIN_CONTENT).find(CLASS_BODY_CONTENT);
         if ($response.length) {
           $content.html($response.html());
+          // will trigger this event(relaod.qor.bottomsheets) when bottomsheets reload complete: like pagination, filter, action etc.
           $bottomsheets.trigger(EVENT_RELOAD);
         } else {
-          _this.loadPaginaton(url);
+          _this.reload(url);
         }
       }).fail(function() {
         window.alert( "server error, please try again later!" );
@@ -264,6 +275,10 @@
               });
 
               this.show();
+
+              if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(':visible').length) {
+                this.$body.addClass('has-header');
+              }
 
               // handle after opened callback
               if (callback && $.isFunction(callback)) {

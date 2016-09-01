@@ -18,6 +18,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_SELECTOR_CHANGE = 'selectorChanged.' + NAMESPACE;
   var CLASS_OPEN = 'open';
   var CLASS_ACTIVE = 'active';
   var CLASS_HOVER = 'hover';
@@ -29,6 +30,7 @@
   var SELECTOR_LABEL = '.qor-selector-label';
   var SELECTOR_CLEAR = '.qor-selector-clear';
   var SELECTOR_MENU = '.qor-selector-menu';
+  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorSelector(element, options) {
     this.options = options;
@@ -136,6 +138,7 @@
     pick: function (data, initialized) {
       var $selector = this.$selector;
       var selected = !!data.value;
+      var $element = this.$element;
 
       $selector.
         find(SELECTOR_TOGGLE).
@@ -152,11 +155,21 @@
             siblings(SELECTOR_SELECTED).
             removeClass(CLASS_SELECTED);
 
-        this.$element.val(data.value).trigger('change');
+        $element.val(data.value);
+
+
+        if ($element.closest(CLASS_BOTTOMSHEETS).length && !$element.closest('[data-toggle="qor.filter"]').length) {
+          // If action is in bottom sheet, will trigger filterChanged.qor.selector event, add passed data.value parameter to event.
+          $(CLASS_BOTTOMSHEETS).trigger(EVENT_SELECTOR_CHANGE, data.value);
+        } else {
+          $element.trigger('change');
+        }
       }
     },
 
     clear: function () {
+      var $element = this.$element;
+
       this.$selector.
         find(SELECTOR_TOGGLE).
         removeClass(CLASS_ACTIVE).
@@ -169,7 +182,7 @@
           children(SELECTOR_SELECTED).
           removeClass(CLASS_SELECTED);
 
-      this.$element.val('').trigger('change');
+      $element.val('').trigger('change');
     },
 
     open: function () {

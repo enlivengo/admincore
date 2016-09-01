@@ -118,12 +118,13 @@
   }
 
   .qor-page__header{
-    position: relative;
+    position: fixed;
     top: auto;
-    width: auto;
+    width: 360px;
     box-shadow: none;
-    padding: 0;
-    margin-bottom: 8px;
+    padding: 13px 0 0 54px;
+    margin: -56px 0 0 -54px;
+    background-color: #fff;
     > div:not(.qor-actions__filter){
       display: none;
     }

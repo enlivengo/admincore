@@ -27,6 +27,9 @@
       padding: 12px 24px 12px 54px;
       background-color: #fff;
       height: calc(100% - 65px);
+      &.has-header{
+        padding: 56px 24px 12px 54px;
+      }
     }
     &::after{
       position: fixed;
