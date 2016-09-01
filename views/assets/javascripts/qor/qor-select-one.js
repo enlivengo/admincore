@@ -17,9 +17,11 @@
   var $document = $(document);
   var Mustache = window.Mustache;
   var NAMESPACE = 'qor.selectone';
+  var PARENT_NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
+  var EVENT_RELOAD = 'reload.' + PARENT_NAMESPACE;
   var CLASS_CLEAR_SELECT = '.qor-selected__remove';
   var CLASS_CHANGE_SELECT = '.qor-selected__change';
   var CLASS_SELECT_FIELD = '.qor-field__selected';
@@ -28,6 +30,8 @@
   var CLASS_PARENT = '.qor-field__selectone';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
   var CLASS_SELECTED = 'is_selected';
+  var CLASS_ONE = 'qor-bottomsheets__select-one';
+  
 
   function QorSelectOne(element, options) {
     this.$element = $(element);
@@ -43,11 +47,12 @@
     },
 
     bind: function () {
-      $document.on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this));
+      $document.on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this)).
+                on(EVENT_RELOAD, '.' + CLASS_ONE, this.reloadData.bind(this));
+      
       this.$element.
         on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect).
         on(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
-
     },
 
     clearSelect: function () {
@@ -81,11 +86,11 @@
       this.BottomSheets.open(data, this.handleSelectOne.bind(this));
     },
 
-    initItem: function (data) {
-      var $selectFeild = $(data.selectId).closest(CLASS_PARENT).find(CLASS_SELECT_FIELD),
+    initItem: function () {
+      var $selectFeild = $(this.bottomsheetsData.selectId).closest(CLASS_PARENT).find(CLASS_SELECT_FIELD),
           selectedID;
 
-      if (!$selectFeild.size()) {
+      if (!$selectFeild.length) {
         return;
       }
 
@@ -94,6 +99,10 @@
       if (selectedID) {
         $(CLASS_BOTTOMSHEETS).find('tr[data-primary-key="' + selectedID + '"]').addClass(CLASS_SELECTED).find('td:first').append(this.SELECT_ONE_SELECTED_ICON);
       }
+    },
+
+    reloadData: function () {
+      this.initItem();
     },
 
     renderSelectOne: function (data) {
@@ -106,8 +115,8 @@
         formatOnSubmit: this.formatSubmitResults.bind(this)  //render new items after new item form submitted
       };
 
-      $(CLASS_BOTTOMSHEETS).qorSelectCore(options);
-      this.initItem(this.bottomsheetsData);
+      $(CLASS_BOTTOMSHEETS).qorSelectCore(options).addClass(CLASS_ONE).data(this.bottomsheetsData);
+      this.initItem();
     },
 
     formatSelectResults: function (data) {

@@ -32,6 +32,7 @@
   var CLASS_PARENT = '.qor-field__selectmany';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
   var CLASS_SELECTED = 'is_selected';
+  var CLASS_MANY = 'qor-bottomsheets__select-many';
 
 
   function QorSelectMany(element, options) {
@@ -48,13 +49,13 @@
     },
 
     bind: function () {
-      $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this));
+      $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this)).
+                on(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
       
       this.$element
         .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
         .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
 
-      $(CLASS_BOTTOMSHEETS).on(EVENT_RELOAD, this.reloadData.bind(this));
     },
 
     clearSelect: function (e) {
@@ -139,10 +140,6 @@
       this.updateHint(this.getSelectedItemData());
     },
 
-    addSearch: function () {
-
-    },
-
     getSelectedItemData: function() {
       var selecedItems = this.$selectFeild.find('[data-primary-key]').not('.' + CLASS_DELETED_ITEM);
       return {
@@ -222,9 +219,8 @@
             formatOnSubmit: this.formatSubmitResults.bind(this)   // render new items after new item form submitted
           };
 
-      $bottomsheets.qorSelectCore(options);
+      $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
       this.initItems();
-      this.addSearch();
     },
 
     formatSelectResults: function (data) {
