@@ -157,7 +157,7 @@
       template = this.renderHint(data);
 
       $(CLASS_SELECT_HINT).remove();
-      $(CLASS_BOTTOMSHEETS).find('.qor-bottomsheets__body').prepend(template);
+      $(CLASS_BOTTOMSHEETS).find('.qor-page__body').before(template);
     },
 
     updateSelectInputData: function ($selectFeild) {

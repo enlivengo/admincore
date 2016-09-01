@@ -24,7 +24,7 @@
     margin-left: -180px;
     transition: height 0.3s ease;
     .qor-bottomsheets__body {
-      padding: 16px 24px 16px 54px;
+      padding: 12px 24px 12px 54px;
       background-color: #fff;
       height: calc(100% - 65px);
     }
@@ -44,14 +44,14 @@
     height: 500px;
   }
 
+  .qor-table-container{
+    margin-top: 12px;
+  }
+
   .qor-error {
     margin-right: 0;
     margin-left: 0;
     box-shadow: none;
-  }
-
-  .qor-page__header{
-    display: none;
   }
 
   .qor-button--new{
