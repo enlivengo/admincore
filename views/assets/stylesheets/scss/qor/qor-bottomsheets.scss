@@ -78,6 +78,9 @@
     margin: 0;
     box-shadow: none;
     width: 100%;
+    tr{
+      cursor: pointer;
+    }
     td{
       padding: 10px;
     }
@@ -122,6 +125,9 @@
   z-index: $zindex-bottomsheets;
   overflow: auto;
 
+  .qor-button--new{
+    display: none;
+  }
   .qor-action-forms{
     display: block !important;
     margin-top: 0;

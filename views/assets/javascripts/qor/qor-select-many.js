@@ -17,13 +17,16 @@
   var $document = $(document);
   var Mustache = window.Mustache;
   var NAMESPACE = 'qor.selectone';
+  var PARENT_NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
+  var EVENT_RELOAD = 'reload.' + PARENT_NAMESPACE;
   var CLASS_CLEAR_SELECT = '.qor-selected-many__remove';
   var CLASS_UNDO_DELETE = '.qor-selected-many__undo';
   var CLASS_DELETED_ITEM = 'qor-selected-many__deleted';
   var CLASS_SELECT_FIELD = '.qor-field__selected-many';
+  var CLASS_SELECT_INPUT = '.qor-field__selectmany-input';
   var CLASS_SELECT_ICON = '.qor-select__select-icon';
   var CLASS_SELECT_HINT = '.qor-selectmany__hint';
   var CLASS_PARENT = '.qor-field__selectmany';
@@ -46,9 +49,12 @@
 
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this));
+      
       this.$element
         .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
         .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
+
+      $(CLASS_BOTTOMSHEETS).on(EVENT_RELOAD, this.reloadData.bind(this));
     },
 
     clearSelect: function (e) {
@@ -92,6 +98,10 @@
 
     },
 
+    reloadData: function () {
+      this.initItems();
+    },
+
     renderSelectMany: function (data) {
       return Mustache.render(this.SELECT_MANY_TEMPLATE, data);
     },
@@ -127,13 +137,16 @@
       });
 
       this.updateHint(this.getSelectedItemData());
+    },
+
+    addSearch: function () {
 
     },
 
     getSelectedItemData: function() {
-      var selecedItems = $(CLASS_BOTTOMSHEETS).find('.is_selected');
+      var selecedItems = this.$selectFeild.find('[data-primary-key]').not('.' + CLASS_DELETED_ITEM);
       return {
-        selectedNum: selecedItems.size()
+        selectedNum: selecedItems.length
       };
     },
 
@@ -150,7 +163,7 @@
     updateSelectInputData: function ($selectFeild) {
       var $selectList = $selectFeild ?  $selectFeild : this.$selectFeild,
           $selectedItems = $selectList.find('[data-primary-key]').not('.' + CLASS_DELETED_ITEM),
-          $selector = $selectFeild ? $selectFeild.find('select') : this.$selector,
+          $selector = $selectFeild ? $selectFeild.find(CLASS_SELECT_INPUT) : this.$selector,
           options = $selector.find('option');
 
       options.prop('selected', false);
@@ -211,6 +224,7 @@
 
       $bottomsheets.qorSelectCore(options);
       this.initItems();
+      this.addSearch();
     },
 
     formatSelectResults: function (data) {

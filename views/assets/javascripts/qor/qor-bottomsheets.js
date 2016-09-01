@@ -18,6 +18,7 @@
   var NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
+  var EVENT_RELOAD = 'reload.' + NAMESPACE; // will trigger this event(relaod.qor.bottomsheets) when bottomsheets reload complete: like pagination, filter, action etc.
   var EVENT_SHOW = 'show.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
   var EVENT_HIDE = 'hide.' + NAMESPACE;
@@ -26,6 +27,7 @@
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
   var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
+  var CLASS_BODY_CONTENT = '.qor-page__body';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
 
   function QorBottomSheets(element, options) {
@@ -67,8 +69,8 @@
     bind: function () {
       this.$bottomsheets
         .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
-        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this));
-
+        .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
+        .on(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this));
     },
 
     unbind: function () {
@@ -83,6 +85,37 @@
       for (var i = actiondData.length - 1; i >= 0; i--) {
         $form.prepend('<input type="hidden" name="primary_values[]" value="' + actiondData[i] + '" />');
       }
+    },
+
+    pagination: function (e) {
+      var $ele = $(e.target),
+          url = $ele.prop('href');
+      if (url) {
+        this.loadPaginaton(url);
+      }
+      return false;
+    },
+
+    loadPaginaton: function (url) {
+      var $bottomsheets = this.$bottomsheets,
+          $content = $bottomsheets.find(CLASS_BODY_CONTENT),
+          $loading,
+          _this = this;
+
+      $loading = $(QorBottomSheets.TEMPLATE_LOADING).appendTo($content.html(''));
+      window.componentHandler.upgradeElement($loading.children()[0]);
+
+      $.get(url, function (response) {
+        var $response = $(response).find(CLASS_MAIN_CONTENT).find(CLASS_BODY_CONTENT);
+        if ($response.length) {
+          $content.html($response.html());
+          $bottomsheets.trigger(EVENT_RELOAD);
+        } else {
+          _this.loadPaginaton(url);
+        }
+      }).fail(function() {
+        window.alert( "server error, please try again later!" );
+      });
     },
 
     submit: function (e) {
@@ -356,6 +389,8 @@
     title: '.qor-form-title, .mdl-layout-title',
     content: false
   };
+
+  QorBottomSheets.TEMPLATE_LOADING = '<div><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>';
 
   QorBottomSheets.TEMPLATE = (
     '<div class="qor-bottomsheets">' +
