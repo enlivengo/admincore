@@ -55,6 +55,7 @@
       var data = {};
       var eleData = $this.data();
       var hover = eleData.hover;
+      var paramName = $this.attr('name');
 
       this.isBottom = eleData.position == 'bottom';
 
@@ -75,6 +76,7 @@
             classNames.push(CLASS_SELECTED);
             data.value = value;
             data.label = label;
+            data.paramName = paramName;
           }
 
           if (disabled) {
@@ -86,6 +88,7 @@
               (classNames.length ? ' class="' + classNames.join(' ') + '"' : '') +
               ' data-value="' + value + '"' +
               ' data-label="' + label + '"' +
+              ' data-param-name="' + paramName + '"' +
             '>' +
               label +
             '</li>'
@@ -97,6 +100,7 @@
 
       this.$selector = $selector;
       $this.hide().after($selector);
+      $selector.find(SELECTOR_TOGGLE).data('paramName', paramName);
       this.pick(data, true);
       this.bind();
     },
@@ -160,7 +164,7 @@
 
         if ($element.closest(CLASS_BOTTOMSHEETS).length && !$element.closest('[data-toggle="qor.filter"]').length) {
           // If action is in bottom sheet, will trigger filterChanged.qor.selector event, add passed data.value parameter to event.
-          $(CLASS_BOTTOMSHEETS).trigger(EVENT_SELECTOR_CHANGE, data.value);
+          $(CLASS_BOTTOMSHEETS).trigger(EVENT_SELECTOR_CHANGE, [data.value, data.paramName]);
         } else {
           $element.trigger('change');
         }

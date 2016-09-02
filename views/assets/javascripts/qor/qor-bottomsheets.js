@@ -13,7 +13,6 @@
 
   'use strict';
 
-  var $document = $(document);
   var FormData = window.FormData;
   var NAMESPACE = 'qor.bottomsheets';
   var EVENT_CLICK = 'click.' + NAMESPACE;
@@ -30,6 +29,7 @@
   var CLASS_BODY_CONTENT = '.qor-page__body';
   var CLASS_BODY_HEAD = '.qor-page__header';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
+  var URL_GETQOR = 'http://www.getqor.com/';
 
   function QorBottomSheets(element, options) {
     this.$element = $(element);
@@ -37,6 +37,23 @@
     this.disabled = false;
     this.resourseData = {};
     this.init();
+  }
+
+  function getUrlParameter(name, search) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
+
+  function updateQueryStringParameter(uri, key, value) {
+    var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
+    var separator = uri.indexOf('?') !== -1 ? '&' : '?';
+    if (uri.match(re)) {
+      return uri.replace(re, '$1' + key + '=' + value + '$2');
+    } else {
+      return uri + separator + key + '=' + value;
+    }
   }
 
   QorBottomSheets.prototype = {
@@ -59,6 +76,8 @@
       this.$title = $bottomsheets.find('.qor-bottomsheets__title');
       this.$header = $bottomsheets.find('.qor-bottomsheets__header');
       this.$bodyClass = $('body').prop('class');
+      this.filterURL = '';
+      this.searchParams = '';
 
     },
 
@@ -72,14 +91,17 @@
         .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
         .on(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this))
-        .on('selectorChanged.qor.selector', this.selectorChanged.bind(this));
+        .on('selectorChanged.qor.selector', this.selectorChanged.bind(this))
+        .on('filterChanged.qor.filter', this.filterChanged.bind(this));
     },
 
     unbind: function () {
-      this.$bottomsheets.
-        off(EVENT_SUBMIT, this.submit);
-
-      $document.off(EVENT_CLICK, this.click);
+      this.$bottomsheets
+        .off(EVENT_SUBMIT, 'form', this.submit.bind(this))
+        .off(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
+        .off(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this))
+        .off('selectorChanged.qor.selector', this.selectorChanged.bind(this))
+        .off('filterChanged.qor.filter', this.filterChanged.bind(this));
     },
 
     bindActionData: function (actiondData) {
@@ -89,11 +111,27 @@
       }
     },
 
-    selectorChanged: function (e, value) {
-      var url = value;
-      if (url) {
-        this.reload(url);
-      }
+    filterChanged: function (e, search, key) {
+      // if this event triggered:
+      // search: ?locale_mode=locale,
+      // key: search param name: locale_mode
+
+      var loadUrl;
+
+      loadUrl = this.constructloadURL(search, key);
+      loadUrl && this.reload(loadUrl);
+      return false;
+    },
+
+    selectorChanged: function (e, url, key) {
+      // if this event triggered: 
+      // url: /admin/!remote_data_searcher/products/Collections?locale=en-US
+      // key: search param key: locale
+      
+      var loadUrl;
+
+      loadUrl = this.constructloadURL(url, key);
+      loadUrl && this.reload(loadUrl);
       return false;
     },
 
@@ -107,18 +145,29 @@
     },
 
     reload: function (url) {
+      var $content = this.$bottomsheets.find(CLASS_BODY_CONTENT),
+          $loading = $(QorBottomSheets.TEMPLATE_LOADING).appendTo($content.html(''));
+
+      window.componentHandler.upgradeElement($loading.children()[0]);
+      this.fetchPage(url);
+    },
+
+    fetchPage: function (url) {
       var $bottomsheets = this.$bottomsheets,
-          $content = $bottomsheets.find(CLASS_BODY_CONTENT),
-          $loading,
           _this = this;
 
-      $loading = $(QorBottomSheets.TEMPLATE_LOADING).appendTo($content.html(''));
-      window.componentHandler.upgradeElement($loading.children()[0]);
-
       $.get(url, function (response) {
-        var $response = $(response).find(CLASS_MAIN_CONTENT).find(CLASS_BODY_CONTENT);
-        if ($response.length) {
-          $content.html($response.html());
+        var $response = $(response).find(CLASS_MAIN_CONTENT),
+            $responseHeader = $response.find(CLASS_BODY_HEAD),
+            $responseBody = $response.find(CLASS_BODY_CONTENT);
+        
+        if ($responseBody.length) {
+          $bottomsheets.find(CLASS_BODY_CONTENT).html($responseBody.html());
+          
+          if ($responseHeader.length) {
+            _this.$body.find(CLASS_BODY_HEAD).html($responseHeader.html()).trigger('enable');
+            _this.addHeaderClass();
+          }
           // will trigger this event(relaod.qor.bottomsheets) when bottomsheets reload complete: like pagination, filter, action etc.
           $bottomsheets.trigger(EVENT_RELOAD);
         } else {
@@ -127,6 +176,32 @@
       }).fail(function() {
         window.alert( "server error, please try again later!" );
       });
+    },
+
+    constructloadURL: function (url, key) {
+      var fakeURL,
+          value,
+          filterURL = this.filterURL;
+
+      if (!filterURL) {
+        if (this.$bottomsheets.data().url) {
+          filterURL = this.$bottomsheets.data().url;
+        } else {
+          return;
+        }
+      }
+
+      fakeURL = new URL(URL_GETQOR + url);
+      value = getUrlParameter(key, fakeURL.search);
+      filterURL = this.filterURL = updateQueryStringParameter(filterURL, key, value);
+
+      return filterURL;
+    },
+
+    addHeaderClass: function () {
+      if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(':visible').length) {
+        this.$body.addClass('has-header');
+      }
     },
 
     submit: function (e) {
@@ -225,6 +300,8 @@
         return;
       }
 
+      this.filterURL = url;
+
       data = $.isPlainObject(data) ? data : {};
 
       method = data.method ? data.method : 'GET';
@@ -276,9 +353,9 @@
 
               this.show();
 
-              if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(':visible').length) {
-                this.$body.addClass('has-header');
-              }
+              this.addHeaderClass();
+
+              this.$bottomsheets.data(data);
 
               // handle after opened callback
               if (callback && $.isFunction(callback)) {

@@ -123,10 +123,11 @@
       var value;
       var index;
       var matched;
+      var paramName;
 
       if ($target.is('select')) {
         params = decodeSearch(location.search);
-        name = $target.attr('name');
+        paramName = name = $target.attr('name');
         value = $target.val();
         param = [name];
 
@@ -166,6 +167,7 @@
         }
       } else if ($target.is('a')) {
         e.preventDefault();
+        paramName = $target.data().paramName;
         data = decodeSearch($target.attr('href'));
         if ($target.hasClass(CLASS_IS_ACTIVE)) {
           search = encodeSearch(data, true); // set `true` to detach
@@ -174,15 +176,11 @@
         }
       }
 
-      location.search = search;
-
-      // TODO: 
-
-      // if ($element.closest(CLASS_BOTTOMSHEETS)) {
-      //     $element.trigger(EVENT_FILTER_CHANGE, data.value);
-      //   } else {
-      //     location.search = search;
-      //   }
+      if (this.$element.closest(CLASS_BOTTOMSHEETS).length) {
+        $(CLASS_BOTTOMSHEETS).trigger(EVENT_FILTER_CHANGE, [search, paramName]);
+      } else {
+        location.search = search;
+      }
 
 
     },
