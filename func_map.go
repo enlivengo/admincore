@@ -783,9 +783,23 @@ func (context *Context) AllowedActions(actions []*Action, mode string, records .
 	var allowedActions []*Action
 	for _, action := range actions {
 		for _, m := range action.Modes {
-			if m == mode && action.HasPermission(roles.Update, context, records...) {
-				allowedActions = append(allowedActions, action)
-				break
+			if m == mode {
+				var permission = roles.Update
+				switch strings.ToUpper(action.Method) {
+				case "POST":
+					permission = roles.Create
+				case "DELETE":
+					permission = roles.Delete
+				case "PUT":
+					permission = roles.Update
+				case "GET":
+					permission = roles.Read
+				}
+
+				if action.HasPermission(permission, context, records...) {
+					allowedActions = append(allowedActions, action)
+					break
+				}
 			}
 		}
 	}
