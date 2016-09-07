@@ -201,7 +201,9 @@ func (meta *Meta) updateMeta() {
 		}
 
 		if _, ok := reflect.New(fieldType).Interface().(sql.Scanner); ok {
-			fieldType = reflect.Indirect(reflect.New(fieldType)).Field(0).Type()
+			if fieldType.Kind() == reflect.Struct {
+				fieldType = reflect.Indirect(reflect.New(fieldType)).Field(0).Type()
+			}
 		}
 	}
 
