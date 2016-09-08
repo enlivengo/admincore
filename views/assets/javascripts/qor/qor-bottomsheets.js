@@ -124,10 +124,10 @@
     },
 
     selectorChanged: function (e, url, key) {
-      // if this event triggered: 
+      // if this event triggered:
       // url: /admin/!remote_data_searcher/products/Collections?locale=en-US
       // key: search param key: locale
-      
+
       var loadUrl;
 
       loadUrl = this.constructloadURL(url, key);
@@ -160,10 +160,10 @@
         var $response = $(response).find(CLASS_MAIN_CONTENT),
             $responseHeader = $response.find(CLASS_BODY_HEAD),
             $responseBody = $response.find(CLASS_BODY_CONTENT);
-        
+
         if ($responseBody.length) {
           $bottomsheets.find(CLASS_BODY_CONTENT).html($responseBody.html());
-          
+
           if ($responseHeader.length) {
             _this.$body.find(CLASS_BODY_HEAD).html($responseHeader.html()).trigger('enable');
             _this.addHeaderClass();
@@ -301,6 +301,7 @@
       }
 
       this.filterURL = url;
+      this.$body.removeClass('has-header');
 
       data = $.isPlainObject(data) ? data : {};
 

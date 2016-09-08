@@ -102,7 +102,7 @@
 .qor-bottomsheets__header {
   position: relative;
   box-sizing: border-box;
-  z-index: $zindex-bottomsheets;
+  z-index: $zindex-bottomsheets + 1;
   background-color: #fff;
 
   .qor-bottomsheets__title {
@@ -129,7 +129,9 @@
   box-sizing: border-box;
   z-index: $zindex-bottomsheets;
   overflow: auto;
-
+  .qor-form-container{
+    margin-top: 0;
+  }
   .qor-button--new{
     display: none;
   }

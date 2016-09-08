@@ -29,14 +29,15 @@
 
     init: function () {
       var $this = this.$element;
+      var remoteUrl = $this.data('remote-data-url');
       var option = {
         minimumResultsForSearch: 20,
         dropdownParent: $this.parent()
       };
 
-      if ($this.data('remote-data-url')) {
+      if (remoteUrl) {
         option.ajax = {
-          url: $this.data('remote-data-url'),
+          url: remoteUrl,
           dataType: 'json',
           delay: 250,
           data: function (params) {
