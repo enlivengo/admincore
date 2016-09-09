@@ -108,7 +108,6 @@ func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 			filter := s.Resource.filters[key]
 			if filter != nil && filter.Handler != nil {
 				filterArgument := &FilterArgument{
-					Field:    key,
 					Value:    value,
 					Context:  context,
 					Resource: s.Resource,
