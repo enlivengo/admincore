@@ -361,102 +361,7 @@ func (res *Resource) SearchAttrs(columns ...string) []string {
 		if len(columns) > 0 {
 			res.searchAttrs = &columns
 			res.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
-				db := context.GetDB()
-				var joinConditionsMap = map[string][]string{}
-				var conditions []string
-				var keywords []interface{}
-				scope := db.NewScope(res.Value)
-
-				for _, column := range columns {
-					currentScope, nextScope := scope, scope
-
-					if strings.Contains(column, ".") {
-						for _, field := range strings.Split(column, ".") {
-							column = field
-							currentScope = nextScope
-							if field, ok := scope.FieldByName(field); ok {
-								if relationship := field.Relationship; relationship != nil {
-									nextScope = currentScope.New(reflect.New(field.Field.Type()).Interface())
-									key := fmt.Sprintf("LEFT JOIN %v ON", nextScope.TableName())
-
-									for index := range relationship.ForeignDBNames {
-										if relationship.Kind == "has_one" || relationship.Kind == "has_many" {
-											joinConditionsMap[key] = append(joinConditionsMap[key],
-												fmt.Sprintf("%v.%v = %v.%v",
-													nextScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
-													currentScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
-												))
-										} else if relationship.Kind == "belongs_to" {
-											joinConditionsMap[key] = append(joinConditionsMap[key],
-												fmt.Sprintf("%v.%v = %v.%v",
-													currentScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
-													nextScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
-												))
-										}
-									}
-								}
-							}
-						}
-					}
-
-					var tableName = currentScope.Quote(currentScope.TableName())
-					if field, ok := currentScope.FieldByName(column); ok && field.IsNormal {
-						switch field.Field.Kind() {
-						case reflect.String:
-							conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
-							keywords = append(keywords, "%"+keyword+"%")
-						case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-							if _, err := strconv.Atoi(keyword); err == nil {
-								conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-								keywords = append(keywords, keyword)
-							}
-						case reflect.Float32, reflect.Float64:
-							if _, err := strconv.ParseFloat(keyword, 64); err == nil {
-								conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-								keywords = append(keywords, keyword)
-							}
-						case reflect.Bool:
-							if value, err := strconv.ParseBool(keyword); err == nil {
-								conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-								keywords = append(keywords, value)
-							}
-						case reflect.Struct:
-							// time ?
-							if _, ok := field.Field.Interface().(time.Time); ok {
-								if parsedTime, err := now.Parse(keyword); err == nil {
-									conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-									keywords = append(keywords, parsedTime)
-								}
-							}
-						case reflect.Ptr:
-							// time ?
-							if _, ok := field.Field.Interface().(*time.Time); ok {
-								if parsedTime, err := now.Parse(keyword); err == nil {
-									conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-									keywords = append(keywords, parsedTime)
-								}
-							}
-						default:
-							conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-							keywords = append(keywords, keyword)
-						}
-					}
-				}
-
-				// join conditions
-				if len(joinConditionsMap) > 0 {
-					var joinConditions []string
-					for key, values := range joinConditionsMap {
-						joinConditions = append(joinConditions, fmt.Sprintf("%v %v", key, strings.Join(values, " AND ")))
-					}
-					db = db.Joins(strings.Join(joinConditions, " "))
-				}
-
-				// search conditions
-				if len(conditions) > 0 {
-					return db.Where(strings.Join(conditions, " OR "), keywords...)
-				}
-				return db
+				return defaultFieldFilter(res, columns, keyword, context.GetDB().Debug())
 			}
 		}
 	}
@@ -598,4 +503,105 @@ func (res *Resource) configure() {
 	if injector, ok := res.Value.(resource.ConfigureResourceInterface); ok {
 		injector.ConfigureQorResource(res)
 	}
+}
+
+func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gorm.DB) *gorm.DB {
+	var (
+		scope             = db.NewScope(res.Value)
+		tableName         = scope.QuotedTableName()
+		joinConditionsMap = map[string][]string{}
+		conditions        []string
+		keywords          []interface{}
+	)
+
+	for _, column := range columns {
+		if strings.Contains(column, ".") {
+			currentScope, nextScope := scope, scope
+			for _, field := range strings.Split(column, ".") {
+				column = field
+				currentScope = nextScope
+				if field, ok := currentScope.FieldByName(field); ok {
+					if relationship := field.Relationship; relationship != nil {
+						nextScope = currentScope.New(reflect.New(field.Field.Type()).Interface())
+						key := fmt.Sprintf("LEFT JOIN %v ON", nextScope.QuotedTableName())
+
+						for index := range relationship.ForeignDBNames {
+							if relationship.Kind == "has_one" || relationship.Kind == "has_many" {
+								joinConditionsMap[key] = append(joinConditionsMap[key],
+									fmt.Sprintf("%v.%v = %v.%v",
+										nextScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
+										currentScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
+									))
+							} else if relationship.Kind == "belongs_to" {
+								joinConditionsMap[key] = append(joinConditionsMap[key],
+									fmt.Sprintf("%v.%v = %v.%v",
+										currentScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
+										nextScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
+									))
+							}
+						}
+					}
+				}
+			}
+			continue
+		}
+
+		if field, ok := scope.FieldByName(column); ok && field.IsNormal {
+			switch field.Field.Kind() {
+			case reflect.String:
+				conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
+				keywords = append(keywords, "%"+keyword+"%")
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				if _, err := strconv.Atoi(keyword); err == nil {
+					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, keyword)
+				}
+			case reflect.Float32, reflect.Float64:
+				if _, err := strconv.ParseFloat(keyword, 64); err == nil {
+					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, keyword)
+				}
+			case reflect.Bool:
+				if value, err := strconv.ParseBool(keyword); err == nil {
+					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, value)
+				}
+			case reflect.Struct:
+				// time ?
+				if _, ok := field.Field.Interface().(time.Time); ok {
+					if parsedTime, err := now.Parse(keyword); err == nil {
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+						keywords = append(keywords, parsedTime)
+					}
+				}
+			case reflect.Ptr:
+				// time ?
+				if _, ok := field.Field.Interface().(*time.Time); ok {
+					if parsedTime, err := now.Parse(keyword); err == nil {
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+						keywords = append(keywords, parsedTime)
+					}
+				}
+			default:
+				conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+				keywords = append(keywords, keyword)
+			}
+		}
+	}
+
+	// join conditions
+	if len(joinConditionsMap) > 0 {
+		var joinConditions []string
+		for key, values := range joinConditionsMap {
+			joinConditions = append(joinConditions, fmt.Sprintf("%v %v", key, strings.Join(values, " AND ")))
+		}
+		db = db.Joins(strings.Join(joinConditions, " "))
+	}
+
+	// search conditions
+	if len(conditions) > 0 {
+		return db.Where(strings.Join(conditions, " OR "), keywords...)
+	}
+
+	return db
 }
