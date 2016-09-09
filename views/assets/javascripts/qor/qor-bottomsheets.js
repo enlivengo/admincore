@@ -29,6 +29,8 @@
   var CLASS_BODY_CONTENT = '.qor-page__body';
   var CLASS_BODY_HEAD = '.qor-page__header';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
+  var CLASS_BOTTOMSHEETS_BUTTON = '.qor-bottomsheets__search-button';
+  var CLASS_BOTTOMSHEETS_INPUT = '.qor-bottomsheets__search-input';
   var URL_GETQOR = 'http://www.getqor.com/';
 
   function QorBottomSheets(element, options) {
@@ -91,6 +93,7 @@
         .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
         .on(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this))
+        .on(EVENT_CLICK, CLASS_BOTTOMSHEETS_BUTTON, this.search.bind(this))
         .on('selectorChanged.qor.selector', this.selectorChanged.bind(this))
         .on('filterChanged.qor.filter', this.filterChanged.bind(this));
     },
@@ -100,6 +103,7 @@
         .off(EVENT_SUBMIT, 'form', this.submit.bind(this))
         .off(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
         .off(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this))
+        .off(EVENT_CLICK, CLASS_BOTTOMSHEETS_BUTTON, this.search.bind(this))
         .off('selectorChanged.qor.selector', this.selectorChanged.bind(this))
         .off('filterChanged.qor.filter', this.filterChanged.bind(this));
     },
@@ -133,6 +137,16 @@
       loadUrl = this.constructloadURL(url, key);
       loadUrl && this.reload(loadUrl);
       return false;
+    },
+
+    search: function () {
+      var $bottomsheets = this.$bottomsheets,
+          param = '?keyword=',
+          baseUrl = $bottomsheets.data().url,
+          searchValue = $.trim($bottomsheets.find(CLASS_BOTTOMSHEETS_INPUT).val()),
+          url = baseUrl + param + searchValue;
+
+      this.reload(url);
     },
 
     pagination: function (e) {
@@ -199,8 +213,9 @@
     },
 
     addHeaderClass: function () {
+      this.$body.find(CLASS_BODY_HEAD).hide();
       if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(':visible').length) {
-        this.$body.addClass('has-header');
+        this.$body.addClass('has-header').find(CLASS_BODY_HEAD).show();
       }
     },
 
@@ -295,13 +310,15 @@
       var dataType;
       var load;
       var actionData = data.actionData;
+      var hasSearch = data.hasSearch;
+      var selectModal = this.resourseData.selectModal;
 
       if (!url) {
         return;
       }
 
       this.filterURL = url;
-      this.$body.removeClass('has-header');
+      this.$body.removeClass('has-header has-hint');
 
       data = $.isPlainObject(data) ? data : {};
 
@@ -330,32 +347,34 @@
               this.$body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
-              if (this.resourseData.selectModal) {
+              if (selectModal) {
                 this.$body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
+                if (selectModal == 'mediabox' || selectModal == 'many') {
+                  this.$body.addClass('has-hint');
+                }
               }
 
               this.$header.find('.qor-button--new').remove();
               this.$title.after(this.$body.find('.qor-button--new'));
+
+              if (hasSearch) {
+                this.$header.prepend(QorBottomSheets.TEMPLATE_SEARCH);
+              }
 
               if (actionData && actionData.length) {
                 this.bindActionData(actionData);
               }
 
               this.$bottomsheets.one(EVENT_SHOWN, function () {
-
                 // Enable all Qor components within the bottomSheets
                 $(this).trigger('enable');
               }).one(EVENT_HIDDEN, function () {
-
                 // Destroy all Qor components within the bottomSheets
                 $(this).trigger('disable');
-
               });
 
               this.show();
-
               this.addHeaderClass();
-
               this.$bottomsheets.data(data);
 
               // handle after opened callback
@@ -484,6 +503,14 @@
   };
 
   QorBottomSheets.TEMPLATE_LOADING = '<div><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>';
+  QorBottomSheets.TEMPLATE_SEARCH = (
+    '<div class="qor-bottomsheets__search">' +
+      '<input autocomplete="off" type="text" class="mdl-textfield__input qor-bottomsheets__search-input" placeholder="Search" />' +
+      '<button class="mdl-button mdl-js-button mdl-button--icon qor-bottomsheets__search-button" type="button"><i class="material-icons">search</i></button>' +
+    '</div>'
+  );
+
+
 
   QorBottomSheets.TEMPLATE = (
     '<div class="qor-bottomsheets">' +

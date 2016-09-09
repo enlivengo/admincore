@@ -108,6 +108,14 @@
   }
   .qor-selectmany__hint{
     font-size: 14px;
+    position: fixed;
+    z-index: 2002;
+    padding: 12px 12px 12px 54px;
+    margin-left: -54px;
+    margin-top: -11px;
+    box-sizing: border-box;
+    background-color: #fff;
+    width: 360px;
     > span{
       float: left;
     }
@@ -132,4 +140,20 @@
       padding: 0;
     }
   }
+
+  .has-hint{
+    .qor-selectmany__hint{
+      margin-top: -56px;
+    }
+  }
+  .has-hint.has-header{
+    .qor-page__header{
+      margin: -100px 0 0 -54px;
+    }
+    .qor-selectmany__hint{
+      margin-top: -55px;
+    }
+  }
+
+
 }

@@ -27,8 +27,14 @@
       padding: 12px 24px 12px 54px;
       background-color: #fff;
       height: calc(100% - 65px);
+      &.has-hint{
+        padding: 56px 24px 12px 54px;
+      }
       &.has-header{
         padding: 56px 24px 12px 54px;
+        &.has-hint{
+          padding: 100px 24px 12px 54px;
+        }
       }
     }
     &::after{
@@ -104,7 +110,28 @@
   box-sizing: border-box;
   z-index: $zindex-bottomsheets + 1;
   background-color: #fff;
-
+  .qor-bottomsheets__search{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -60px;
+    background-color: #fff;
+    border-radius: 4px;
+    height: 48px;
+    input{
+      height: 24px;
+      line-height: 24px;
+      border:  0;
+      margin-top: 8px;
+      text-indent: 16px;
+      outline: none;
+    }
+    button{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  }
   .qor-bottomsheets__title {
     position: relative;
     margin: 0;
