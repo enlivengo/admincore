@@ -11,13 +11,26 @@ import (
 // Filter register filter for qor resource
 func (res *Resource) Filter(filter *Filter) {
 	res.filters[filter.Name] = filter
+
+	if filter.Handler == nil {
+		// generate default handler
+	}
+}
+
+// FilterArgument filter argument that used in handler
+type FilterArgument struct {
+	Field    string
+	Query    string
+	Resource *Resource
+	Context  *qor.Context
 }
 
 // Filter filter definiation
 type Filter struct {
-	Name       string
-	Operations []string
-	Handler    func(fieldName string, query string, scope *gorm.DB, context *qor.Context) *gorm.DB
+	Name    string
+	Type    string
+	Handler func(*gorm.DB, *FilterArgument) *gorm.DB
+	Config  MetaConfigInterface
 }
 
 var defaultFilterHandler = func(name string, value string, scope *gorm.DB, context *qor.Context) *gorm.DB {

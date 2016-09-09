@@ -105,7 +105,12 @@ func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 		for key, value := range s.filters {
 			filter := s.Resource.filters[key]
 			if filter != nil && filter.Handler != nil {
-				db = filter.Handler(key, value, db, context)
+				filterArgument := &FilterArgument{
+					Field:   key,
+					Query:   value,
+					Context: context,
+				}
+				db = filter.Handler(db, filterArgument)
 			} else {
 				db = defaultFilterHandler(key, value, db, context)
 			}
