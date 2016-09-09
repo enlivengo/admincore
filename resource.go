@@ -361,7 +361,7 @@ func (res *Resource) SearchAttrs(columns ...string) []string {
 		if len(columns) > 0 {
 			res.searchAttrs = &columns
 			res.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
-				return defaultFieldFilter(res, columns, keyword, context.GetDB().Debug())
+				return defaultFieldFilter(res, columns, keyword, context.GetDB())
 			}
 		}
 	}
