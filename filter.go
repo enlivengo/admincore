@@ -6,6 +6,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
+	"github.com/qor/qor/resource"
 )
 
 // Filter register filter for qor resource
@@ -20,7 +21,7 @@ func (res *Resource) Filter(filter *Filter) {
 // FilterArgument filter argument that used in handler
 type FilterArgument struct {
 	Field    string
-	Query    string
+	Value    *resource.MetaValues
 	Resource *Resource
 	Context  *qor.Context
 }

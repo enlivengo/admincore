@@ -1,12 +1,14 @@
 package admin
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
+	"github.com/qor/qor/resource"
 )
 
 type scopeFunc func(db *gorm.DB, context *qor.Context) *gorm.DB
@@ -23,7 +25,7 @@ type Pagination struct {
 type Searcher struct {
 	*Context
 	scopes     []*Scope
-	filters    map[string]string
+	filters    map[string]*resource.MetaValues
 	Pagination Pagination
 }
 
@@ -58,12 +60,12 @@ func (s *Searcher) Scope(names ...string) *Searcher {
 }
 
 // Filter filter with defined filters, filter with columns value
-func (s *Searcher) Filter(name, query string) *Searcher {
+func (s *Searcher) Filter(name string, values *resource.MetaValues) *Searcher {
 	newSearcher := s.clone()
 	if newSearcher.filters == nil {
-		newSearcher.filters = map[string]string{}
+		newSearcher.filters = map[string]*resource.MetaValues{}
 	}
-	newSearcher.filters[name] = query
+	newSearcher.filters[name] = values
 	return newSearcher
 }
 
@@ -83,7 +85,7 @@ func (s *Searcher) FindOne() (interface{}, error) {
 	return result, err
 }
 
-var filterRegexp = regexp.MustCompile(`^filters\[(.*?)\]$`)
+var filterRegexp = regexp.MustCompile(`^filters\[(.*?)\]`)
 
 func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 	db := context.GetDB()
@@ -106,13 +108,12 @@ func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 			filter := s.Resource.filters[key]
 			if filter != nil && filter.Handler != nil {
 				filterArgument := &FilterArgument{
-					Field:   key,
-					Query:   value,
-					Context: context,
+					Field:    key,
+					Value:    value,
+					Context:  context,
+					Resource: s.Resource,
 				}
 				db = filter.Handler(db, filterArgument)
-			} else {
-				db = defaultFilterHandler(key, value, db, context)
 			}
 		}
 	}
@@ -158,9 +159,12 @@ func (s *Searcher) parseContext() *qor.Context {
 		searcher = searcher.Scope(scopes...)
 
 		// parse filters
-		for key, value := range context.Request.Form {
+		for key, _ := range context.Request.Form {
 			if matches := filterRegexp.FindStringSubmatch(key); len(matches) > 0 {
-				searcher = searcher.Filter(matches[1], value[0])
+				var prefix = fmt.Sprintf("filters[%v]", matches[1])
+				if metaValues, err := resource.ConvertFormToMetaValues(context.Request, []resource.Metaor{}, prefix); err == nil {
+					searcher = searcher.Filter(matches[1], metaValues)
+				}
 			}
 		}
 	}
