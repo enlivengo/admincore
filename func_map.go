@@ -197,6 +197,42 @@ func (context *Context) renderSections(value interface{}, sections []*Section, p
 	}
 }
 
+func (context *Context) renderFilter(filter *Filter) template.HTML {
+	var (
+		err     error
+		content []byte
+		result  = bytes.NewBufferString("")
+	)
+
+	defer func() {
+		if r := recover(); r != nil {
+			debug.PrintStack()
+			result.WriteString(fmt.Sprintf("Get error when render template for filter %v (%v): %v", filter.Name, filter.Type, r))
+		}
+	}()
+
+	if content, err = context.Asset(fmt.Sprintf("metas/filter/%v.tmpl", filter.Type)); err == nil {
+		tmpl := template.New(filter.Type + ".tmpl").Funcs(context.FuncMap())
+		if tmpl, err = tmpl.Parse(string(content)); err == nil {
+			var data = map[string]interface{}{
+				"Filter":          filter,
+				"Label":           filter.Label,
+				"InputNamePrefix": fmt.Sprintf("filters[%v]", filter.Name),
+				"Context":         context,
+				"Resource":        context.Resource,
+			}
+
+			err = tmpl.Execute(result, data)
+		}
+	}
+
+	if err != nil {
+		result.WriteString(fmt.Sprintf("got error when render filter template for %v(%v):%v", filter.Name, filter.Type, err))
+	}
+
+	return template.HTML(result.String())
+}
+
 func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []string, metaType string, writer *bytes.Buffer) {
 	var (
 		err      error
@@ -233,7 +269,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	defer func() {
 		if r := recover(); r != nil {
 			debug.PrintStack()
-			writer.Write([]byte(fmt.Sprintf("Get error when render template for meta %v (%v): %v", meta.Name, meta.Type, r)))
+			writer.WriteString(fmt.Sprintf("Get error when render template for meta %v (%v): %v", meta.Name, meta.Type, r))
 		}
 	}()
 
@@ -887,7 +923,8 @@ func (context *Context) FuncMap() template.FuncMap {
 			context.renderMeta(meta, value, []string{}, typ, result)
 			return template.HTML(result.String())
 		},
-		"page_title": context.pageTitle,
+		"render_filter": context.renderFilter,
+		"page_title":    context.pageTitle,
 		"meta_label": func(meta *Meta) template.HTML {
 			key := fmt.Sprintf("%v.attributes.%v", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, meta.Label)
