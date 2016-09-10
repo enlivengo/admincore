@@ -508,15 +508,14 @@ func (res *Resource) configure() {
 func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gorm.DB) *gorm.DB {
 	var (
 		scope             = db.NewScope(res.Value)
-		tableName         = scope.QuotedTableName()
 		joinConditionsMap = map[string][]string{}
 		conditions        []string
 		keywords          []interface{}
 	)
 
 	for _, column := range columns {
+		currentScope, nextScope := scope, scope
 		if strings.Contains(column, ".") {
-			currentScope, nextScope := scope, scope
 			for _, field := range strings.Split(column, ".") {
 				column = field
 				currentScope = nextScope
@@ -543,10 +542,10 @@ func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gor
 					}
 				}
 			}
-			continue
 		}
 
-		if field, ok := scope.FieldByName(column); ok && field.IsNormal {
+		tableName := currentScope.QuotedTableName()
+		if field, ok := currentScope.FieldByName(column); ok && field.IsNormal {
 			switch field.Field.Kind() {
 			case reflect.String:
 				conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
