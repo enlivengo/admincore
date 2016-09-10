@@ -199,9 +199,9 @@ func (context *Context) renderSections(value interface{}, sections []*Section, p
 
 func (context *Context) renderFilter(filter *Filter) template.HTML {
 	var (
-		err    error
-		result = bytes.NewBufferString("")
-		tmpl   = template.New(filter.Type + ".tmpl").Funcs(context.FuncMap())
+		err     error
+		content []byte
+		result  = bytes.NewBufferString("")
 	)
 
 	defer func() {
@@ -211,19 +211,18 @@ func (context *Context) renderFilter(filter *Filter) template.HTML {
 		}
 	}()
 
-	if content, err := context.Asset(fmt.Sprintf("metas/filter/%v.tmpl", filter.Type)); err == nil {
-		tmpl, err = tmpl.Parse(string(content))
-	}
+	if content, err = context.Asset(fmt.Sprintf("metas/filter/%v.tmpl", filter.Type)); err == nil {
+		tmpl := template.New(filter.Type + ".tmpl").Funcs(context.FuncMap())
+		if tmpl, err = tmpl.Parse(string(content)); err == nil {
+			var data = map[string]interface{}{
+				"Context":  context,
+				"Resource": context.Resource,
+				"Filter":   filter,
+				"Label":    filter.Label,
+			}
 
-	if err == nil {
-		var data = map[string]interface{}{
-			"Context":  context,
-			"Resource": context.Resource,
-			"Filter":   filter,
-			"Label":    filter.Label,
+			err = tmpl.Execute(result, data)
 		}
-
-		err = tmpl.Execute(result, data)
 	}
 
 	if err != nil {
