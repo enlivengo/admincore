@@ -1,8 +1,6 @@
 package admin
 
 import (
-	"fmt"
-
 	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
@@ -24,7 +22,7 @@ func (res *Resource) Filter(filter *Filter) {
 			// generate default handler
 			filter.Handler = func(db *gorm.DB, filterArgument *FilterArgument) *gorm.DB {
 				if metaValue := filterArgument.Value.Get("Value"); metaValue != nil {
-					return defaultFieldFilter(res, []string{filter.Name}, fmt.Sprint(metaValue.Value), db)
+					return defaultFieldFilter(res, []string{filter.Name}, utils.ToString(metaValue.Value), db)
 				}
 				return db
 			}

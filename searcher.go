@@ -159,7 +159,7 @@ func (s *Searcher) parseContext() *qor.Context {
 		// parse filters
 		for key, _ := range context.Request.Form {
 			if matches := filterRegexp.FindStringSubmatch(key); len(matches) > 0 {
-				var prefix = fmt.Sprintf("filters[%v]", matches[1])
+				var prefix = fmt.Sprintf("filters[%v].", matches[1])
 				for _, filter := range s.Resource.filters {
 					if filter.Name == matches[1] {
 						if metaValues, err := resource.ConvertFormToMetaValues(context.Request, []resource.Metaor{}, prefix); err == nil {

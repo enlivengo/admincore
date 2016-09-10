@@ -215,10 +215,11 @@ func (context *Context) renderFilter(filter *Filter) template.HTML {
 		tmpl := template.New(filter.Type + ".tmpl").Funcs(context.FuncMap())
 		if tmpl, err = tmpl.Parse(string(content)); err == nil {
 			var data = map[string]interface{}{
-				"Context":  context,
-				"Resource": context.Resource,
-				"Filter":   filter,
-				"Label":    filter.Label,
+				"Context":         context,
+				"Resource":        context.Resource,
+				"Filter":          filter,
+				"Label":           filter.Label,
+				"InputNamePrefix": fmt.Sprintf("filters[%v]", filter.Name),
 			}
 
 			err = tmpl.Execute(result, data)

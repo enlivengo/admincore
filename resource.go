@@ -507,13 +507,13 @@ func (res *Resource) configure() {
 
 func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gorm.DB) *gorm.DB {
 	var (
-		scope             = db.NewScope(res.Value)
-		joinConditionsMap = map[string][]string{}
-		conditions        []string
-		keywords          []interface{}
+		joinConditionsMap  = map[string][]string{}
+		conditions         []string
+		keywords           []interface{}
+		generateConditions func(column string, scope *gorm.Scope)
 	)
 
-	for _, column := range columns {
+	generateConditions = func(column string, scope *gorm.Scope) {
 		currentScope, nextScope := scope, scope
 		if strings.Contains(column, ".") {
 			for _, field := range strings.Split(column, ".") {
@@ -545,47 +545,68 @@ func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gor
 		}
 
 		tableName := currentScope.QuotedTableName()
-		if field, ok := currentScope.FieldByName(column); ok && field.IsNormal {
-			switch field.Field.Kind() {
-			case reflect.String:
-				conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
-				keywords = append(keywords, "%"+keyword+"%")
-			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-				if _, err := strconv.Atoi(keyword); err == nil {
+		if field, ok := currentScope.FieldByName(column); ok {
+			if field.IsNormal {
+				switch field.Field.Kind() {
+				case reflect.String:
+					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, "%"+keyword+"%")
+				case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+					if _, err := strconv.Atoi(keyword); err == nil {
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+						keywords = append(keywords, keyword)
+					}
+				case reflect.Float32, reflect.Float64:
+					if _, err := strconv.ParseFloat(keyword, 64); err == nil {
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+						keywords = append(keywords, keyword)
+					}
+				case reflect.Bool:
+					if value, err := strconv.ParseBool(keyword); err == nil {
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+						keywords = append(keywords, value)
+					}
+				case reflect.Struct:
+					// time ?
+					if _, ok := field.Field.Interface().(time.Time); ok {
+						if parsedTime, err := now.Parse(keyword); err == nil {
+							conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+							keywords = append(keywords, parsedTime)
+						}
+					}
+				case reflect.Ptr:
+					// time ?
+					if _, ok := field.Field.Interface().(*time.Time); ok {
+						if parsedTime, err := now.Parse(keyword); err == nil {
+							conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+							keywords = append(keywords, parsedTime)
+						}
+					}
+				default:
 					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, keyword)
 				}
-			case reflect.Float32, reflect.Float64:
-				if _, err := strconv.ParseFloat(keyword, 64); err == nil {
-					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-					keywords = append(keywords, keyword)
-				}
-			case reflect.Bool:
-				if value, err := strconv.ParseBool(keyword); err == nil {
-					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-					keywords = append(keywords, value)
-				}
-			case reflect.Struct:
-				// time ?
-				if _, ok := field.Field.Interface().(time.Time); ok {
-					if parsedTime, err := now.Parse(keyword); err == nil {
-						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-						keywords = append(keywords, parsedTime)
+			} else if relationship := field.Relationship; relationship != nil {
+				switch relationship.Kind {
+				case "select_one", "select_many":
+					for _, foreignFieldName := range relationship.ForeignFieldNames {
+						generateConditions(strings.Join([]string{field.Name, foreignFieldName}, "."), currentScope)
 					}
-				}
-			case reflect.Ptr:
-				// time ?
-				if _, ok := field.Field.Interface().(*time.Time); ok {
-					if parsedTime, err := now.Parse(keyword); err == nil {
-						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-						keywords = append(keywords, parsedTime)
+				case "belongs_to":
+					for _, foreignFieldName := range relationship.ForeignFieldNames {
+						generateConditions(foreignFieldName, currentScope)
 					}
+				case "many_to_many":
+					// TODO
+					panic("not supported")
 				}
-			default:
-				conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-				keywords = append(keywords, keyword)
 			}
 		}
+	}
+
+	scope := db.NewScope(res.Value)
+	for _, column := range columns {
+		generateConditions(column, scope)
 	}
 
 	// join conditions
