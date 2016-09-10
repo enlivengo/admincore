@@ -29,7 +29,7 @@ type Resource struct {
 	params         string
 	base           *Resource
 	scopes         []*Scope
-	filters        map[string]*Filter
+	filters        []*Filter
 	searchAttrs    *[]string
 	sortableAttrs  *[]string
 	indexSections  []*Section

@@ -25,7 +25,7 @@ type Pagination struct {
 type Searcher struct {
 	*Context
 	scopes     []*Scope
-	filters    map[string]*resource.MetaValues
+	filters    map[*Filter]*resource.MetaValues
 	Pagination Pagination
 }
 
@@ -60,12 +60,12 @@ func (s *Searcher) Scope(names ...string) *Searcher {
 }
 
 // Filter filter with defined filters, filter with columns value
-func (s *Searcher) Filter(name string, values *resource.MetaValues) *Searcher {
+func (s *Searcher) Filter(filter *Filter, values *resource.MetaValues) *Searcher {
 	newSearcher := s.clone()
 	if newSearcher.filters == nil {
-		newSearcher.filters = map[string]*resource.MetaValues{}
+		newSearcher.filters = map[*Filter]*resource.MetaValues{}
 	}
-	newSearcher.filters[name] = values
+	newSearcher.filters[filter] = values
 	return newSearcher
 }
 
@@ -104,9 +104,8 @@ func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 
 	// call filters
 	if s.filters != nil {
-		for key, value := range s.filters {
-			filter := s.Resource.filters[key]
-			if filter != nil && filter.Handler != nil {
+		for filter, value := range s.filters {
+			if filter.Handler != nil {
 				filterArgument := &FilterArgument{
 					Value:    value,
 					Context:  context,
@@ -161,8 +160,12 @@ func (s *Searcher) parseContext() *qor.Context {
 		for key, _ := range context.Request.Form {
 			if matches := filterRegexp.FindStringSubmatch(key); len(matches) > 0 {
 				var prefix = fmt.Sprintf("filters[%v]", matches[1])
-				if metaValues, err := resource.ConvertFormToMetaValues(context.Request, []resource.Metaor{}, prefix); err == nil {
-					searcher = searcher.Filter(matches[1], metaValues)
+				for _, filter := range s.Resource.filters {
+					if filter.Name == matches[1] {
+						if metaValues, err := resource.ConvertFormToMetaValues(context.Request, []resource.Metaor{}, prefix); err == nil {
+							searcher = searcher.Filter(filter, metaValues)
+						}
+					}
 				}
 			}
 		}

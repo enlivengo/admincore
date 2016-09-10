@@ -111,7 +111,6 @@ func (admin *Admin) newResource(value interface{}, config ...*Config) *Resource 
 		Resource:    *resource.New(value),
 		Config:      configuration,
 		cachedMetas: &map[string][]*Meta{},
-		filters:     map[string]*Filter{},
 		admin:       admin,
 	}
 
