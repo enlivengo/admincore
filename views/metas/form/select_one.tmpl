@@ -49,7 +49,7 @@
 
         <select id="{{.InputId}}" class="qor-field__input qor-field__selectone-input hidden" name="{{.InputName}}" {{if not (has_update_permission .Meta)}}disabled{{end}}>
           {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
-            {{if (is_included $current_values (index $values 0))}}
+            {{if (is_equal $current_values (index $values 0))}}
               <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
             {{else}}
               <option value="{{index $values 0}}">{{index $values 1}}</option>

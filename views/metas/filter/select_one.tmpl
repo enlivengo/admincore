@@ -18,7 +18,7 @@
     {{end}}
   {{else}}
     {{range $values := (.Filter.Config.GetCollection nil .Context)}}
-      {{if (is_included $value (index $values 0))}}
+      {{if (is_equal $value (index $values 0))}}
         <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
       {{else}}
         <option value="{{index $values 0}}">{{index $values 1}}</option>
