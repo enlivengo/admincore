@@ -200,3 +200,26 @@ func (selectOneConfig *SelectOneConfig) ConfigureQORAdminFilter(filter *Filter) 
 		}
 	}
 }
+
+func (selectOneConfig *SelectOneConfig) FilterValue(filter *Filter, context *Context) interface{} {
+	var (
+		prefix  = fmt.Sprintf("filters[%v].", filter.Name)
+		keyword string
+	)
+
+	if metaValues, err := resource.ConvertFormToMetaValues(context.Request, []resource.Metaor{}, prefix); err == nil {
+		if metaValue := metaValues.Get("Value"); metaValue != nil {
+			keyword = utils.ToString(metaValue.Value)
+		}
+	}
+
+	if keyword != "" && selectOneConfig.RemoteDataResource != nil {
+		result := selectOneConfig.RemoteDataResource.NewStruct()
+		clone := context.Clone()
+		clone.ResourceID = keyword
+		selectOneConfig.RemoteDataResource.CallFindOne(result, nil, clone)
+		return result
+	}
+
+	return keyword
+}

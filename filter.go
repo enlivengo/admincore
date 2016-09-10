@@ -35,13 +35,6 @@ func (res *Resource) GetFilters() []*Filter {
 	return res.filters
 }
 
-// FilterArgument filter argument that used in handler
-type FilterArgument struct {
-	Value    *resource.MetaValues
-	Resource *Resource
-	Context  *qor.Context
-}
-
 // Filter filter definiation
 type Filter struct {
 	Name     string
@@ -52,6 +45,14 @@ type Filter struct {
 	Config   FilterConfigInterface
 }
 
+// FilterConfigInterface filter config interface
 type FilterConfigInterface interface {
 	ConfigureQORAdminFilter(*Filter)
+}
+
+// FilterArgument filter argument that used in handler
+type FilterArgument struct {
+	Value    *resource.MetaValues
+	Resource *Resource
+	Context  *qor.Context
 }
