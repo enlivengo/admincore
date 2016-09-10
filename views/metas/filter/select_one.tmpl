@@ -1,32 +1,28 @@
-<div class="qor-admin-filter qor-field">
-  {{if .Filter.Config.Select2ResultTemplate}}
-    <script name="select2-result-template" type="x-tmpl-mustache">
-      {{.Filter.Config.Select2ResultTemplate}}
-    </script>
-  {{end}}
+{{if .Filter.Config.Select2ResultTemplate}}
+  <script name="select2-result-template" type="x-tmpl-mustache">
+    {{.Filter.Config.Select2ResultTemplate}}
+  </script>
+{{end}}
 
-  {{if .Filter.Config.Select2SelectionTemplate}}
-    <script name="select2-selection-template" type="x-tmpl-mustache">
-      {{.Filter.Config.Select2SelectionTemplate}}
-    </script>
-  {{end}}
+{{if .Filter.Config.Select2SelectionTemplate}}
+  <script name="select2-selection-template" type="x-tmpl-mustache">
+    {{.Filter.Config.Select2SelectionTemplate}}
+  </script>
+{{end}}
 
-  {{$value := .Filter.Config.FilterValue .Filter .Context}}
-  <div class="qor-filter__block qor-filter__selectone" {{if (eq .Filter.Config.SelectMode "bottom_sheet")}} data-toggle="qor.selectone"{{end}}>
-    <select class="qor-action--select" data-toggle="qor.chooser" data-placeholder="{{.Filter.Label}}" name="{{.InputNamePrefix}}.Value" data-allow-clear="true" {{if .Filter.Config.RemoteDataResource}}data-remote-data-url="{{url_for .Filter.Config.RemoteDataResource}}"{{end}}>
-      {{if .Filter.Config.RemoteDataResource}}
-        {{if $value}}
-          <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
-        {{end}}
+{{$value := .Filter.Config.FilterValue .Filter .Context}}
+<select data-toggle="qor.chooser" data-placeholder="{{.Filter.Label}}" name="{{.InputNamePrefix}}.Value" data-allow-clear="true" {{if .Filter.Config.RemoteDataResource}}data-remote-data-url="{{url_for .Filter.Config.RemoteDataResource}}"{{end}}>
+  {{if .Filter.Config.RemoteDataResource}}
+    {{if $value}}
+      <option value="{{primary_key_of $value}}" selected>{{stringify $value}}</option>
+    {{end}}
+  {{else}}
+    {{range $values := (.Filter.Config.GetCollection nil .Context)}}
+      {{if (is_included $value (index $values 0))}}
+        <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
       {{else}}
-        {{range $values := (.Filter.Config.GetCollection nil .Context)}}
-          {{if (is_included $value (index $values 0))}}
-            <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
-          {{else}}
-            <option value="{{index $values 0}}">{{index $values 1}}</option>
-          {{end}}
-        {{end}}
+        <option value="{{index $values 0}}">{{index $values 1}}</option>
       {{end}}
-    </select>
-  </div>
-</div>
+    {{end}}
+  {{end}}
+</select>
