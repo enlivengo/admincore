@@ -66,16 +66,16 @@ $(function () {
         if (isActionButton) {
             actionData = collectSelectID();
             openData = $.extend({}, openData, {
-              actionData: actionData
+                actionData: actionData
             });
         }
 
         if (!openData.method || openData.method.toUpperCase() == "GET") {
             // Open in BottmSheet: is action button, open type is bottom-sheet
-             if (isActionButton || openData.openType == 'bottom-sheet') {
-                   BottomSheets.open(openData);
-                   return false;
-             }
+            if (isActionButton || openData.openType == 'bottom-sheet') {
+                BottomSheets.open(openData);
+                return false;
+            }
 
             // Slideout or New Page: table items, new button, edit button
             if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openData.openType == 'slideout') {

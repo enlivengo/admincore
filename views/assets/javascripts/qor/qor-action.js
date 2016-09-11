@@ -24,6 +24,8 @@
   var MDL_BODY = '.mdl-layout__content';
   var ACTION_SELECTORS = '.qor-actions';
   var ACTION_LINK = 'a.qor-action--button';
+  var MENU_ACTIONS = '.qor-table__actions a[data-url]';
+  var BULK_ACTIONS_TOGGLE = '[data-toggle="qor.action.bulk"]';
   var BUTTON_BULKS = '.qor-action-bulk-buttons';
   var QOR_TABLE = '.qor-table-container';
   var QOR_TABLE_BULK = '.qor-table--bulking';
@@ -52,8 +54,7 @@
       this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
       $(document)
         .on(EVENT_CLICK, '.qor-table--bulking tr', this.click)
-        .on(EVENT_CLICK, ACTION_LINK, this.actionLink)
-        .on(EVENT_CLICK, ".qor-table__actions a[data-url]", $.proxy(this.actionSubmit, this));
+        .on(EVENT_CLICK, ACTION_LINK, this.actionLink);
     },
 
     unbind: function () {
@@ -67,7 +68,6 @@
         $(BUTTON_BULKS).find('button').attr('disabled', true);
         $(ACTION_LINK).attr('disabled', true);
       }
-
     },
 
     collectFormData: function () {
@@ -361,15 +361,18 @@
   };
 
   $(function () {
-    var selector = '[data-toggle="qor.action.bulk"]';
     var options = {};
 
     $(document).
       on(EVENT_DISABLE, function (e) {
-        QorAction.plugin.call($(selector, e.target), 'destroy');
+        QorAction.plugin.call($(BULK_ACTIONS_TOGGLE, e.target), 'destroy');
       }).
       on(EVENT_ENABLE, function (e) {
-        QorAction.plugin.call($(selector, e.target), options);
+        QorAction.plugin.call($(BULK_ACTIONS_TOGGLE, e.target), options);
+      }).
+      on(EVENT_CLICK, MENU_ACTIONS, function (e) {
+        (new QorAction()).actionSubmit(e);
+        return false;
       }).
       triggerHandler(EVENT_ENABLE);
   });
