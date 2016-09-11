@@ -17,17 +17,22 @@ func (res *Resource) Filter(filter *Filter) {
 
 	if filter.Config != nil {
 		filter.Config.ConfigureQORAdminFilter(filter)
+	}
 
-		if filter.Handler == nil {
-			// generate default handler
-			filter.Handler = func(db *gorm.DB, filterArgument *FilterArgument) *gorm.DB {
-				if metaValue := filterArgument.Value.Get("Value"); metaValue != nil {
-					return defaultFieldFilter(res, []string{filter.Name}, utils.ToString(metaValue.Value), db)
-				}
-				return db
+	if filter.Handler == nil {
+		// generate default handler
+		filter.Handler = func(db *gorm.DB, filterArgument *FilterArgument) *gorm.DB {
+			if metaValue := filterArgument.Value.Get("Value"); metaValue != nil {
+				return defaultFieldFilter(res, []string{filter.Name}, utils.ToString(metaValue.Value), db)
 			}
+			return db
 		}
+	}
+
+	if filter.Type != "" {
 		res.filters = append(res.filters, filter)
+	} else {
+		utils.ExitWithMsg("Invalid filter definition %v for resource %v", filter.Name, res.Name)
 	}
 }
 
