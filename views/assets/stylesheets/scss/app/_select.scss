@@ -111,7 +111,6 @@
     position: fixed;
     z-index: 900;
     padding: 12px 12px 12px 54px;
-    margin-left: -54px;
     margin-top: -11px;
     box-sizing: border-box;
     background-color: #fff;
@@ -131,7 +130,7 @@
     width: 360px;
     box-shadow: none;
     padding: 13px 0 0 54px;
-    margin: -56px 0 0 -54px;
+    margin: -56px 0 0 0;
     background-color: #fff;
     > div:not(.qor-bottomsheet__filter){
       display: none;
@@ -148,7 +147,7 @@
   }
   .has-hint.has-header{
     .qor-page__header{
-      margin: -100px 0 0 -54px;
+      margin: -100px 0 0;
     }
     .qor-selectmany__hint{
       margin-top: -55px;
