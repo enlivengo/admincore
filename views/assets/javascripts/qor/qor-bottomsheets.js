@@ -50,7 +50,8 @@
   }
 
   function updateQueryStringParameter(uri, key, value) {
-    var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
+    var escapedkey = String(key).replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+    var re = new RegExp('([?&])' + escapedkey + '=.*?(&|$)', 'i');
     var separator = uri.indexOf('?') !== -1 ? '&' : '?';
     if (uri.match(re)) {
       return uri.replace(re, '$1' + key + '=' + value + '$2');
@@ -118,7 +119,7 @@
 
     filterChanged: function (e, search, key) {
       // if this event triggered:
-      // search: ?locale_mode=locale,
+      // search: ?locale_mode=locale, ?filters[Color].Value=2
       // key: search param name: locale_mode
 
       var loadUrl;
@@ -196,11 +197,12 @@
     constructloadURL: function (url, key) {
       var fakeURL,
           value,
-          filterURL = this.filterURL;
+          filterURL = this.filterURL,
+          bindUrl = this.$bottomsheets.data().url;
 
       if (!filterURL) {
-        if (this.$bottomsheets.data().url) {
-          filterURL = this.$bottomsheets.data().url;
+        if (bindUrl) {
+          filterURL = bindUrl;
         } else {
           return;
         }

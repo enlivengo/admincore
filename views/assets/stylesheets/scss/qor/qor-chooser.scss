@@ -87,6 +87,9 @@
       height: 30px;
       width: 24px;
       top: 8px;
+      b{
+        margin-left: -6px;
+      }
       &:hover{
         background-color: #2196f3;
         b{
@@ -101,6 +104,7 @@
       font-size: 20px;
       padding: 0 8px;
       margin-right: -16px;
+      margin-left: 8px;
       &:hover{
         background-color: #2196f3;
         color: #fff;
@@ -141,3 +145,4 @@
     }
   }
 }
+
