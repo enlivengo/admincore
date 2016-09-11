@@ -12,6 +12,13 @@
       outline: none;
     }
   }
+
+}
+
+.qor-page__header{
+  .select2-container .select2-dropdown--below{
+    width: auto !important;
+  }
 }
 
 .select2-container--default{
@@ -73,6 +80,9 @@
   .select2-selection--single{
     border-radius: 2px;
     border: 2px solid unquote("rgba(#{$color-black}, 0.12)");
+    .select2-selection__rendered{
+      padding-right: 40px;
+    }
     .select2-selection__arrow{
       height: 30px;
       width: 24px;
@@ -90,6 +100,7 @@
     .select2-selection__clear{
       font-size: 20px;
       padding: 0 8px;
+      margin-right: -16px;
       &:hover{
         background-color: #2196f3;
         color: #fff;

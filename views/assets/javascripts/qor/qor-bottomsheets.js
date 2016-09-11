@@ -29,6 +29,7 @@
   var CLASS_BODY_CONTENT = '.qor-page__body';
   var CLASS_BODY_HEAD = '.qor-page__header';
   var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
+  var CLASS_BOTTOMSHEETS_FILTER = '.qor-bottomsheet__filter';
   var CLASS_BOTTOMSHEETS_BUTTON = '.qor-bottomsheets__search-button';
   var CLASS_BOTTOMSHEETS_INPUT = '.qor-bottomsheets__search-input';
   var URL_GETQOR = 'http://www.getqor.com/';
@@ -214,7 +215,7 @@
 
     addHeaderClass: function () {
       this.$body.find(CLASS_BODY_HEAD).hide();
-      if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(':visible').length) {
+      if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(CLASS_BOTTOMSHEETS_FILTER).length) {
         this.$body.addClass('has-header').find(CLASS_BODY_HEAD).show();
       }
     },
@@ -349,7 +350,7 @@
 
               if (selectModal) {
                 this.$body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
-                if (selectModal == 'mediabox' || selectModal == 'many') {
+                if (selectModal != 'one') {
                   this.$body.addClass('has-hint');
                 }
               }

@@ -39,6 +39,7 @@
         option.ajax = {
           url: remoteUrl,
           dataType: 'json',
+          cache: true,
           delay: 250,
           data: function (params) {
             return {

@@ -109,7 +109,7 @@
   .qor-selectmany__hint{
     font-size: 14px;
     position: fixed;
-    z-index: 2002;
+    z-index: 900;
     padding: 12px 12px 12px 54px;
     margin-left: -54px;
     margin-top: -11px;
@@ -133,7 +133,7 @@
     padding: 13px 0 0 54px;
     margin: -56px 0 0 -54px;
     background-color: #fff;
-    > div:not(.qor-actions__filter){
+    > div:not(.qor-bottomsheet__filter){
       display: none;
     }
     .qor-actions{
