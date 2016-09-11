@@ -66,6 +66,7 @@
               <option value="{{primary_key_of $current_values}}" selected>{{.Value}}</option>
             {{end}}
           {{else}}
+            {{if .Meta.Config.AllowBlank}}<option></option>{{end}}
             {{range $values := (.Meta.Config.GetCollection .ResourceValue .Context)}}
               {{if (is_included $current_values (index $values 0))}}
                 <option value="{{index $values 0}}" selected>{{index $values 1}}</option>
