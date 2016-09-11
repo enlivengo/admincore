@@ -298,8 +298,11 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 			"ResourceValue": value,
 			"Value":         context.FormattedValueOf(value, meta),
 			"Label":         meta.Label,
-			"InputId":       fmt.Sprintf("%v_%v_%v", scope.GetModelStruct().ModelType.Name(), scope.PrimaryKeyValue(), meta.Name),
 			"InputName":     strings.Join(prefix, "."),
+		}
+
+		if !scope.PrimaryKeyZero() {
+			data["InputId"] = fmt.Sprintf("%v_%v_%v", scope.GetModelStruct().ModelType.Name(), scope.PrimaryKeyValue(), meta.Name)
 		}
 
 		data["CollectionValue"] = func() [][]string {
