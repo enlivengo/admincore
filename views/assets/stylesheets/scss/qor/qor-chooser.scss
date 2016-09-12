@@ -21,6 +21,20 @@
   }
 }
 
+[chooser-selected="true"]{
+  & + .select2-container--default{
+    .select2-selection--single{
+      border-color: unquote("rgb(#{$color-primary})");
+      .select2-selection__rendered{
+        padding-right: 50px;
+      }
+      .select2-selection__arrow{
+        right: 29px;
+      }
+    }
+
+  }
+}
 .select2-container--default{
   &.select2-container--focus{
     .select2-selection--multiple{
@@ -29,15 +43,10 @@
     }
   }
 
-  &.select2-container--open {
+  &.select2-container--open{
     .select2-selection--single .select2-selection__arrow{
-      &:hover{
-        b{
-          border-color: transparent transparent #fff;
-        }
-      }
       b{
-        border-width: 0 5px 6px;
+        border-width: 0 4px 4px;
       }
     }
   }
@@ -55,10 +64,6 @@
       position: absolute;
       top: 2px;
       right: 2px;
-      &:hover{
-        background-color: #2196f3;
-        color: #fff;
-      }
     }
     .select2-selection__choice{
       padding: 0 6px 0px 2px;
@@ -80,39 +85,33 @@
   .select2-selection--single{
     border-radius: 2px;
     border: 2px solid unquote("rgba(#{$color-black}, 0.12)");
+
+    .select2-selection__placeholder{
+      color: unquote("rgba(#{$color-black}, 0.54)");
+    }
     .select2-selection__rendered{
-      padding-right: 40px;
+      padding-right: 30px;
+      font-weight: 500;
     }
     .select2-selection__arrow{
       height: 30px;
       width: 24px;
       top: 8px;
       b{
-        margin-left: -6px;
-      }
-      &:hover{
-        background-color: #2196f3;
-        b{
-          border-color: #fff transparent transparent;
-        }
-      }
-      b{
-        border-width: 6px 5px 0;
+        border-width: 4px 4px 0;
       }
     }
     .select2-selection__clear{
       font-size: 20px;
       padding: 0 8px;
-      margin-right: -16px;
+      margin-right: -50px;
       margin-left: 8px;
-      &:hover{
-        background-color: #2196f3;
-        color: #fff;
-      }
+      background-color: unquote("rgb(#{$color-primary})");
+      color: #fff;
     }
   }
   .select2-results__option--highlighted[aria-selected]{
-    background-color: #2196f3;
+    background-color: unquote("rgb(#{$color-primary})");
   }
 }
 

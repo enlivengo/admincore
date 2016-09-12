@@ -53,7 +53,7 @@
         {{end}}
       </select>
     {{else}}
-      <select id="{{.InputId}}" class="qor-field__input hidden" data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_an_option" "Select an Option"}}" name="{{.InputName}}" {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.AllowBlank}}data-allow-clear="true"{{end}} {{if .Meta.Config.RemoteDataResource}}data-remote-data-url="{{url_for .Meta.Config.RemoteDataResource}}"{{end}}>
+      <select id="{{.InputId}}" class="qor-field__input hidden" {{if .Meta.Config.RemoteDataResource}}{{if .Value}}chooser-selected="true"{{end}}{{end}} data-toggle="qor.chooser" data-placeholder="{{t "qor_admin.form.select_an_option" "Select an Option"}}" name="{{.InputName}}" {{if not (has_update_permission .Meta)}}disabled{{end}} {{if .Meta.Config.AllowBlank}}data-allow-clear="true"{{end}} {{if .Meta.Config.RemoteDataResource}}data-remote-data-url="{{url_for .Meta.Config.RemoteDataResource}}"{{end}}>
         {{$current_values := (raw_value_of .ResourceValue .Meta)}}
         {{if .Meta.Config.RemoteDataResource}}
           {{if .Value}}
