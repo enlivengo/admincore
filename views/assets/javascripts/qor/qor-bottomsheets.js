@@ -323,7 +323,7 @@
       var dataType;
       var load;
       var actionData = data.actionData;
-      var hasSearch = data.hasSearch;
+      var hasSearch = $('.qor-search-container').length;
       var selectModal = this.resourseData.selectModal;
 
       if (!url) {
