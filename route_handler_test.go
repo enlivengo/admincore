@@ -71,6 +71,14 @@ func TestRouteHandler(t *testing.T) {
 			Route:  "/hello/:name[.*]/",
 			URL:    "/hello/world/123",
 			Values: url.Values{":name": []string{"world"}},
+		}, {
+			Route:  "/hello/:name/",
+			URL:    "/hello/world/123",
+			Values: url.Values{":name": []string{"world"}},
+		}, {
+			Route:  "/hello/world/",
+			URL:    "/hello/world/123",
+			Values: url.Values{},
 		},
 	}
 
