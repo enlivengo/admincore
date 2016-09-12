@@ -22,6 +22,7 @@
   var EVENT_SHOWN = 'shown.' + NAMESPACE;
   var EVENT_HIDE = 'hide.' + NAMESPACE;
   var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
+  var EVENT_KEYUP = 'keyup.' + NAMESPACE;
   var CLASS_OPEN = 'qor-bottomsheets-open';
   var CLASS_IS_SHOWN = 'is-shown';
   var CLASS_IS_SLIDED = 'is-slided';
@@ -96,6 +97,7 @@
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
         .on(EVENT_CLICK, '.qor-pagination a', this.pagination.bind(this))
         .on(EVENT_CLICK, CLASS_BOTTOMSHEETS_BUTTON, this.search.bind(this))
+        .on(EVENT_KEYUP, this.keyup.bind(this))
         .on('selectorChanged.qor.selector', this.selectorChanged.bind(this))
         .on('filterChanged.qor.filter', this.filterChanged.bind(this));
     },
@@ -139,6 +141,14 @@
       loadUrl = this.constructloadURL(url, key);
       loadUrl && this.reload(loadUrl);
       return false;
+    },
+
+    keyup: function (e) {
+      var searchInput = this.$bottomsheets.find(CLASS_BOTTOMSHEETS_INPUT);
+
+      if (e.which === 13 && searchInput.length && searchInput.is(':focus')) {
+        this.search();
+      }
     },
 
     search: function () {
@@ -361,6 +371,7 @@
               this.$title.after(this.$body.find('.qor-button--new'));
 
               if (hasSearch) {
+                this.$header.find('.qor-bottomsheets__search').remove();
                 this.$header.prepend(QorBottomSheets.TEMPLATE_SEARCH);
               }
 
