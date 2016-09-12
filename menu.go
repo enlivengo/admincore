@@ -122,7 +122,7 @@ func appendMenu(menus []*Menu, ancestors []string, menu *Menu) []*Menu {
 		if newMenu.Priority < 0 {
 			for idx := len(menus) - 1; idx >= 0; idx-- {
 				menu := menus[idx]
-				if menu.Priority > newMenu.Priority || menu.Priority == 0 {
+				if menu.Priority < newMenu.Priority || menu.Priority == 0 {
 					menus = append(menus[0:idx+1], append([]*Menu{newMenu}, menus[idx+1:]...)...)
 					added = true
 					break
