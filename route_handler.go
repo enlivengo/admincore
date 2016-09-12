@@ -95,14 +95,13 @@ func (handler routeHandler) try(path string) (url.Values, bool) {
 			var nextc byte
 
 			name, nextc, j = match(handler.Path, isAlnum, j+1)
-			val, _, _ = match(path, matchPart(nextc), i)
+			val, _, i = match(path, matchPart(nextc), i)
 
 			if (j < len(handler.Path)) && handler.Path[j] == '[' {
 				var index int
-				if i := strings.Index(handler.Path[j:], "]/"); i > 0 {
-					index = i
+				if idx := strings.Index(handler.Path[j:], "]/"); idx > 0 {
+					index = idx
 				} else if handler.Path[len(handler.Path)-1] == ']' {
-					val = handler.Path[j:]
 					index = len(handler.Path) - j - 1
 				}
 
