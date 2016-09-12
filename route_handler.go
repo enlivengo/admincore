@@ -27,7 +27,7 @@ type routeHandler struct {
 
 func newRouteHandler(path string, handle requestHandler, configs ...RouteConfig) routeHandler {
 	handler := routeHandler{
-		Path:   "/" + strings.Trim(path, "/"),
+		Path:   "/" + strings.TrimPrefix(path, "/"),
 		Handle: handle,
 	}
 
