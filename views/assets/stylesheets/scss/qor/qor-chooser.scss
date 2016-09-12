@@ -21,7 +21,7 @@
   }
 }
 
-[chooser-selected="true"]{
+[chooser-selected="true"][data-allow-clear="true"]{
   & + .select2-container--default{
     .select2-selection--single{
       border-color: unquote("rgb(#{$color-primary})");
