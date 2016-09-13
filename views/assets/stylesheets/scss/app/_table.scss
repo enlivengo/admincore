@@ -141,7 +141,7 @@ table{
     }
   }
   .mdl-card{
-    width: 240px;
+    width: 200px;
     .mdl-card__menu{
       right: 4px;
       top: 8px;
@@ -154,8 +154,13 @@ table{
   }
   .mdl-card__supporting-text{
     width: auto;
+    padding: 0 0 16px;
     > p{
       margin-bottom: 4px;
+      padding: 0 16px;
+      &[data-heading*="Image"],&[data-heading*="image"]{
+        padding: 0;
+      }
     }
   }
   tbody{
