@@ -429,6 +429,7 @@
         this.hideSlideout();
       }
 
+      this.removeSelectedClass();
     },
 
     hideSlideout: function () {
