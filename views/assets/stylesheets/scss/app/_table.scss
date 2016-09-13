@@ -1,3 +1,6 @@
+table{
+  border-spacing: 0;
+}
 .qor-table {
   width: calc(100% - 48px);
   border: 0;
@@ -146,12 +149,14 @@
       margin-bottom: 4px;
     }
   }
-  tbody tr{
-    display: inline-flex;
-    vertical-align: top;
-    td{
-      padding-right: 24px;
-      padding-bottom: 24px;
+  tbody{
+      tr{
+        vertical-align: top;
+        display: inline-flex;
+      td{
+        padding-right: 16px;
+        padding-bottom: 16px;
+      }
     }
   }
   img{
