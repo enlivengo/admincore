@@ -142,6 +142,15 @@ table{
   }
   .mdl-card{
     width: 240px;
+    .mdl-card__menu{
+      right: 4px;
+      top: 8px;
+    }
+    &:hover{
+      .mdl-button{
+        background-color: rgba(158,158,158,.5);
+      }
+    }
   }
   .mdl-card__supporting-text{
     width: auto;
@@ -161,5 +170,6 @@ table{
   }
   img{
     max-width: 100%;
+    width: 100%;
   }
 }
