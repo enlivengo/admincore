@@ -154,10 +154,14 @@ table{
   }
   .mdl-card__supporting-text{
     width: auto;
-    padding: 0 0 16px;
+    padding: 0;
     > p{
-      margin-bottom: 4px;
+      margin-bottom: 8px;
       padding: 0 16px;
+      line-height: 1.2;
+      &:last-child{
+        margin-bottom: 16px;
+      }
       &[data-heading*="Image"],&[data-heading*="image"]{
         padding: 0;
       }
