@@ -362,7 +362,7 @@
 
               if (selectModal) {
                 this.$body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
-                if (selectModal != 'one') {
+                if (selectModal != 'one' && this.resourseData.maxItem != '1') {
                   this.$body.addClass('has-hint');
                 }
               }
