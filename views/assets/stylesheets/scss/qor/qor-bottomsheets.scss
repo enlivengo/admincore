@@ -24,9 +24,12 @@
     margin-left: -180px;
     transition: height 0.3s ease;
     .qor-bottomsheets__body {
-      padding: 12px 0;
+      padding:  12px 24px 12px 42px;;
       background-color: #fff;
       height: calc(100% - 65px);
+      &.qor-bottomsheets__select-many,&.qor-bottomsheets__select-one,&.qor-bottomsheets__mediabox{
+        padding: 12px 0;
+      }
       &.has-hint{
         padding: 56px 0 12px;
       }
