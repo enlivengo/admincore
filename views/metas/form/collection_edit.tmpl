@@ -26,8 +26,8 @@
         {{render_nested_form $meta.Resource.NewStruct (new_sections $meta.Resource) (len .Value)}}
       </fieldset>
 
-      <button class="mdl-button mdl-button--fab mdl-button--mini-fab mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-fieldset__add" type="button">
-        <i class="material-icons">add</i>
+      <button class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-fieldset__add" type="button">
+        add {{meta_label .Meta}}
       </button>
     {{end}}
   </div>
