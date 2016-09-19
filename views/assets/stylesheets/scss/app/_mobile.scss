@@ -129,6 +129,18 @@ and (max-device-width : 736px) {
 
 }
 
+/* mobile: iphone 6p */
+@media only screen
+and (min-device-width : 414px)
+and (max-device-width : 736px) {
+  .qor-table--medialibrary{
+    margin-left: 12px;
+    .mdl-card{
+      width: 180px;
+    }
+  }
+}
+
 /* iPad */
 
 @media only screen
