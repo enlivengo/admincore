@@ -2,6 +2,12 @@
   <div class="sidebar-header">
     {{t "qor_admin.layout.logo" "<a href=\"{{.Prefix}}\"><span class=\"visuallyhidden\">QOR</span></a><a href=\"/\" target=\"_blank\">View Site <i class=\"material-icons md-14\" aria-hidden=\"true\">open_in_new</i></a>" .Admin.GetRouter}}
   </div>
+  <div class="sidebar-userinfo">
+    <div>
+      <h5>{{.CurrentUser.DisplayName}}</h5>
+      <p>{{.CurrentUser.Email}}</p>
+    </div>
+  </div>
   <div class="sidebar-body">
     <div class="qor-menu-container">
       {{if .Admin.GetSearchResources }}
