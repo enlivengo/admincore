@@ -153,13 +153,17 @@
     padding-left: 16px;
     h5{
       font-size: 14px;
+      max-width: 70%;
+      text-overflow: ellipsis;
+      line-height: 48px;
       margin: 0;
-      padding-top: 8px;
       font-weight: 300;
+      float: left;
     }
-    p{
-      font-size: 12px;
-      color: unquote("rgba(#{$color-black}, 0.12)");
+    & > a{
+      float: right;
+      margin-top: 8px;
+      margin-right: 8px;
     }
   }
 

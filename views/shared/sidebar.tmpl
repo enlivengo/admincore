@@ -5,8 +5,8 @@
   <div class="sidebar-userinfo">
     <div>
       <h5>{{.CurrentUser.DisplayName}}</h5>
-      <p>{{.CurrentUser.Email}}</p>
     </div>
+    <a class="mdl-button mdl-js-button mdl-button--icon" href="{{logout_url}}" title="{{t "qor_admin.account.logout" "logout"}}" alt="{{t "qor_admin.account.logout" "logout"}}"><i class="material-icons">exit_to_app</i></a>
   </div>
   <div class="sidebar-body">
     <div class="qor-menu-container">
