@@ -59,7 +59,7 @@ $(function () {
             actionData;
 
         // if clicking item's menu actions
-        if ($(e.target).parents(".qor-button--actions").size() || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
+        if ((openData.method && openData.method.toUpperCase() != "GET") || $(e.target).parents(".qor-button--actions").size() || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
         }
 
