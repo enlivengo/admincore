@@ -1,30 +1,33 @@
 // Reset for cropper
 
-.qor-cropper__toggle--redactor {
-  display: none;
+.redactor-editor figure{
+  position: relative;
+}
+
+.qor-redactor__image--buttons{
   position: absolute;
   z-index: 5;
   top: 50%;
   left: 50%;
   margin-top: -11px;
-  margin-left: 1px;
-  padding: 7px 10px;
+  margin-left: -30px;
   background-color: #000;
   font-size: 11px;
   line-height: 1;
   color: #fff;
   cursor: pointer;
-
-  ~ #redactor-image-editter {
-    left: auto;
-    right: 50%;
-    margin-left: 0 !important;
+  + img{
+    opacity: .6;
   }
-
-  #redactor-image-box & {
-    display: block;
+  .qor-redactor__image--edit{
+    border-right: 1px solid rgba(255, 255, 255, .5);
+  }
+  span{
+    display: inline-block;
+    padding: 7px 10px;
   }
 }
+
 
 .redactor-editor pre{
   white-space: normal;

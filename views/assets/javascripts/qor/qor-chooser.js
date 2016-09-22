@@ -104,9 +104,6 @@
       var fn;
 
       if (!data) {
-        if (!$.fn.chosen) {
-          return;
-        }
 
         if (/destroy/.test(options)) {
           return;

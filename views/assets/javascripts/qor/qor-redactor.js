@@ -19,6 +19,8 @@
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_FOCUS = 'focus.' + NAMESPACE;
+  var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
+  var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
   var EVENT_BLUR = 'blur.' + NAMESPACE;
   var EVENT_IMAGE_UPLOAD = 'imageupload.' + NAMESPACE;
   var EVENT_IMAGE_DELETE = 'imagedelete.' + NAMESPACE;
@@ -124,17 +126,19 @@
         on(EVENT_IMAGE_UPLOAD, function (e, image) {
           $(image).on(EVENT_CLICK, click);
         }).
-        on(EVENT_IMAGE_DELETE, function (e, image) {
-          $(image).off(EVENT_CLICK, click);
-        }).
-        on(EVENT_FOCUS, function () {
-          $parent.find('img').off(EVENT_CLICK, click).on(EVENT_CLICK, click);
-        }).
-        on(EVENT_BLUR, function () {
-          $parent.find('img').off(EVENT_CLICK, click);
-        });
+        // on(EVENT_IMAGE_DELETE, function (e, image) {
+        //   $(image).off(EVENT_CLICK, click);
+        // }).
+        // on(EVENT_FOCUS, function () {
+        //   $parent.find('img').off(EVENT_CLICK, click).on(EVENT_CLICK, click);
+        // }).
+        on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
+        on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
+        // on(EVENT_BLUR, function () {
+        //   $parent.find('img').off(EVENT_CLICK, click);
+        // });
 
-      $window.on(EVENT_CLICK, $.proxy(this.removeButton, this));
+      // $window.on(EVENT_CLICK, $.proxy(this.removeButton, this));
     },
 
     unbind: function () {
@@ -148,15 +152,17 @@
     },
 
     click: function (e) {
+      console.log($(e.target))
       e.stopPropagation();
       setTimeout($.proxy(this.addButton, this, $(e.target)), 1);
     },
 
-    addButton: function ($image) {
+    addButton: function (e, image) {
+      var $image = $(image);
+
       this.$button.
         prependTo($image.parent()).
-        off(EVENT_CLICK).
-        one(EVENT_CLICK, $.proxy(this.crop, this, $image));
+        on(EVENT_CLICK, $.proxy(this.crop, this, $image));
     },
 
     removeButton: function () {
@@ -241,7 +247,14 @@
     }
   };
 
-  QorRedactor.BUTTON = '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>';
+  QorRedactor.BUTTON = (
+    '<div class="qor-redactor__image--buttons">' +
+      '<span class="qor-redactor__image--edit" contenteditable="false">Edit</span>' +
+      '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>' +
+    '</div>'
+
+  );
+
   QorRedactor.MODAL = (
     '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
       '<div class="mdl-card mdl-shadow--2dp" role="document">' +
@@ -282,44 +295,69 @@
 
         $this.data(NAMESPACE, (data = {}));
         config = {
+          plugins: ['source','medialibrary'],
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
+          // imageEditable: false,
 
-          initCallback: function () {
-            if (!$this.data("cropUrl")) {
-              return;
+          callbacks: {
+            init: function () {
+              if (!$this.data("cropUrl")) {
+                return;
+              }
+
+              $this.data(NAMESPACE, (data = new QorRedactor($this, {
+                remote: $this.data("cropUrl"),
+                text: $this.data("text"),
+                parent: '.qor-field',
+                toggle: '.qor-cropper__toggle--redactor',
+                replace: function (url) {
+                  return url.replace(/\.\w+$/, function (extension) {
+                    return '.original' + extension;
+                  });
+                },
+                complete: $.proxy(function () {
+                  this.code.sync();
+                }, this)
+              })));
+            },
+
+            imageUpload: function (image, json) {
+              $(image).prop('src',json.filelink);
+              // $this.triggerHandler(EVENT_IMAGE_UPLOAD, arguments[0]);
+            },
+
+            focus: function (e) {
+              // console.log('focus')
+
+              //
+            },
+
+            blur: function (/*e*/) {
+              // $this.triggerHandler(EVENT_BLUR);
+            },
+
+            click: function (e) {
+
+              var $image = $(e.target);
+
+              if ($image.is('img')) {
+                $this.triggerHandler(EVENT_ADD_CROP, $image);
+              } else {
+                $this.triggerHandler(EVENT_REMOVE_CROP);
+              }
+              // console.log(this.code.get());
+            },
+
+            modalOpened: function (name, modal) {
+              // console.log(name);
+              // console.log(modal);
+            },
+
+            change: function (/*url, image*/) {
+              // console.log(this.code.get())
+              // $this.triggerHandler(EVENT_IMAGE_DELETE, arguments[1]);
             }
-
-            $this.data(NAMESPACE, (data = new QorRedactor($this, {
-              remote: $this.data("cropUrl"),
-              text: $this.data("text"),
-              parent: '.qor-field',
-              toggle: '.qor-cropper__toggle--redactor',
-              replace: function (url) {
-                return url.replace(/\.\w+$/, function (extension) {
-                  return '.original' + extension;
-                });
-              },
-              complete: $.proxy(function () {
-                this.code.sync();
-              }, this)
-            })));
-          },
-
-          focusCallback: function (/*e*/) {
-            $this.triggerHandler(EVENT_FOCUS);
-          },
-
-          blurCallback: function (/*e*/) {
-            $this.triggerHandler(EVENT_BLUR);
-          },
-
-          imageUploadCallback: function (/*image, json*/) {
-            $this.triggerHandler(EVENT_IMAGE_UPLOAD, arguments[0]);
-          },
-
-          imageDeleteCallback: function (/*url, image*/) {
-            $this.triggerHandler(EVENT_IMAGE_DELETE, arguments[1]);
           }
         };
 
