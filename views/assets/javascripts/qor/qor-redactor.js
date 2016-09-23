@@ -29,6 +29,8 @@
 
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_SAVE = '.qor-cropper__save';
+  var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
+  var CLASS_IMAGE_EDIT = '.qor-redactor__image--edit';
 
   function encodeCropData(data) {
     var nums = [];
@@ -162,7 +164,8 @@
 
       this.$button.
         prependTo($image.parent()).
-        on(EVENT_CLICK, $.proxy(this.crop, this, $image));
+        find(CLASS_CROPPER_TOGGLE).
+        one(EVENT_CLICK, $.proxy(this.crop, this, $image));
     },
 
     removeButton: function () {
@@ -340,13 +343,29 @@
             click: function (e) {
 
               var $image = $(e.target);
+              // $.Redactor.prototype.events.imageEditing = true;
 
-              if ($image.is('img')) {
+              // if (this.showEditModal) {
+              //   $.Redactor.prototype.events.imageEditing = false;
+              //   console.log(1)
+              //   $this.triggerHandler(EVENT_REMOVE_CROP);
+              //   $.Redactor.prototype.image.showEdit($image);
+              //   return;
+              // }
+              //
+
+              if ($image.is('img')) { // add crop and edit button for inline image
+                console.log(2)
+                this.events.imageEditing = true;
                 $this.triggerHandler(EVENT_ADD_CROP, $image);
+              } else if ($image.is(CLASS_IMAGE_EDIT)) { // Open edit image modal
+                console.log(3)
+                this.events.imageEditing = false;
+                this.image.showEdit($image);
+                // this.showEditModal = true;
               } else {
                 $this.triggerHandler(EVENT_REMOVE_CROP);
               }
-              // console.log(this.code.get());
             },
 
             modalOpened: function (name, modal) {
