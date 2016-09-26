@@ -189,8 +189,6 @@
           properties = ajaxForm.properties || $actionButton.data(),
           url = properties.url,
           undoUrl = properties.undoUrl,
-          undoLabel = properties.undoLabel,
-          orignalLabel = properties.label,
           isUndo = $actionButton.hasClass(CLASS_IS_UNDO),
           isInSlideout = $actionButton.closest(QOR_SLIDEOUT).length,
           needDisableButtons = $element && !isInSlideout;
@@ -230,7 +228,7 @@
         data: ajaxForm.formData,
         dataType: properties.datatype,
         beforeSend: function () {
-          if (undoUrl && undoLabel) {
+          if (undoUrl) {
             $actionButton.prop('disabled', true);
           } else if (needDisableButtons){
             _this.switchButtons($element, 1);
@@ -239,11 +237,8 @@
         },
         success: function (data) {
           // has undo action
-          if (undoUrl && undoLabel) {
-
-            // TODO:
-            $element.trigger(EVENT_UNDO, [$actionButton, isUndo, properties.undoType]);
-
+          if (undoUrl) {
+            $element.triggerHandler(EVENT_UNDO, [$actionButton, isUndo, data]);
             isUndo ? $actionButton.removeClass(CLASS_IS_UNDO) : $actionButton.addClass(CLASS_IS_UNDO);
             $actionButton.prop('disabled', false);
             return;
@@ -261,7 +256,7 @@
 
         },
         error: function (xhr, textStatus, errorThrown) {
-          if (undoUrl && undoLabel) {
+          if (undoUrl) {
             $actionButton.prop('disabled', false);
           } else if (needDisableButtons){
             _this.switchButtons($element);
