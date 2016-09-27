@@ -13,17 +13,12 @@
 
   'use strict';
 
-  var $window = $(window);
   var NAMESPACE = 'qor.redactor';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
-  var EVENT_FOCUS = 'focus.' + NAMESPACE;
   var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
   var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
-  var EVENT_BLUR = 'blur.' + NAMESPACE;
-  var EVENT_IMAGE_UPLOAD = 'imageupload.' + NAMESPACE;
-  var EVENT_IMAGE_DELETE = 'imagedelete.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.qor.modal';
   var EVENT_HIDDEN = 'hidden.qor.modal';
 
@@ -121,42 +116,15 @@
     },
 
     bind: function () {
-      var $parent = this.$parent;
-      var click = $.proxy(this.click, this);
-
       this.$element.
-        on(EVENT_IMAGE_UPLOAD, function (e, image) {
-          $(image).on(EVENT_CLICK, click);
-        }).
-        // on(EVENT_IMAGE_DELETE, function (e, image) {
-        //   $(image).off(EVENT_CLICK, click);
-        // }).
-        // on(EVENT_FOCUS, function () {
-        //   $parent.find('img').off(EVENT_CLICK, click).on(EVENT_CLICK, click);
-        // }).
         on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
         on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
-        // on(EVENT_BLUR, function () {
-        //   $parent.find('img').off(EVENT_CLICK, click);
-        // });
-
-      // $window.on(EVENT_CLICK, $.proxy(this.removeButton, this));
     },
 
     unbind: function () {
       this.$element.
-        off(EVENT_IMAGE_UPLOAD).
-        off(EVENT_IMAGE_DELETE).
-        off(EVENT_FOCUS).
-        off(EVENT_BLUR);
-
-      $window.off(EVENT_CLICK, this.removeButton);
-    },
-
-    click: function (e) {
-      console.log($(e.target))
-      e.stopPropagation();
-      setTimeout($.proxy(this.addButton, this, $(e.target)), 1);
+        off(EVENT_ADD_CROP).
+        off(EVENT_REMOVE_CROP);
     },
 
     addButton: function (e, image) {
@@ -169,7 +137,8 @@
     },
 
     removeButton: function () {
-      this.$button.off(EVENT_CLICK).detach();
+      this.$button.find(CLASS_CROPPER_TOGGLE).off(EVENT_CLICK);
+      this.$button.detach();
     },
 
     crop: function ($image) {
@@ -217,7 +186,6 @@
                     if ($.isFunction(options.complete)) {
                       options.complete();
                     }
-
                     $modal.qorModal('hide');
                   }
                 }
@@ -305,6 +273,8 @@
 
           callbacks: {
             init: function () {
+              this.events.imageEditing = true;
+
               if (!$this.data("cropUrl")) {
                 return;
               }
@@ -327,56 +297,33 @@
 
             imageUpload: function (image, json) {
               $(image).prop('src',json.filelink);
-              // $this.triggerHandler(EVENT_IMAGE_UPLOAD, arguments[0]);
             },
 
-            focus: function (e) {
-              // console.log('focus')
-
-              //
+            focus: function () {
+              $this.triggerHandler(EVENT_REMOVE_CROP);
             },
 
-            blur: function (/*e*/) {
-              // $this.triggerHandler(EVENT_BLUR);
+            blur: function () {
+              $this.triggerHandler(EVENT_REMOVE_CROP);
             },
 
             click: function (e) {
 
-              var $image = $(e.target);
-              // $.Redactor.prototype.events.imageEditing = true;
+              var $target = $(e.target),
+                  $image = $target.closest('figure').find('img');
 
-              // if (this.showEditModal) {
-              //   $.Redactor.prototype.events.imageEditing = false;
-              //   console.log(1)
-              //   $this.triggerHandler(EVENT_REMOVE_CROP);
-              //   $.Redactor.prototype.image.showEdit($image);
-              //   return;
-              // }
-              //
+              $this.triggerHandler(EVENT_REMOVE_CROP);
 
-              if ($image.is('img')) { // add crop and edit button for inline image
-                console.log(2)
+              if ($target.is('img')) { // add crop and edit button for inline image
                 this.events.imageEditing = true;
-                $this.triggerHandler(EVENT_ADD_CROP, $image);
-              } else if ($image.is(CLASS_IMAGE_EDIT)) { // Open edit image modal
-                console.log(3)
+                $this.triggerHandler(EVENT_ADD_CROP, $target);
+              } else if ($target.is(CLASS_IMAGE_EDIT)) { // Open edit image modal
                 this.events.imageEditing = false;
                 this.image.showEdit($image);
-                // this.showEditModal = true;
-              } else {
-                $this.triggerHandler(EVENT_REMOVE_CROP);
               }
-            },
 
-            modalOpened: function (name, modal) {
-              // console.log(name);
-              // console.log(modal);
-            },
-
-            change: function (/*url, image*/) {
-              // console.log(this.code.get())
-              // $this.triggerHandler(EVENT_IMAGE_DELETE, arguments[1]);
             }
+
           }
         };
 

@@ -51,7 +51,7 @@
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this)).
                 on(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
-      
+
       this.$element
         .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
         .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
@@ -223,15 +223,15 @@
       this.initItems();
     },
 
-    formatSelectResults: function (data) {
-      this.formatResults(data);
+    formatSelectResults: function (e, data) {
+      this.formatResults(e, data);
     },
 
-    formatSubmitResults: function (data) {
-      this.formatResults(data, true);
+    formatSubmitResults: function (e, data) {
+      this.formatResults(e, data, true);
     },
 
-    formatResults: function (data, isNewData) {
+    formatResults: function (e, data, isNewData) {
       if (isNewData) {
         this.addItem(data, true);
         return;
