@@ -1,4 +1,4 @@
-// Add media library button for refactor editor
+// Add media library button for redactor editor
 // By Jason weng @theplant
 
 $.Redactor.prototype.medialibrary = function() {
@@ -27,7 +27,7 @@ $.Redactor.prototype.medialibrary = function() {
                     formatOnSubmit: this.medialibrary.formatSubmitResults   // render new items after new item form submitted
                 };
 
-                $bottomsheets.qorSelectCore(options).addClass('qor-bottomsheets__mediabox');
+                $bottomsheets.qorSelectCore(options).addClass('qor-bottomsheets__mediabox').find('.qor-button--new').data('ingore-submit', true);
         },
 
         formatSelectResults: function (e, data) {
@@ -39,8 +39,13 @@ $.Redactor.prototype.medialibrary = function() {
         },
 
         formatResults: function (e, data, isNew) {
-            var $img = $(data.Image),
-                json = {url: $img.prop('src').replace(/image\..+\./,'image.')};
+            var json = {},
+                src;
+
+            isNew ? src = JSON.parse(data.MediaOption).URL : src = $(data.Image).prop('src');
+            src = src.replace(/image\..+\./, 'image.');
+
+            json.url = src;
 
             // insert: function(json, direct, e)
             this.image.insert(json, false, e);

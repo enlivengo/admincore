@@ -130,7 +130,7 @@
     addButton: function (e, image) {
       var $image = $(image);
 
-      this.$button.
+      this.$button.css('left', $(image).width() / 2).
         prependTo($image.parent()).
         find(CLASS_CROPPER_TOGGLE).
         one(EVENT_CLICK, $.proxy(this.crop, this, $image));
