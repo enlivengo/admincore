@@ -274,6 +274,13 @@
           callbacks: {
             init: function () {
               this.events.imageEditing = true;
+              // this.button.setIcon('image', '<i class="fa fa-cog"></i>');
+              // console.log(this.button.get('bold'))
+
+              var buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule'];
+              buttons.forEach(function (item) {
+                this.button.setIcon(this.button.get(item), '<i class="material-icons ' + item + '"></i>');
+              }, this);
 
               if (!$this.data("cropUrl")) {
                 return;

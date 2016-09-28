@@ -6,6 +6,7 @@ $.Redactor.prototype.medialibrary = function() {
         init: function () {
             var button = this.button.add('medialibrary', 'MediaLibrary');
             this.button.addCallback(button, this.medialibrary.addMedialibrary);
+            this.button.setIcon(button, '<i class="material-icons">photo_library</i>');
         },
 
         addMedialibrary: function () {
