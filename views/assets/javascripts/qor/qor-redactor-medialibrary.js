@@ -43,7 +43,7 @@ $.Redactor.prototype.medialibrary = function() {
             var json = {},
                 src;
 
-            isNew ? src = JSON.parse(data.MediaOption).URL : src = $(data.Image).prop('src');
+            src = isNew ? JSON.parse(data.MediaOption).URL : $(data.Image).prop('src');
             src = src.replace(/image\..+\./, 'image.');
 
             json.url = src;

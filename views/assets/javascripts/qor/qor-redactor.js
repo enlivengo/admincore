@@ -26,6 +26,7 @@
   var CLASS_SAVE = '.qor-cropper__save';
   var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
   var CLASS_IMAGE_EDIT = '.qor-redactor__image--edit';
+  var CLASS_IMAGE_BUTTONS = '.qor-redactor__image--buttons';
 
   function encodeCropData(data) {
     var nums = [];
@@ -317,14 +318,14 @@
             click: function (e) {
 
               var $target = $(e.target),
-                  $image = $target.closest('figure').find('img');
+                  $image = $target.closest(CLASS_IMAGE_BUTTONS).parent().find('img');
 
               $this.triggerHandler(EVENT_REMOVE_CROP);
 
               if ($target.is('img')) { // add crop and edit button for inline image
                 this.events.imageEditing = true;
                 $this.triggerHandler(EVENT_ADD_CROP, $target);
-              } else if ($target.is(CLASS_IMAGE_EDIT)) { // Open edit image modal
+              } else if ($target.is(CLASS_IMAGE_EDIT) && $image.is('img')) { // Open edit image modal
                 this.events.imageEditing = false;
                 this.image.showEdit($image);
               }
