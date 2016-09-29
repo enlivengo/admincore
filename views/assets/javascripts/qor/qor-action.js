@@ -55,12 +55,16 @@
       this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
       $(document)
         .on(EVENT_CLICK, '.qor-table--bulking tr', this.click)
-        .on(EVENT_CLICK, ACTION_LINK, this.actionLink)
-        .on(EVENT_CLICK, MENU_ACTIONS, this.actionSubmit.bind(this));
+        .on(EVENT_CLICK, ACTION_LINK, this.actionLink);
     },
 
     unbind: function () {
-      this.$element.off(EVENT_CLICK, this.check);
+      this.$element.off(EVENT_CLICK, this.click);
+
+      $(document)
+        .off(EVENT_CLICK, '.qor-table--bulking tr', this.click)
+        .off(EVENT_CLICK, ACTION_LINK, this.actionLink);
+
     },
 
     initActions: function () {
@@ -394,6 +398,10 @@
       }).
       on(EVENT_ENABLE, function (e) {
         QorAction.plugin.call($(selector, e.target), options);
+      }).
+      on(EVENT_CLICK, MENU_ACTIONS, function (e) {
+        (new QorAction()).actionSubmit(e);
+        return false;
       }).
       triggerHandler(EVENT_ENABLE);
   });
