@@ -329,7 +329,7 @@
 
               });
 
-
+              this.show();
 
               // callback for after slider loaded HTML
               var qorSliderAfterShow = $.fn.qorSliderAfterShow;
@@ -396,6 +396,7 @@
       if (showEvent.isDefaultPrevented()) {
         return;
       }
+
 
       if (this.slideoutType == 'mini') {
         $slideout.addClass(CLASS_MINI);
