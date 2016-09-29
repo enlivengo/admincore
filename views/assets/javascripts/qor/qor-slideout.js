@@ -329,7 +329,7 @@
 
               });
 
-              this.show();
+
 
               // callback for after slider loaded HTML
               var qorSliderAfterShow = $.fn.qorSliderAfterShow;
@@ -379,7 +379,7 @@
     },
 
     open: function (options) {
-      this.load(options.url,options.data);
+      this.load(options.url, options.data);
     },
 
     show: function () {

@@ -460,7 +460,7 @@
     },
 
     show: function () {
-      this.$bottomsheets.addClass(CLASS_IS_SLIDED).addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
+      this.$bottomsheets.addClass(CLASS_IS_SLIDED).addClass(CLASS_IS_SHOWN);
       $('body').addClass(CLASS_OPEN);
     },
 
