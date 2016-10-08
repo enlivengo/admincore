@@ -276,18 +276,17 @@
 
           callbacks: {
             init: function () {
-              this.events.imageEditing = true;
-              // this.button.setIcon('image', '<i class="fa fa-cog"></i>');
-              // console.log(this.button.get('bold'))
-
-              var buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule'];
+              var button, buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule'];
               buttons.forEach(function (item) {
-                this.button.setIcon(this.button.get(item), '<i class="material-icons ' + item + '"></i>');
+                button = this.button.get(item);
+                this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
               }, this);
 
               if (!$this.data("cropUrl")) {
                 return;
               }
+
+              this.events.imageEditing = true;
 
               $this.data(NAMESPACE, (data = new QorRedactor($this, {
                 remote: $this.data("cropUrl"),
@@ -309,6 +308,10 @@
               $(image).prop('src',json.filelink);
             },
 
+            fileUpload: function(link, json) {
+              $(link).prop('href',json.filelink).html(json.filename);
+            },
+
             focus: function () {
               $this.triggerHandler(EVENT_REMOVE_CROP);
             },
@@ -323,6 +326,10 @@
                   $image = $target.closest(CLASS_IMAGE_BUTTONS).parent().find('img');
 
               $this.triggerHandler(EVENT_REMOVE_CROP);
+
+              if (!$this.data("cropUrl")) {
+                return;
+              }
 
               if ($target.is('img')) { // add crop and edit button for inline image
                 this.events.imageEditing = true;
