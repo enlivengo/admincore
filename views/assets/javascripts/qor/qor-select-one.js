@@ -134,6 +134,8 @@
           $target = $select.closest(CLASS_PARENT),
           $selectFeild = $target.find(CLASS_SELECT_FIELD);
 
+      data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
+
       $select[0].value = data.primaryKey;
       template = this.renderSelectOne(data);
 
@@ -154,7 +156,7 @@
 
   };
 
-  QorSelectOne.SELECT_ONE_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
+  QorSelectOne.SELECT_ONE_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ displayName ]]</option>';
 
   QorSelectOne.plugin = function (options) {
     return this.each(function () {

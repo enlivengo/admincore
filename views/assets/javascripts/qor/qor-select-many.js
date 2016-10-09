@@ -232,6 +232,8 @@
     },
 
     formatResults: function (e, data, isNewData) {
+      data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
+
       if (isNewData) {
         this.addItem(data, true);
         return;
@@ -256,7 +258,7 @@
 
   };
 
-  QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
+  QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ displayName ]]</option>';
 
   QorSelectMany.plugin = function (options) {
     return this.each(function () {
