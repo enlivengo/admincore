@@ -305,7 +305,12 @@
             },
 
             imageUpload: function (image, json) {
-              $(image).prop('src',json.filelink);
+              var $image = $(image);
+              if (json.fromMedialibrary) {
+                $image.attr('from-medialibrary', 'true');
+              }
+
+              json.filelink && $image.prop('src',json.filelink);
             },
 
             fileUpload: function(link, json) {
@@ -327,7 +332,8 @@
 
               $this.triggerHandler(EVENT_REMOVE_CROP);
 
-              if (!$this.data("cropUrl")) {
+              if (!$this.data("cropUrl") || $target.attr('from-medialibrary')) {
+                this.events.imageEditing = false;
                 return;
               }
 
