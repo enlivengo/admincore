@@ -267,7 +267,6 @@
 
         $this.data(NAMESPACE, (data = {}));
         config = {
-          plugins: ['source','medialibrary'],
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
           toolbarFixed: true,
