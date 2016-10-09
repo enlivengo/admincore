@@ -6,8 +6,15 @@ import (
 
 type RichEditorConfig struct {
 	AssetManager *Resource
+	Plugins      []RedactorPlugin
 	Settings     map[string]interface{}
 	metaConfig
+}
+
+type RedactorPlugin struct {
+	Name     string
+	Source   string
+	Settings map[string]interface{}
 }
 
 // ConfigureQorMeta configure rich editor meta

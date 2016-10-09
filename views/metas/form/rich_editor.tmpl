@@ -6,7 +6,13 @@
   <div class="qor-field__show">
     {{raw .Value}}
   </div>
-aaa
+
+  {{if .Meta.Config.Plugins}}
+    {{range $plugin := .Meta.Config.Plugins}}
+      <script src="{{$plugin.Source}}"></script>
+    {{end}}
+  {{end}}
+
   <div class="qor-field__edit qor-field__block">
     {{if .Meta.Config.AssetManager}}
       {{$asset_router := printf "%v/%v" .Context.Admin.GetRouter.Prefix .Meta.Config.AssetManager.ToParam}}
