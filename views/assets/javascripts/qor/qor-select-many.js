@@ -51,7 +51,7 @@
     bind: function () {
       $document.on(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this)).
                 on(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
-      
+
       this.$element
         .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
         .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
@@ -232,6 +232,8 @@
     },
 
     formatResults: function (data, isNewData) {
+      data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
+
       if (isNewData) {
         this.addItem(data, true);
         return;
@@ -256,7 +258,7 @@
 
   };
 
-  QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ Name ]]</option>';
+  QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ displayName ]]</option>';
 
   QorSelectMany.plugin = function (options) {
     return this.each(function () {
