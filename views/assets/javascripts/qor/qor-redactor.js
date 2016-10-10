@@ -13,20 +13,20 @@
 
   'use strict';
 
-  var $window = $(window);
   var NAMESPACE = 'qor.redactor';
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
-  var EVENT_FOCUS = 'focus.' + NAMESPACE;
-  var EVENT_BLUR = 'blur.' + NAMESPACE;
-  var EVENT_IMAGE_UPLOAD = 'imageupload.' + NAMESPACE;
-  var EVENT_IMAGE_DELETE = 'imagedelete.' + NAMESPACE;
+  var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
+  var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.qor.modal';
   var EVENT_HIDDEN = 'hidden.qor.modal';
 
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_SAVE = '.qor-cropper__save';
+  var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
+  var CLASS_IMAGE_EDIT = '.qor-redactor__image--edit';
+  var CLASS_IMAGE_BUTTONS = '.qor-redactor__image--buttons';
 
   function encodeCropData(data) {
     var nums = [];
@@ -117,50 +117,29 @@
     },
 
     bind: function () {
-      var $parent = this.$parent;
-      var click = $.proxy(this.click, this);
-
       this.$element.
-        on(EVENT_IMAGE_UPLOAD, function (e, image) {
-          $(image).on(EVENT_CLICK, click);
-        }).
-        on(EVENT_IMAGE_DELETE, function (e, image) {
-          $(image).off(EVENT_CLICK, click);
-        }).
-        on(EVENT_FOCUS, function () {
-          $parent.find('img').off(EVENT_CLICK, click).on(EVENT_CLICK, click);
-        }).
-        on(EVENT_BLUR, function () {
-          $parent.find('img').off(EVENT_CLICK, click);
-        });
-
-      $window.on(EVENT_CLICK, $.proxy(this.removeButton, this));
+        on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
+        on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
     },
 
     unbind: function () {
       this.$element.
-        off(EVENT_IMAGE_UPLOAD).
-        off(EVENT_IMAGE_DELETE).
-        off(EVENT_FOCUS).
-        off(EVENT_BLUR);
-
-      $window.off(EVENT_CLICK, this.removeButton);
+        off(EVENT_ADD_CROP).
+        off(EVENT_REMOVE_CROP);
     },
 
-    click: function (e) {
-      e.stopPropagation();
-      setTimeout($.proxy(this.addButton, this, $(e.target)), 1);
-    },
+    addButton: function (e, image) {
+      var $image = $(image);
 
-    addButton: function ($image) {
-      this.$button.
+      this.$button.css('left', $(image).width() / 2).
         prependTo($image.parent()).
-        off(EVENT_CLICK).
+        find(CLASS_CROPPER_TOGGLE).
         one(EVENT_CLICK, $.proxy(this.crop, this, $image));
     },
 
     removeButton: function () {
-      this.$button.off(EVENT_CLICK).detach();
+      this.$button.find(CLASS_CROPPER_TOGGLE).off(EVENT_CLICK);
+      this.$button.detach();
     },
 
     crop: function ($image) {
@@ -208,7 +187,6 @@
                     if ($.isFunction(options.complete)) {
                       options.complete();
                     }
-
                     $modal.qorModal('hide');
                   }
                 }
@@ -241,7 +219,14 @@
     }
   };
 
-  QorRedactor.BUTTON = '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>';
+  QorRedactor.BUTTON = (
+    '<div class="qor-redactor__image--buttons">' +
+      '<span class="qor-redactor__image--edit" contenteditable="false">Edit</span>' +
+      '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>' +
+    '</div>'
+
+  );
+
   QorRedactor.MODAL = (
     '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
       '<div class="mdl-card mdl-shadow--2dp" role="document">' +
@@ -284,42 +269,83 @@
         config = {
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
+          toolbarFixed: true,
+          toolbarFixedTarget: '.qor-slideout',
+          // imageEditable: false,
 
-          initCallback: function () {
-            if (!$this.data("cropUrl")) {
-              return;
+          callbacks: {
+            init: function () {
+              var button, buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule'];
+              buttons.forEach(function (item) {
+                button = this.button.get(item);
+                this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
+              }, this);
+
+              if (!$this.data("cropUrl")) {
+                return;
+              }
+
+              this.events.imageEditing = true;
+
+              $this.data(NAMESPACE, (data = new QorRedactor($this, {
+                remote: $this.data("cropUrl"),
+                text: $this.data("text"),
+                parent: '.qor-field',
+                toggle: '.qor-cropper__toggle--redactor',
+                replace: function (url) {
+                  return url.replace(/\.\w+$/, function (extension) {
+                    return '.original' + extension;
+                  });
+                },
+                complete: $.proxy(function () {
+                  this.code.sync();
+                }, this)
+              })));
+            },
+
+            imageUpload: function (image, json) {
+              var $image = $(image);
+              if (json.fromMedialibrary) {
+                $image.attr('from-medialibrary', 'true');
+              }
+
+              json.filelink && $image.prop('src',json.filelink);
+            },
+
+            fileUpload: function(link, json) {
+              $(link).prop('href',json.filelink).html(json.filename);
+            },
+
+            focus: function () {
+              $this.triggerHandler(EVENT_REMOVE_CROP);
+            },
+
+            blur: function () {
+              $this.triggerHandler(EVENT_REMOVE_CROP);
+            },
+
+            click: function (e) {
+
+              var $target = $(e.target),
+                  $image = $target.closest(CLASS_IMAGE_BUTTONS).parent().find('img');
+
+              $this.triggerHandler(EVENT_REMOVE_CROP);
+
+              if (!$this.data("cropUrl") || $target.attr('from-medialibrary')) {
+                this.events.imageEditing = false;
+                return;
+              }
+
+              if ($target.is('img')) { // add crop and edit button for inline image
+                this.events.imageEditing = true;
+                $this.triggerHandler(EVENT_ADD_CROP, $target);
+              } else if ($target.is(CLASS_IMAGE_EDIT) && $image.is('img')) { // Open edit image modal
+                this.events.imageEditing = false;
+                this.image.showEdit($image);
+              }
+
             }
 
-            $this.data(NAMESPACE, (data = new QorRedactor($this, {
-              remote: $this.data("cropUrl"),
-              text: $this.data("text"),
-              parent: '.qor-field',
-              toggle: '.qor-cropper__toggle--redactor',
-              replace: function (url) {
-                return url.replace(/\.\w+$/, function (extension) {
-                  return '.original' + extension;
-                });
-              },
-              complete: $.proxy(function () {
-                this.code.sync();
-              }, this)
-            })));
-          },
-
-          focusCallback: function (/*e*/) {
-            $this.triggerHandler(EVENT_FOCUS);
-          },
-
-          blurCallback: function (/*e*/) {
-            $this.triggerHandler(EVENT_BLUR);
-          },
-
-          imageUploadCallback: function (/*image, json*/) {
-            $this.triggerHandler(EVENT_IMAGE_UPLOAD, arguments[0]);
-          },
-
-          imageDeleteCallback: function (/*url, image*/) {
-            $this.triggerHandler(EVENT_IMAGE_DELETE, arguments[1]);
           }
         };
 

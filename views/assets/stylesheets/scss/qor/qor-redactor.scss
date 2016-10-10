@@ -1,31 +1,112 @@
 // Reset for cropper
 
-.qor-cropper__toggle--redactor {
-  display: none;
+.redactor-editor{
+  pre{
+    white-space: normal;
+  }
+  > figure, > h1,> h2,> h3,> h4,> h5,> h6,> p,> code,> pre{
+    position: relative;
+  }
+}
+.redactor-toolbar{
+  li a{
+    padding: 12px;
+  }
+  i{
+    font-size: 18px;
+    &.html:after{
+      content: "code";
+    }
+    &.link:after{
+      content: "insert_link";
+    }
+    &.image:after{
+      content: "image";
+    }
+    &.format:after{
+      content: "text_fields";
+    }
+    &.bold:after{
+      content: "format_bold";
+    }
+    &.file:after{
+      content: "attach_file";
+    }
+    &.italic:after{
+      content: "format_italic";
+    }
+    &.deleted:after{
+      content: "strikethrough_s";
+    }
+    &.lists:after{
+      content: "format_line_spacing";
+    }
+  }
+}
+
+.qor-redactor__image--buttons{
   position: absolute;
   z-index: 5;
   top: 50%;
   left: 50%;
   margin-top: -11px;
-  margin-left: 1px;
-  padding: 7px 10px;
+  margin-left: -30px;
   background-color: #000;
   font-size: 11px;
   line-height: 1;
   color: #fff;
   cursor: pointer;
-
-  ~ #redactor-image-editter {
-    left: auto;
-    right: 50%;
-    margin-left: 0 !important;
+  + img{
+    opacity: .4;
   }
-
-  #redactor-image-box & {
-    display: block;
+  .qor-redactor__image--edit{
+    border-right: 1px solid rgba(255, 255, 255, .5);
+  }
+  span{
+    display: inline-block;
+    padding: 7px 10px;
   }
 }
 
-.redactor-editor pre{
-  white-space: normal;
+
+/* Reset for radactor modal */
+#redactor-modal{
+  border-radius:  2px;
+  box-shadow: 0 9px 46px 8px rgba(0, 0, 0, 0.14), 0 11px 15px -7px rgba(0, 0, 0, 0.12), 0 24px 38px 3px rgba(0, 0, 0, 0.2);
+  padding:  24px;
+  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  #redactor-modal-header{
+    background:  none;
+    padding: 0;
+    margin-bottom: 36px;
+    font-weight: 300;
+    border-radius: 0;
+    font-size: 30px;
+    border: 0;
+  }
+  input[type=text], input[type=password], input[type=email], input[type=url], select, textarea{
+    border-radius: 0;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  #redactor-modal-body{
+    padding: 0;
+  }
+  button{
+    height: 36px;
+    line-height: 36px;
+    padding: 0 16px;
+    font-size: 14px;
+    border-radius: 2px;
+    border: 0;
+    background: none;
+    &:hover{
+      background-color: rgba(158,158,158,.2);
+    }
+    &#redactor-modal-button-action{
+      background-color: unquote("rgb(#{$color-primary})");
+      &:hover{
+        background-color: unquote("rgb(#{$color-primary})");
+      }
+    }
+  }
 }

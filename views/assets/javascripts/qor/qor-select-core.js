@@ -70,7 +70,7 @@
       });
 
       if (formatOnSelect && $.isFunction(formatOnSelect)) {
-        formatOnSelect(data);
+        formatOnSelect(e, data);
       }
 
       return false;
@@ -101,7 +101,7 @@
             data.primaryKey = data.ID;
 
             if (formatOnSubmit && $.isFunction(formatOnSubmit)) {
-              formatOnSubmit(data);
+              formatOnSubmit(e, data);
             } else {
               _this.refresh();
             }
