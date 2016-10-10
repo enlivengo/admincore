@@ -59,7 +59,7 @@
         {{end}}
       </ul>
 
-      <a  href="javascript://" class="mdl-button mdl-button--colored qor-field__selectmany-trigger" data-select-modal="many" data-select-id="#{{.InputId}}" data-selectmany-url="{{url_for .Meta.Config.RemoteDataResource}}">
+      <a  href="javascript://" class="mdl-button mdl-button--colored qor-field__selectmany-trigger" data-select-modal="many" {{if .InputId}}data-select-id="#{{.InputId}}"{{end}} data-selectmany-url="{{url_for .Meta.Config.RemoteDataResource}}">
         {{t "qor_admin.form.add_items" "ADD ITEMS"}}
       </a>
 

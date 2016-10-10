@@ -58,6 +58,16 @@
 
     },
 
+    unbind: function () {
+      $document.off(EVENT_CLICK, '[data-selectmany-url]', this.openBottomSheets.bind(this)).
+                off(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
+
+      this.$element
+        .off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
+        .off(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
+
+    },
+
     clearSelect: function (e) {
       var $target = $(e.target),
           $selectFeild = $target.closest(CLASS_PARENT);
@@ -79,12 +89,13 @@
     },
 
     openBottomSheets: function (e) {
-      var data = $(e.target).data();
+      var $this = $(e.target),
+          data = $this.data();
 
       this.BottomSheets = $body.data('qor.bottomsheets');
       this.bottomsheetsData = data;
 
-      this.$selector = $(data.selectId);
+      this.$selector = data.selectId ? $(data.selectId) : $this.closest(CLASS_PARENT).find('select');
       this.$selectFeild = this.$selector.closest(CLASS_PARENT).find(CLASS_SELECT_FIELD);
 
       // select many templates
@@ -254,6 +265,11 @@
       this.updateHint(this.getSelectedItemData());
       this.updateSelectInputData();
 
+    },
+
+    destroy: function () {
+      this.unbind();
+      this.$element.removeData(NAMESPACE);
     }
 
   };
