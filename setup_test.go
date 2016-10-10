@@ -40,7 +40,7 @@ type User struct {
 	Age          uint
 	Role         string
 	Active       bool
-	RegisteredAt time.Time
+	RegisteredAt *time.Time
 	Avatar       media_library.FileSystem
 	CreditCard   CreditCard
 	Addresses    []Address
