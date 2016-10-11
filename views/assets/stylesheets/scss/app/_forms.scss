@@ -151,18 +151,8 @@
 button.qor-fieldset__add, .qor-fieldset__add-promotion, .qor-button__icon-add{
   font-size: 12px;
   padding-left: 0;
-  text-transform: capitalize;
   &:hover{
     background: none;
-  }
-  &:before{
-    content: '\e145';
-    font-weight: 600;
-    @extend .material-icons;
-    font-size: 12px;
-    width: 12px;
-    height: 12px;
-    line-height: 12px;
   }
 }
 .qor-field {

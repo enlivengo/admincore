@@ -3,7 +3,11 @@
 .qor-field__selectone{
   padding-top: 10px;
   .qor-field__selectone-trigger{
-    margin-left: -16px;
+    font-size: 12px;
+    padding-left: 0;
+    &:hover{
+      background: none;
+    }
   }
   .qor-field__selected{
     padding-top: 10px;
@@ -14,7 +18,7 @@
     }
     > span{
       font-size: 16px;
-      color: unquote("rgb(#{$color-primary})");
+      color: rgb(33,150,243);
       cursor: pointer;
     }
     > a{
@@ -28,8 +32,11 @@
 
 .qor-field__selectmany{
   .qor-field__selectmany-trigger{
-    float: right;
     font-size: 12px;
+    padding-left: 0;
+    &:hover{
+      background: none;
+    }
   }
   .qor-field__selected-many{
     margin-left: 0;
