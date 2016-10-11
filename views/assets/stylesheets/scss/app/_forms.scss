@@ -151,7 +151,7 @@
 button.qor-fieldset__add, .qor-fieldset__add-promotion, .qor-button__icon-add{
   font-size: 12px;
   padding-left: 0;
-  &:hover{
+  &:hover, &:active, &:focus:not(:active){
     background: none;
   }
 }
