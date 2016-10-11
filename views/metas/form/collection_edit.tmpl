@@ -32,7 +32,7 @@
       </fieldset>
 
       <button class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-fieldset__add" type="button">
-        {{t (printf "qor_admin.form.add_%v" (singular (meta_label .Meta))) (printf "Add %v" (singular (meta_label .Meta)))}}
+        {{t (printf "%v.attributes.add_%v" .BaseResource.ToParam (singular (meta_label .Meta))) (printf "Add %v" (singular (meta_label .Meta)))}}
       </button>
     {{end}}
   </div>
