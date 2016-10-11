@@ -911,8 +911,12 @@ func (context *Context) FuncMap() template.FuncMap {
 		"raw":        func(str string) template.HTML { return template.HTML(htmlSanitizer.Sanitize(str)) },
 		"equal":      equal,
 		"stringify":  utils.Stringify,
-		"plural":     inflection.Plural,
-		"singular":   inflection.Singular,
+		"plural": func(value interface{}) string {
+			return inflection.Plural(fmt.Sprint(value))
+		},
+		"singular": func(value interface{}) string {
+			return inflection.Singular(fmt.Sprint(value))
+		},
 		"marshal": func(v interface{}) template.JS {
 			switch value := v.(type) {
 			case string:
