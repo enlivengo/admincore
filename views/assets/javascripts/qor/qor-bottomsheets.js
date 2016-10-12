@@ -387,6 +387,7 @@
               this.$title.after($body.find('.qor-button--new'));
 
               if (hasSearch) {
+                $bottomsheets.addClass("has-search");
                 $header.find('.qor-bottomsheets__search').remove();
                 $header.prepend(QorBottomSheets.TEMPLATE_SEARCH);
               }

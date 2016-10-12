@@ -4,7 +4,7 @@
   padding-top: 10px;
   .qor-field__selectone-trigger{
     font-size: 12px;
-    padding-left: 0;
+    padding: 0;
     &:hover, &:active, &:focus:not(:active){
       background: none;
     }
@@ -33,7 +33,7 @@
 .qor-field__selectmany{
   .qor-field__selectmany-trigger{
     font-size: 12px;
-    padding-left: 0;
+    padding: 0;
     &:hover, &:active, &:focus:not(:active){
       background: none;
     }

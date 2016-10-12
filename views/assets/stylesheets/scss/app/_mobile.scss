@@ -127,6 +127,21 @@ and (max-device-width : 736px) {
     }
   }
 
+  .qor-bottomsheets.is-shown{
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    left: 0;
+    right: 0;
+    margin-left: 0;
+    .qor-bottomsheets__search{
+      display: none;
+    }
+    .qor-button--new{
+      right: 8px;
+    }
+  }
+
 }
 
 /* mobile: iphone 6p */
