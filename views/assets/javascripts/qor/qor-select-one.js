@@ -123,23 +123,23 @@
 
     handleSelectOne: function () {
       var options = {
-        formatOnSelect: this.formatSelectResults.bind(this), //render selected item after click item lists
-        formatOnSubmit: this.formatSubmitResults.bind(this)  //render new items after new item form submitted
+        onSelect: this.onSelectResults.bind(this), //render selected item after click item lists
+        onSubmit: this.onSubmitResults.bind(this)  //render new items after new item form submitted
       };
 
       $(CLASS_BOTTOMSHEETS).qorSelectCore(options).addClass(CLASS_ONE).data(this.bottomsheetsData);
       this.initItem();
     },
 
-    formatSelectResults: function (e, data) {
-      this.formatResults(e, data);
+    onSelectResults: function (e, data) {
+      this.handleResults(e, data);
     },
 
-    formatSubmitResults: function (e, data) {
-      this.formatResults(e, data, true);
+    onSubmitResults: function (e, data) {
+      this.handleResults(e, data, true);
     },
 
-    formatResults: function (e, data, isNewData) {
+    handleResults: function (e, data, isNewData) {
       var template,
           bottomsheetsData = this.bottomsheetsData,
           $parent = this.$parent,

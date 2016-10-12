@@ -54,7 +54,7 @@
           name,
           value,
           options = this.options,
-          formatOnSelect = options.formatOnSelect;
+          onSelect = options.onSelect;
 
       $.extend(data, $this.data());
       data.$clickElement = $this;
@@ -69,20 +69,20 @@
         }
       });
 
-      if (formatOnSelect && $.isFunction(formatOnSelect)) {
-        formatOnSelect(e, data);
+      if (onSelect && $.isFunction(onSelect)) {
+        onSelect(e, data);
       }
 
       return false;
     },
 
     submit: function (e) {
-      var form = e.target;
-      var $form = $(form);
-      var _this = this;
-      var $submit = $form.find(':submit');
-      var data;
-      var formatOnSubmit = this.options.formatOnSubmit;
+      var form = e.target,
+          $form = $(form),
+          _this = this,
+          $submit = $form.find(':submit'),
+          data,
+          onSubmit = this.options.onSubmit;
 
       if (FormData) {
         e.preventDefault();
@@ -100,8 +100,8 @@
             data = json;
             data.primaryKey = data.ID;
 
-            if (formatOnSubmit && $.isFunction(formatOnSubmit)) {
-              formatOnSubmit(e, data);
+            if (onSubmit && $.isFunction(onSubmit)) {
+              onSubmit(e, data);
             } else {
               _this.refresh();
             }

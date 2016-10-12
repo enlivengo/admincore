@@ -226,23 +226,23 @@
     handleSelectMany: function () {
       var $bottomsheets = $(CLASS_BOTTOMSHEETS),
           options = {
-            formatOnSelect: this.formatSelectResults.bind(this),  // render selected item after click item lists
-            formatOnSubmit: this.formatSubmitResults.bind(this)   // render new items after new item form submitted
+            onSelect: this.onSelectResults.bind(this),  // render selected item after click item lists
+            onSubmit: this.onSubmitResults.bind(this)   // render new items after new item form submitted
           };
 
       $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
       this.initItems();
     },
 
-    formatSelectResults: function (e, data) {
-      this.formatResults(e, data);
+    onSelectResults: function (e, data) {
+      this.handleResults(e, data);
     },
 
-    formatSubmitResults: function (e, data) {
-      this.formatResults(e, data, true);
+    onSubmitResults: function (e, data) {
+      this.handleResults(e, data, true);
     },
 
-    formatResults: function (e, data, isNewData) {
+    handleResults: function (e, data, isNewData) {
       data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
 
       if (isNewData) {
