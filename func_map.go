@@ -911,6 +911,9 @@ func (context *Context) FuncMap() template.FuncMap {
 		"raw":        func(str string) template.HTML { return template.HTML(htmlSanitizer.Sanitize(str)) },
 		"equal":      equal,
 		"stringify":  utils.Stringify,
+		"lower": func(value interface{}) string {
+			return strings.ToLower(fmt.Sprint(value))
+		},
 		"plural": func(value interface{}) string {
 			return inflection.Plural(fmt.Sprint(value))
 		},

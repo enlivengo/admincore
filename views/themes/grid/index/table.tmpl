@@ -55,5 +55,5 @@
     </tbody>
   </table>
 {{else}}
-  <h2 class="qor-page__tips">{{t "qor_admin.tables.no_items" "It's a blank slate."}}</h2>
+  <h2 class="qor-page__tips">{{t (printf "%v.tables.no_items" $resource.ToParam) (printf "No %v to show." (lower (plural $resource.Name)))}}</h2>
 {{end}}
