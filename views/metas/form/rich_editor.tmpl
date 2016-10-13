@@ -21,7 +21,7 @@
                 data-toggle="qor.redactor"
                 data-upload-url="{{$asset_router}}/upload"
                 data-crop-url="{{$asset_router}}/crop"
-                data-text="{&quot;title&quot;: &quot;{{t "qor_admin.form.crop_the_image" "Crop the image"}}&quot;, &quot;ok&quot;: &quot;{{t "qor_admin.form.ok" "OK"}}&quot;, &quot;cancel&quot;: &quot;{{t "qor_admin.form.cancel" "Cancel"}}&quot;}"
+                data-text="{&quot;title&quot;: &quot;{{t "qor_admin.form.crop_image" "Crop image"}}&quot;, &quot;ok&quot;: &quot;{{t "qor_admin.form.ok" "OK"}}&quot;, &quot;cancel&quot;: &quot;{{t "qor_admin.form.cancel" "Cancel"}}&quot;}"
                 {{if not (has_update_permission .Meta)}}disabled{{end}}>
             {{.Value}}
       </textarea>
