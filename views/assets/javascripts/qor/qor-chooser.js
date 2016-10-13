@@ -88,6 +88,10 @@
       });
 
       $this.select2(option);
+
+      if ($this.val()) {
+        $this.attr('chooser-selected','true');
+      }
     },
 
     destroy: function () {
