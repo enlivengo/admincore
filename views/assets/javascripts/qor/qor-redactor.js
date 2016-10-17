@@ -271,7 +271,6 @@
           fileUpload: $this.data("uploadUrl"),
           toolbarFixed: true,
           toolbarFixedTarget: '.qor-slideout',
-          // imageEditable: false,
 
           callbacks: {
             init: function () {
