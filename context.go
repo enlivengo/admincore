@@ -24,11 +24,19 @@ type Context struct {
 	Action   string
 	Settings map[string]interface{}
 	Result   interface{}
+
+	funcMaps template.FuncMap
 }
 
 // NewContext new admin context
 func (admin *Admin) NewContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{Context: &qor.Context{Config: admin.Config, Request: r, Writer: w}, Admin: admin, Settings: map[string]interface{}{}}
+}
+
+// Funcs set FuncMap for templates
+func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
+	context.funcMaps = funcMaps
+	return context
 }
 
 func (context *Context) clone() *Context {

@@ -1002,5 +1002,10 @@ func (context *Context) FuncMap() template.FuncMap {
 	for key, value := range context.Admin.funcMaps {
 		funcMap[key] = value
 	}
+
+	for key, value := range context.funcMaps {
+		funcMap[key] = value
+	}
+
 	return funcMap
 }
