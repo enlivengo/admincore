@@ -83,7 +83,8 @@
     }
   }
   .qor-page__header{
-    position: static;
+    position: relative;
+    top: inherit;
     width: calc(100% + 48px);
     + .qor-page__body{
       padding-top: 0;
