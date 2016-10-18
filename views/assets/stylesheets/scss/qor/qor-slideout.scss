@@ -83,7 +83,6 @@
     }
   }
   .qor-page__header{
-    margin: -16px -24px 32px -24px;
     position: static;
     width: calc(100% + 48px);
     + .qor-page__body{
@@ -99,4 +98,5 @@
   padding: 0;
   margin: 20px 0;
   box-shadow: none;
+  background-color: transparent;
 }

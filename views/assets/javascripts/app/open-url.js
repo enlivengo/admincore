@@ -38,7 +38,7 @@ $(function () {
         var $checked = $('.qor-table tbody').find('.mdl-checkbox__input:checked'),
             IDs = [];
 
-        if (!$checked.size()) {
+        if (!$checked.length) {
             return;
         }
 
@@ -51,6 +51,7 @@ $(function () {
 
     $(document).on('click.qor.openUrl', '[data-url]', function (e) {
         var $this = $(this),
+            $target = $(e.target),
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
             isInTable = $this.is('.qor-table tr[data-url]') || $this.closest('.qor-js-table').length,
@@ -59,7 +60,7 @@ $(function () {
             actionData;
 
         // if clicking item's menu actions
-        if ($(e.target).closest('.qor-table__actions').length || (!$(e.target).data('url') && $(e.target).is('a')) || (isInTable && isBottomsheetsOpened())) {
+        if ($target.closest('.qor-button--actions').length || (!$target.data('url') && $target.is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
         }
 

@@ -105,7 +105,7 @@
     actionSubmit: function (e) {
       var $target = $(e.target);
       this.$actionButton = $target;
-      this.submit();
+      $target.data().method && this.submit();
       return false;
     },
 
