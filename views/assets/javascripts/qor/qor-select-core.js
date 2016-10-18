@@ -100,6 +100,7 @@
             data = json;
             data.primaryKey = data.ID;
 
+            $('.qor-error').remove();
             if (data.status == 'error' && data.error) {
               var $flashMessage = window.Mustache.render(QorSelectCore.TEMPLATE_ERROR, data);
               $form.before($flashMessage);
@@ -146,7 +147,7 @@
 
   };
 
-  QorSelectCore.TEMPLATE_ERROR = '<ul class="qor-error"><li><i class="material-icons">error</i><span>[[error]]</span></li></ul>';
+  QorSelectCore.TEMPLATE_ERROR = '<ul class="qor-error"><li><label><i class="material-icons">error</i><span>[[error]]</span></label></li></ul>';
 
   QorSelectCore.plugin = function (options) {
     return this.each(function () {

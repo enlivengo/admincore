@@ -74,6 +74,13 @@
     margin-right: 0;
     margin-left: 0;
     box-shadow: none;
+    & > li > label{
+      padding: 8px 12px 8px 36px;
+      i{
+        top: 8px;
+        left: 6px;
+      }
+    }
   }
 
   .qor-button--new{

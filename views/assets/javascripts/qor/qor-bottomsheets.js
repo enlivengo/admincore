@@ -262,6 +262,7 @@
           },
           success: function (data) {
 
+            $('.qor-error').remove();
             if (data.status == 'error' && data.error) {
               var $flashMessage = window.Mustache.render(QorBottomSheets.TEMPLATE_ERROR, data);
               $form.before($flashMessage);
@@ -506,7 +507,7 @@
     content: false
   };
 
-  QorBottomSheets.TEMPLATE_ERROR = '<ul class="qor-error"><li><i class="material-icons">error</i><span>[[error]]</span></li></ul>';
+  QorBottomSheets.TEMPLATE_ERROR = '<ul class="qor-error"><li><label><i class="material-icons">error</i><span>[[error]]</span></label></li></ul>';
   QorBottomSheets.TEMPLATE_LOADING = '<div style="text-align: center; margin-top: 30px;"><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>';
   QorBottomSheets.TEMPLATE_SEARCH = (
     '<div class="qor-bottomsheets__search">' +
