@@ -235,14 +235,11 @@
           error: function (xhr, textStatus, errorThrown) {
             var $error;
 
-            // Custom HTTP status code
             if (xhr.status === 422) {
 
-              // Clear old errors
               $body.find('.qor-error').remove();
               $form.find('.qor-field').removeClass('is-error').find('.qor-field__error').remove();
 
-              // Append new errors
               $error = $(xhr.responseText).find('.qor-error');
               $form.before($error);
 
@@ -258,7 +255,6 @@
                 }
               });
 
-              // Scroll to top to view the errors
               $slideout.scrollTop(0);
             } else {
               window.alert([textStatus, errorThrown].join(': '));

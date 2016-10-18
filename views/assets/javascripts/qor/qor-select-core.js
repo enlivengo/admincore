@@ -100,6 +100,12 @@
             data = json;
             data.primaryKey = data.ID;
 
+            if (data.status == 'error' && data.error) {
+              var $flashMessage = window.Mustache.render(QorSelectCore.TEMPLATE_ERROR, data);
+              $form.before($flashMessage);
+              return;
+            }
+
             if (onSubmit && $.isFunction(onSubmit)) {
               onSubmit(e, data);
             } else {
@@ -110,28 +116,13 @@
           error: function (xhr, textStatus, errorThrown) {
 
             var $error;
-            // Custom HTTP status code
             if (xhr.status === 422) {
-
-              // Clear old errors
               $form.find('.qor-error').remove();
               $form.find('.qor-field').removeClass('is-error').find('.qor-field__error').remove();
 
-              // Append new errors
               $error = $(xhr.responseText).find('.qor-error');
               $form.before($error);
 
-              $error.find('> li > label').each(function () {
-                var $label = $(this);
-                var id = $label.attr('for');
-
-                if (id) {
-                  $form.find('#' + id).
-                    closest('.qor-field').
-                    addClass('is-error').
-                    append($label.clone().addClass('qor-field__error'));
-                }
-              });
             } else {
               window.alert([textStatus, errorThrown].join(': '));
             }
@@ -154,6 +145,8 @@
     }
 
   };
+
+  QorSelectCore.TEMPLATE_ERROR = '<ul class="qor-error"><li><i class="material-icons">error</i><span>[[error]]</span></li></ul>';
 
   QorSelectCore.plugin = function (options) {
     return this.each(function () {

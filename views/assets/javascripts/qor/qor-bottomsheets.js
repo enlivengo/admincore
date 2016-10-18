@@ -242,7 +242,6 @@
         return;
       }
 
-      var $bottomsheets = this.$bottomsheets;
       var $body = this.$body;
       var form = e.target;
       var $form = $(form);
@@ -261,7 +260,14 @@
           beforeSend: function () {
             $submit.prop('disabled', true);
           },
-          success: function () {
+          success: function (data) {
+
+            if (data.status == 'error' && data.error) {
+              var $flashMessage = window.Mustache.render(QorBottomSheets.TEMPLATE_ERROR, data);
+              $form.before($flashMessage);
+              return;
+            }
+
             var returnUrl = $form.data('returnUrl');
             var refreshUrl = $form.data('refreshUrl');
 
@@ -284,31 +290,13 @@
           error: function (xhr, textStatus, errorThrown) {
             var $error;
 
-            // Custom HTTP status code
             if (xhr.status === 422) {
-
-              // Clear old errors
               $body.find('.qor-error').remove();
               $form.find('.qor-field').removeClass('is-error').find('.qor-field__error').remove();
 
-              // Append new errors
               $error = $(xhr.responseText).find('.qor-error');
               $form.before($error);
 
-              $error.find('> li > label').each(function () {
-                var $label = $(this);
-                var id = $label.attr('for');
-
-                if (id) {
-                  $form.find('#' + id).
-                    closest('.qor-field').
-                    addClass('is-error').
-                    append($label.clone().addClass('qor-field__error'));
-                }
-              });
-
-              // Scroll to top to view the errors
-              $bottomsheets.scrollTop(0);
             } else {
               window.alert([textStatus, errorThrown].join(': '));
             }
@@ -518,6 +506,7 @@
     content: false
   };
 
+  QorBottomSheets.TEMPLATE_ERROR = '<ul class="qor-error"><li><i class="material-icons">error</i><span>[[error]]</span></li></ul>';
   QorBottomSheets.TEMPLATE_LOADING = '<div style="text-align: center; margin-top: 30px;"><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>';
   QorBottomSheets.TEMPLATE_SEARCH = (
     '<div class="qor-bottomsheets__search">' +
