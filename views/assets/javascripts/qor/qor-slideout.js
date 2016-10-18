@@ -397,12 +397,8 @@
         return;
       }
 
-
-      if (this.slideoutType == 'mini') {
-        $slideout.addClass(CLASS_MINI);
-      } else {
-        $slideout.removeClass(CLASS_MINI);
-      }
+      $slideout.removeClass(CLASS_MINI);
+      (this.slideoutType == 'mini') && $slideout.addClass(CLASS_MINI);
 
       $slideout.addClass(CLASS_IS_SHOWN).get(0).offsetWidth;
       $slideout.

@@ -28,12 +28,13 @@
     constructor: QorChooser,
 
     init: function () {
-      var $this = this.$element;
-      var remoteUrl = $this.data('remote-data-url');
-      var option = {
-        minimumResultsForSearch: 20,
-        dropdownParent: $this.parent()
-      };
+      var $this = this.$element,
+          remoteUrl = $this.data('remote-data-url'),
+          resetSelect2Width,
+          option = {
+            minimumResultsForSearch: 20,
+            dropdownParent: $this.parent()
+          };
 
       if (remoteUrl) {
         option.ajax = {
@@ -89,9 +90,19 @@
 
       $this.select2(option);
 
+      // reset select2 container width
+      this.resetSelect2Width();
+      resetSelect2Width = window._.debounce(this.resetSelect2Width.bind(this), 300);
+      $(window).resize(resetSelect2Width);
+
       if ($this.val()) {
         $this.attr('chooser-selected','true');
       }
+    },
+
+    resetSelect2Width: function () {
+      var $container = this.$element.data().select2.$container;
+      $container.width($container.parent().width());
     },
 
     destroy: function () {

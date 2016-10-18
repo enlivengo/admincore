@@ -1,7 +1,5 @@
 /* reset */
-
 .select2-container{
-  width: 100% !important;
   .select2-selection--single,.select2-selection--multiple{
     height: 32px;
     min-height: 30px;
@@ -13,8 +11,13 @@
 }
 
 .qor-page__header{
-  .select2-container .select2-dropdown--below{
-    width: auto !important;
+  .select2-container{
+    width: 100% !important;
+    max-width: 260px;
+    .select2-dropdown--below{
+      width: auto !important;
+      max-width: 260px;
+    }
   }
 }
 
@@ -119,6 +122,9 @@
     height: 48px;
     padding: 0 16px;
     line-height: 48px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     &[aria-selected=true]{
       display: none;
     }
