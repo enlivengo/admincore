@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -542,45 +543,72 @@ func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gor
 				}
 			}
 		}
-
 		tableName := currentScope.QuotedTableName()
+
+		appendString := func(field *gorm.Field) {
+			conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
+			keywords = append(keywords, "%"+keyword+"%")
+		}
+
+		appendInteger := func(field *gorm.Field) {
+			if _, err := strconv.Atoi(keyword); err == nil {
+				conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+				keywords = append(keywords, keyword)
+			}
+		}
+
+		appendFloat := func(field *gorm.Field) {
+			if _, err := strconv.ParseFloat(keyword, 64); err == nil {
+				conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+				keywords = append(keywords, keyword)
+			}
+		}
+
+		appendBool := func(field *gorm.Field) {
+			if value, err := strconv.ParseBool(keyword); err == nil {
+				conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+				keywords = append(keywords, value)
+			}
+		}
+
+		appendTime := func(field *gorm.Field) {
+			if parsedTime, err := utils.ParseTime(keyword, context); err == nil {
+				conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+				keywords = append(keywords, parsedTime)
+			}
+		}
+
+		appendStruct := func(field *gorm.Field) {
+			switch field.Field.Interface().(type) {
+			case time.Time, *time.Time:
+				appendTime(field)
+			// add support for sql null fields
+			case sql.NullInt64:
+				appendInteger(field)
+			case sql.NullFloat64:
+				appendFloat(field)
+			case sql.NullString:
+				appendString(field)
+			case sql.NullBool:
+				appendBool(field)
+			default:
+				// if we don't recognize the struct type, just ignore it
+			}
+		}
+
 		if field, ok := currentScope.FieldByName(column); ok {
 			if field.IsNormal {
 				switch field.Field.Kind() {
 				case reflect.String:
-					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
-					keywords = append(keywords, "%"+keyword+"%")
+					appendString(field)
 				case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-					if _, err := strconv.Atoi(keyword); err == nil {
-						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-						keywords = append(keywords, keyword)
-					}
+					appendInteger(field)
 				case reflect.Float32, reflect.Float64:
-					if _, err := strconv.ParseFloat(keyword, 64); err == nil {
-						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-						keywords = append(keywords, keyword)
-					}
+					appendFloat(field)
 				case reflect.Bool:
-					if value, err := strconv.ParseBool(keyword); err == nil {
-						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-						keywords = append(keywords, value)
-					}
-				case reflect.Struct:
-					// time ?
-					if _, ok := field.Field.Interface().(time.Time); ok {
-						if parsedTime, err := utils.ParseTime(keyword, context); err == nil {
-							conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-							keywords = append(keywords, parsedTime)
-						}
-					}
-				case reflect.Ptr:
-					// time ?
-					if _, ok := field.Field.Interface().(*time.Time); ok {
-						if parsedTime, err := utils.ParseTime(keyword, context); err == nil {
-							conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-							keywords = append(keywords, parsedTime)
-						}
-					}
+					appendBool(field)
+				case reflect.Struct, reflect.Ptr:
+					appendStruct(field)
 				default:
 					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, keyword)
