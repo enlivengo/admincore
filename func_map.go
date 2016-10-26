@@ -47,6 +47,9 @@ func (context *Context) primaryKeyOf(value interface{}) interface{} {
 }
 
 func (context *Context) isNewRecord(value interface{}) bool {
+	if value == nil {
+		return true
+	}
 	return context.GetDB().NewRecord(value)
 }
 
