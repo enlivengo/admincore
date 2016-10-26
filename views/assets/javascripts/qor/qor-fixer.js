@@ -123,6 +123,9 @@
     },
 
     toggle: function () {
+      if (!this.$content.length) {
+        return;
+      }
       var self = this;
       var $clone = this.$clone;
       var $thead = this.$thead;
