@@ -78,6 +78,10 @@
     },
 
     build: function () {
+      if (!this.$content.length) {
+        return;
+      }
+
       var $this = this.$element;
       var $thead = this.$thead;
       var $clone = this.$clone;
