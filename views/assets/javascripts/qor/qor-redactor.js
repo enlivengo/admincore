@@ -270,6 +270,8 @@
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
           toolbarFixed: true,
+          imageResizable: true,
+          imagePosition: true,
           toolbarFixedTarget: '.qor-slideout',
 
           callbacks: {
@@ -283,8 +285,6 @@
               if (!$this.data("cropUrl")) {
                 return;
               }
-
-              this.events.imageEditing = true;
 
               $this.data(NAMESPACE, (data = new QorRedactor($this, {
                 remote: $this.data("cropUrl"),
@@ -313,36 +313,6 @@
 
             fileUpload: function(link, json) {
               $(link).prop('href',json.filelink).html(json.filename);
-            },
-
-            focus: function () {
-              $this.triggerHandler(EVENT_REMOVE_CROP);
-            },
-
-            blur: function () {
-              $this.triggerHandler(EVENT_REMOVE_CROP);
-            },
-
-            click: function (e) {
-
-              var $target = $(e.target),
-                  $image = $target.closest(CLASS_IMAGE_BUTTONS).parent().find('img');
-
-              $this.triggerHandler(EVENT_REMOVE_CROP);
-
-              if (!$this.data("cropUrl") || $target.attr('from-medialibrary')) {
-                this.events.imageEditing = false;
-                return;
-              }
-
-              if ($target.is('img')) { // add crop and edit button for inline image
-                this.events.imageEditing = true;
-                $this.triggerHandler(EVENT_ADD_CROP, $target);
-              } else if ($target.is(CLASS_IMAGE_EDIT) && $image.is('img')) { // Open edit image modal
-                this.events.imageEditing = false;
-                this.image.showEdit($image);
-              }
-
             }
 
           }
