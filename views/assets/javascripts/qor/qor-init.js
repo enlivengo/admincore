@@ -1,5 +1,5 @@
 // init for slideout after show event
-$.fn.qorSliderAfterShow = {};
+$.fn.qorSliderAfterShow = $.fn.qorSliderAfterShow || {};
 
 // change Mustache tags from {{}} to [[]]
 window.Mustache.tags = ['[[', ']]'];

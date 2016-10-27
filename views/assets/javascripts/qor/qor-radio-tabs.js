@@ -17,6 +17,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_SWITCHED = 'switched.' + NAMESPACE;
   var CLASS_TAB = '[data-tab-target]';
   var CLASS_TAB_SOURCE = '[data-tab-source]';
   var CLASS_ACTIVE = 'is-active';
@@ -48,7 +49,8 @@
           $element = this.$element,
           $tabs = $element.find(CLASS_TAB),
           $tabSources = $element.find(CLASS_TAB_SOURCE),
-          data = $target.data();
+          data = $target.data(),
+          tabTarget = data.tabTarget;
 
       if ($target.hasClass(CLASS_ACTIVE)){
         return;
@@ -57,8 +59,8 @@
       $tabs.removeClass(CLASS_ACTIVE);
       $target.addClass(CLASS_ACTIVE);
 
-      $tabSources.hide().filter('[data-tab-source="' + data.tabTarget + '"]').show();
-
+      $tabSources.hide().filter('[data-tab-source="' + tabTarget + '"]').show();
+      $element.trigger(EVENT_SWITCHED, [$element, tabTarget]);
 
     },
 
