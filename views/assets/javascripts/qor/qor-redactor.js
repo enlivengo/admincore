@@ -17,6 +17,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_BLUR = 'blur.' + NAMESPACE;
   var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
   var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.qor.modal';
@@ -25,8 +26,6 @@
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_SAVE = '.qor-cropper__save';
   var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
-  var CLASS_IMAGE_EDIT = '.qor-redactor__image--edit';
-  var CLASS_IMAGE_BUTTONS = '.qor-redactor__image--buttons';
 
   function encodeCropData(data) {
     var nums = [];
@@ -120,6 +119,8 @@
       this.$element.
         on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
         on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
+
+      $(document).on(EVENT_BLUR, '#redactor-link-title', this.getLinkTitle);
     },
 
     unbind: function () {
@@ -197,6 +198,10 @@
       }).one(EVENT_HIDDEN, function () {
         $clone.cropper('destroy').remove();
       }).qorModal('show').find(CLASS_WRAPPER).append($clone);
+    },
+
+    getLinkTitle: function () {
+      QorRedactor.LINK_TITLE = $('#redactor-link-title').val();
     },
 
     destroy: function () {
@@ -309,6 +314,35 @@
               }
 
               json.filelink && $image.prop('src',json.filelink);
+            },
+
+            click: function (e) {
+              this.linkTitle = '';
+              if (this.link.is()) {
+                this.linkTitle = this.link.get().prop('title');
+                this.$linkHtml = $(e.target);
+              }
+
+            },
+
+            modalClosed: function (name) {
+              if (name == 'link') {
+                this.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
+                QorRedactor.LINK_TITLE = '';
+              }
+            },
+
+            modalOpened: function (name, modal) {
+              if (name == 'link') {
+                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Title</label><input value="' + this.linkTitle + '" type="text" id="redactor-link-title" aria-label="Title" placeholder="This is for Accessibility" /></section>');
+              }
+              this.linkTitle = '';
+            },
+
+            insertedLink: function (link) {
+              var $link = $(link);
+              $link.prop('title', QorRedactor.LINK_TITLE);
+              QorRedactor.LINK_TITLE = '';
             },
 
             fileUpload: function(link, json) {
