@@ -285,7 +285,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		}
 		fallthrough
 	default:
-		if content, err := context.Asset(fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Name), fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Type)); err == nil {
+		if content, err := context.Asset(fmt.Sprintf("%v/metas/%v/%v.tmpl", meta.baseResource.ToParam(), metaType, meta.Name), fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Type)); err == nil {
 			tmpl, err = tmpl.Parse(string(content))
 		} else {
 			tmpl, err = tmpl.Parse("{{.Value}}")
