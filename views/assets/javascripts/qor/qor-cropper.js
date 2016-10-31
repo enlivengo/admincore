@@ -390,7 +390,7 @@
             var cropData = $clone.cropper('getData', true);
             var syncData = [];
             var url;
-            
+
             data.crop = true;
             data[options.key][sizeName] = cropData;
             _this.imageData = $clone.cropper('getImageData');
