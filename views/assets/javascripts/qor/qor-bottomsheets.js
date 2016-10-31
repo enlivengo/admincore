@@ -235,6 +235,27 @@
       window.componentHandler.upgradeElement($loading.children()[0]);
     },
 
+    loadScript: function (src) {
+      var script = document.createElement('script');
+      script.src = src;
+      script.onload = function () {};
+      document.body.appendChild(script);
+    },
+
+    loadMedialibraryJS: function ($response) {
+      var $script = $response.filter('script'),
+          theme = /theme=media_library/g,
+          src,
+          _this = this;
+
+      $script.each(function () {
+        src = $(this).prop('src');
+        if (theme.test(src)) {
+          _this.loadScript(src);
+        }
+      });
+    },
+
     submit: function (e) {
 
       // will ingore submit event if need handle with other submit event: like select one, many...
@@ -363,12 +384,13 @@
               $body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
-
-
               if (selectModal) {
                 $body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
                 if (selectModal != 'one' && this.resourseData.maxItem != '1') {
                   $body.addClass('has-hint');
+                }
+                if (selectModal == 'mediabox') {
+                  this.loadMedialibraryJS($response);
                 }
               }
 

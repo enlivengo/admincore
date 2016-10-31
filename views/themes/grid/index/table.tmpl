@@ -57,5 +57,3 @@
 {{else}}
   <h2 class="qor-page__tips">{{t (printf "%v.tables.no_items" $resource.ToParam) (printf "No %v to show." (lower (plural $resource.Name)))}}</h2>
 {{end}}
-
-{{javascript_tag "media_library"}}
