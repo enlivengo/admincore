@@ -161,6 +161,11 @@ table{
       &:last-child{
         margin-bottom: 16px;
       }
+      &[data-heading*="Name"], &[data-heading*="name"]{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       &[data-heading*="Image"], &[data-heading*="image"], &[data-heading*="File"], &[data-heading*="file"], &.qor-table--video{
         padding: 0;
         height: 200px;

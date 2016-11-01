@@ -238,7 +238,6 @@
     loadScript: function (src) {
       var script = document.createElement('script');
       script.src = src;
-      script.onload = function () {};
       document.body.appendChild(script);
     },
 

@@ -59,8 +59,6 @@
       $.extend(data, $this.data());
       data.$clickElement = $this;
 
-      // console.log(data);
-
       $headings.each(function () {
         $heading = $(this),
         $content = $heading.find(CLASS_TABLE_CONTENT);
@@ -69,12 +67,10 @@
         if (name) {
           data[name] = $.trim(value);
         }
-        // console.log(data)
-        // console.log(data[name])
       });
 
       if (onSelect && $.isFunction(onSelect)) {
-        onSelect(e, data);
+        onSelect(data, e);
       }
 
       return false;
@@ -112,7 +108,7 @@
             }
 
             if (onSubmit && $.isFunction(onSubmit)) {
-              onSubmit(e, data);
+              onSubmit(data, e);
             } else {
               _this.refresh();
             }
