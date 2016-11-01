@@ -47,6 +47,9 @@ func (context *Context) primaryKeyOf(value interface{}) interface{} {
 }
 
 func (context *Context) isNewRecord(value interface{}) bool {
+	if value == nil {
+		return true
+	}
 	return context.GetDB().NewRecord(value)
 }
 
@@ -541,7 +544,7 @@ const visiblePageCount = 8
 func (context *Context) Pagination() *PaginationResult {
 	var pages []Page
 	pagination := context.Searcher.Pagination
-	if pagination.Total < context.Searcher.Resource.Config.PageCount {
+	if pagination.Total <= context.Searcher.Resource.Config.PageCount {
 		return nil
 	}
 

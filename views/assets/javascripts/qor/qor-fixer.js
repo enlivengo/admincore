@@ -78,6 +78,10 @@
     },
 
     build: function () {
+      if (!this.$content.length) {
+        return;
+      }
+
       var $this = this.$element;
       var $thead = this.$thead;
       var $clone = this.$clone;
@@ -119,6 +123,9 @@
     },
 
     toggle: function () {
+      if (!this.$content.length) {
+        return;
+      }
       var self = this;
       var $clone = this.$clone;
       var $thead = this.$thead;

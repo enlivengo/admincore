@@ -17,6 +17,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
+  var EVENT_BLUR = 'blur.' + NAMESPACE;
   var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
   var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.qor.modal';
@@ -25,8 +26,6 @@
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_SAVE = '.qor-cropper__save';
   var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
-  var CLASS_IMAGE_EDIT = '.qor-redactor__image--edit';
-  var CLASS_IMAGE_BUTTONS = '.qor-redactor__image--buttons';
 
   function encodeCropData(data) {
     var nums = [];
@@ -120,6 +119,8 @@
       this.$element.
         on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
         on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
+
+      $(document).on(EVENT_BLUR, '#redactor-link-title', this.getLinkTitle);
     },
 
     unbind: function () {
@@ -199,6 +200,10 @@
       }).qorModal('show').find(CLASS_WRAPPER).append($clone);
     },
 
+    getLinkTitle: function () {
+      QorRedactor.LINK_TITLE = $('#redactor-link-title').val();
+    },
+
     destroy: function () {
       this.unbind();
       this.$modal.qorModal('hide').remove();
@@ -270,6 +275,8 @@
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
           toolbarFixed: true,
+          imageResizable: true,
+          imagePosition: true,
           toolbarFixedTarget: '.qor-slideout',
 
           callbacks: {
@@ -283,8 +290,6 @@
               if (!$this.data("cropUrl")) {
                 return;
               }
-
-              this.events.imageEditing = true;
 
               $this.data(NAMESPACE, (data = new QorRedactor($this, {
                 remote: $this.data("cropUrl"),
@@ -311,38 +316,37 @@
               json.filelink && $image.prop('src',json.filelink);
             },
 
+            click: function (e) {
+              this.linkTitle = '';
+              if (this.link.is()) {
+                this.linkTitle = this.link.get().prop('title');
+                this.$linkHtml = $(e.target);
+              }
+
+            },
+
+            modalClosed: function (name) {
+              if (name == 'link') {
+                this.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
+                QorRedactor.LINK_TITLE = '';
+              }
+            },
+
+            modalOpened: function (name, modal) {
+              if (name == 'link') {
+                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Title</label><input value="' + this.linkTitle + '" type="text" id="redactor-link-title" aria-label="Title" placeholder="This is for Accessibility" /></section>');
+              }
+              this.linkTitle = '';
+            },
+
+            insertedLink: function (link) {
+              var $link = $(link);
+              $link.prop('title', QorRedactor.LINK_TITLE);
+              QorRedactor.LINK_TITLE = '';
+            },
+
             fileUpload: function(link, json) {
               $(link).prop('href',json.filelink).html(json.filename);
-            },
-
-            focus: function () {
-              $this.triggerHandler(EVENT_REMOVE_CROP);
-            },
-
-            blur: function () {
-              $this.triggerHandler(EVENT_REMOVE_CROP);
-            },
-
-            click: function (e) {
-
-              var $target = $(e.target),
-                  $image = $target.closest(CLASS_IMAGE_BUTTONS).parent().find('img');
-
-              $this.triggerHandler(EVENT_REMOVE_CROP);
-
-              if (!$this.data("cropUrl") || $target.attr('from-medialibrary')) {
-                this.events.imageEditing = false;
-                return;
-              }
-
-              if ($target.is('img')) { // add crop and edit button for inline image
-                this.events.imageEditing = true;
-                $this.triggerHandler(EVENT_ADD_CROP, $target);
-              } else if ($target.is(CLASS_IMAGE_EDIT) && $image.is('img')) { // Open edit image modal
-                this.events.imageEditing = false;
-                this.image.showEdit($image);
-              }
-
             }
 
           }

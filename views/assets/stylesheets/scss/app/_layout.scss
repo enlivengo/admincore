@@ -277,6 +277,12 @@
   font-size: 20px;
   margin-top: 48px;
 }
+.qor-fieldset{
+  .qor-page__tips{
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
 
 @media screen and (max-width: 1024px){
   .qor-page__header {
