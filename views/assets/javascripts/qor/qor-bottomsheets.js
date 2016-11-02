@@ -330,17 +330,19 @@
     },
 
     load: function (url, data, callback) {
-      var options = this.options;
-      var method;
-      var dataType;
-      var load;
-      var actionData = data.actionData;
-      var selectModal = this.resourseData.selectModal;
-      var hasSearch = selectModal && $('.qor-search-container').length;
-      var ingoreSubmit = this.resourseData.ingoreSubmit;
-      var $bottomsheets = this.$bottomsheets;
-      var $header = this.$header;
-      var $body = this.$body;
+      var options = this.options,
+          method,
+          dataType,
+          load,
+          actionData = data.actionData,
+          resourseData = this.resourseData,
+          selectModal = resourseData.selectModal,
+          hasSearch = selectModal && $('.qor-search-container').length,
+          ingoreSubmit = resourseData.ingoreSubmit,
+          $bottomsheets = this.$bottomsheets,
+          $header = this.$header,
+          $body = this.$body;
+
 
       if (!url) {
         return;
@@ -384,8 +386,8 @@
               this.$title.html($response.find(options.title).html());
 
               if (selectModal) {
-                $body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
-                if (selectModal != 'one' && this.resourseData.maxItem != '1') {
+                $body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId', resourseData.selectId);
+                if (selectModal != 'one' && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
                   $body.addClass('has-hint');
                 }
                 if (selectModal == 'mediabox') {

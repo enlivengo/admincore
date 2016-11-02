@@ -246,6 +246,7 @@
 
         if (/^image\/\w+$/.test(file.type) && URL) {
           this.load(URL.createObjectURL(file));
+          this.$parent.find('.qor-medialibrary__image-desc').show();
         } else {
           this.$list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
         }
