@@ -13,7 +13,7 @@
           </a>
         {{else}}
           <button class="mdl-button mdl-button--colored mdl-button--raised qor-action-button" type="button"
-            data-url="{{if $action.URL}}{{call $action.URL $result $context}}{{else}}{{url_for $resource}}/{{$action.ToParam}}{{end}}"
+            data-url="{{if $action.URL}}{{call $action.URL $result $context}}{{else}}{{url_for $resource}}/!action/{{$action.ToParam}}{{end}}"
             {{if not $action.Resource}}data-dataType="json"
               data-ajax-form="true"
               data-from-index="true"

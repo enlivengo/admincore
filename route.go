@@ -149,11 +149,11 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 				// Action
 				for _, action := range res.Actions {
 					actionController := &controller{Admin: admin, action: action}
-					router.Get(path.Join(prefix, action.ToParam()), actionController.Action, RouteConfig{
+					router.Get(path.Join(prefix, "!action", action.ToParam()), actionController.Action, RouteConfig{
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
-					router.Put(path.Join(prefix, action.ToParam()), actionController.Action, RouteConfig{
+					router.Put(path.Join(prefix, "!action", action.ToParam()), actionController.Action, RouteConfig{
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
