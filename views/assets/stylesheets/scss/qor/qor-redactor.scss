@@ -1,6 +1,9 @@
 // Reset for cropper
 
 .redactor-editor{
+  iframe.qor-video-container{
+    height: 380px;
+  }
   pre{
     white-space: normal;
   }

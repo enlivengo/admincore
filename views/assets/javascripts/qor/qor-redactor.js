@@ -317,6 +317,8 @@
             },
 
             click: function (e) {
+              this.selection.parentTag = this.selection.parent();
+
               this.linkTitle = '';
               if (this.link.is()) {
                 this.linkTitle = this.link.get().prop('title');
