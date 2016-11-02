@@ -544,7 +544,7 @@ const visiblePageCount = 8
 func (context *Context) Pagination() *PaginationResult {
 	var pages []Page
 	pagination := context.Searcher.Pagination
-	if pagination.Total <= context.Searcher.Resource.Config.PageCount {
+	if pagination.Total <= context.Searcher.Resource.Config.PageCount && pagination.CurrentPage <= 1 {
 		return nil
 	}
 

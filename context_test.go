@@ -60,6 +60,11 @@ func TestPagination(t *testing.T) {
 		}
 	}
 
+	context.Searcher.Pagination.CurrentPage = 3
+	if context.Pagination() == nil {
+		t.Error("Should show pagination for page without records")
+	}
+
 	// Test current page 1
 	context.Searcher.Pagination.Total = 1000
 	context.Searcher.Pagination.Pages = 10
