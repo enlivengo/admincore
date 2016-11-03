@@ -4,6 +4,10 @@ Instantly create a beautiful, cross platform, configurable Admin Interface and A
 
 [![GoDoc](https://godoc.org/github.com/qor/admin?status.svg)](https://godoc.org/github.com/qor/admin)
 
+## Documentation
+
+<https://doc.getqor.com/chapter2/setup.html>
+
 ## Features
 
 - Admin Interface for managing data
