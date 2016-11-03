@@ -317,8 +317,12 @@
             },
 
             click: function (e) {
-              this.selection.parentTag = this.selection.parent();
+              var $currentTag = $(this.selection.parent());
 
+              if ($currentTag.is('.redactor-editor')) {
+                $currentTag = $(this.selection.current());
+              }
+              this.selection.$currentTag = $currentTag;
               this.linkTitle = '';
               if (this.link.is()) {
                 this.linkTitle = this.link.get().prop('title');

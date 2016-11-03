@@ -101,8 +101,12 @@
     },
 
     resetSelect2Width: function () {
-      var $container = this.$element.data().select2.$container;
-      $container.length && $container.width($container.parent().width());
+      var $container, select2 = this.$element.data().select2;
+      if (select2 && select2.$container) {
+        $container = select2.$container;
+        $container.width($container.parent().width());
+      }
+
     },
 
     destroy: function () {

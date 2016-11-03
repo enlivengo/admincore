@@ -52,11 +52,12 @@
           $content,
           data = {},
           name,
+          url,
           value,
           options = this.options,
           onSelect = options.onSelect;
 
-      $.extend(data, $this.data());
+      data = $.extend({}, data, $this.data());
       data.$clickElement = $this;
 
       $headings.each(function () {
@@ -69,10 +70,21 @@
         }
       });
 
-      if (onSelect && $.isFunction(onSelect)) {
-        onSelect(data, e);
-      }
+      url = data.mediaLibraryUrl || data.url;
 
+      if (url) {
+        $.getJSON(url, function(json){
+          json.MediaOption && (json.MediaOption = JSON.parse(json.MediaOption));
+          data = $.extend({}, json, data);
+          if (onSelect && $.isFunction(onSelect)) {
+            onSelect(data, e);
+          }
+        });
+      } else {
+        if (onSelect && $.isFunction(onSelect)) {
+          onSelect(data, e);
+        }
+      }
       return false;
     },
 
