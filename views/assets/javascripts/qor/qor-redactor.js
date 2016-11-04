@@ -309,10 +309,6 @@
 
             imageUpload: function (image, json) {
               var $image = $(image);
-              if (json.fromMedialibrary) {
-                $image.attr('from-medialibrary', 'true');
-              }
-
               json.filelink && $image.prop('src',json.filelink);
             },
 
