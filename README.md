@@ -112,11 +112,11 @@ Here is an example:
 ```go
 type Auth struct{}
 
-func (Auth) LoginURL(c *admin.Context) string {
+func (Auth) LoginURL(*admin.Context) string {
   return "/login"
 }
 
-func (Auth) LogoutURL(*Context) string
+func (Auth) LogoutURL(*Context) string {
   return "/logout"
 }
 
