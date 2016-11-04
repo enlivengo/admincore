@@ -163,6 +163,7 @@
         $select[0].value = data.primaryKey;
       }
 
+      $(CLASS_BOTTOMSHEETS).qorSelectCore('destroy');
       this.BottomSheets.hide();
     },
 

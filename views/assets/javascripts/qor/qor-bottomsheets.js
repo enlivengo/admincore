@@ -503,6 +503,7 @@
         trigger(EVENT_HIDDEN);
 
       $('body').removeClass(CLASS_OPEN);
+      $bottomsheets.qorSelectCore('destroy');
 
       // reinit bottomsheets template, clear all bind events.
       this.init();
@@ -538,8 +539,6 @@
       '<button class="mdl-button mdl-js-button mdl-button--icon qor-bottomsheets__search-button" type="button"><i class="material-icons">search</i></button>' +
     '</div>'
   );
-
-
 
   QorBottomSheets.TEMPLATE = (
     '<div class="qor-bottomsheets">' +
