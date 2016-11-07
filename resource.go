@@ -522,21 +522,50 @@ func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gor
 				if field, ok := currentScope.FieldByName(field); ok {
 					if relationship := field.Relationship; relationship != nil {
 						nextScope = currentScope.New(reflect.New(field.Field.Type()).Interface())
-						key := fmt.Sprintf("LEFT JOIN %v ON", nextScope.QuotedTableName())
+						if relationship.Kind == "many_to_many" {
+							var (
+								condition string
+								jointable = scope.Quote(relationship.JoinTableHandler.Table(scope.DB()))
+								key       = fmt.Sprintf("LEFT JOIN %v ON", jointable)
+							)
 
-						for index := range relationship.ForeignDBNames {
-							if relationship.Kind == "has_one" || relationship.Kind == "has_many" {
-								joinConditionsMap[key] = append(joinConditionsMap[key],
+							conditions := []string{}
+							for index := range relationship.ForeignDBNames {
+								conditions = append(conditions,
 									fmt.Sprintf("%v.%v = %v.%v",
-										nextScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
-										currentScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
+										currentScope.QuotedTableName(), scope.Quote(relationship.ForeignFieldNames[index]),
+										jointable, scope.Quote(relationship.ForeignDBNames[index]),
 									))
-							} else if relationship.Kind == "belongs_to" {
-								joinConditionsMap[key] = append(joinConditionsMap[key],
+							}
+							condition = strings.Join(conditions, " AND ")
+
+							conditions = []string{}
+							for index := range relationship.AssociationForeignDBNames {
+								conditions = append(conditions,
 									fmt.Sprintf("%v.%v = %v.%v",
-										currentScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
-										nextScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
+										nextScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignFieldNames[index]),
+										jointable, scope.Quote(relationship.AssociationForeignDBNames[index]),
 									))
+							}
+
+							joinConditionsMap[key] = []string{fmt.Sprintf("%v LEFT JOIN %v ON %v", condition, nextScope.QuotedTableName(), strings.Join(conditions, " AND "))}
+						} else {
+							key := fmt.Sprintf("LEFT JOIN %v ON", nextScope.QuotedTableName())
+
+							for index := range relationship.ForeignDBNames {
+								if relationship.Kind == "has_one" || relationship.Kind == "has_many" {
+									joinConditionsMap[key] = append(joinConditionsMap[key],
+										fmt.Sprintf("%v.%v = %v.%v",
+											nextScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
+											currentScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
+										))
+								} else if relationship.Kind == "belongs_to" {
+									joinConditionsMap[key] = append(joinConditionsMap[key],
+										fmt.Sprintf("%v.%v = %v.%v",
+											currentScope.QuotedTableName(), scope.Quote(relationship.ForeignDBNames[index]),
+											nextScope.QuotedTableName(), scope.Quote(relationship.AssociationForeignDBNames[index]),
+										))
+								}
 							}
 						}
 					}
@@ -624,10 +653,13 @@ func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gor
 						generateConditions(foreignFieldName, currentScope)
 					}
 				case "many_to_many":
-					// TODO
-					panic("not supported")
+					for _, foreignFieldName := range relationship.ForeignFieldNames {
+						generateConditions(strings.Join([]string{field.Name, foreignFieldName}, "."), currentScope)
+					}
 				}
 			}
+		} else {
+			context.AddError(fmt.Errorf("not supported field %v used to filter", column))
 		}
 	}
 
