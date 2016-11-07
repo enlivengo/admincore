@@ -235,6 +235,26 @@
       window.componentHandler.upgradeElement($loading.children()[0]);
     },
 
+    loadScript: function (src) {
+      var script = document.createElement('script');
+      script.src = src;
+      document.body.appendChild(script);
+    },
+
+    loadMedialibraryJS: function ($response) {
+      var $script = $response.filter('script'),
+          theme = /theme=media_library/g,
+          src,
+          _this = this;
+
+      $script.each(function () {
+        src = $(this).prop('src');
+        if (theme.test(src)) {
+          _this.loadScript(src);
+        }
+      });
+    },
+
     submit: function (e) {
 
       // will ingore submit event if need handle with other submit event: like select one, many...
@@ -310,17 +330,19 @@
     },
 
     load: function (url, data, callback) {
-      var options = this.options;
-      var method;
-      var dataType;
-      var load;
-      var actionData = data.actionData;
-      var selectModal = this.resourseData.selectModal;
-      var hasSearch = selectModal && $('.qor-search-container').length;
-      var ingoreSubmit = this.resourseData.ingoreSubmit;
-      var $bottomsheets = this.$bottomsheets;
-      var $header = this.$header;
-      var $body = this.$body;
+      var options = this.options,
+          method,
+          dataType,
+          load,
+          actionData = data.actionData,
+          resourseData = this.resourseData,
+          selectModal = resourseData.selectModal,
+          hasSearch = selectModal && $('.qor-search-container').length,
+          ingoreSubmit = resourseData.ingoreSubmit,
+          $bottomsheets = this.$bottomsheets,
+          $header = this.$header,
+          $body = this.$body;
+
 
       if (!url) {
         return;
@@ -363,12 +385,13 @@
               $body.html($content.html());
               this.$title.html($response.find(options.title).html());
 
-
-
               if (selectModal) {
-                $body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId',this.resourseData.selectId);
-                if (selectModal != 'one' && this.resourseData.maxItem != '1') {
+                $body.find('.qor-button--new').data('ingoreSubmit',true).data('selectId', resourseData.selectId);
+                if (selectModal != 'one' && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
                   $body.addClass('has-hint');
+                }
+                if (selectModal == 'mediabox') {
+                  this.loadMedialibraryJS($response);
                 }
               }
 
@@ -480,6 +503,7 @@
         trigger(EVENT_HIDDEN);
 
       $('body').removeClass(CLASS_OPEN);
+      $bottomsheets.qorSelectCore('destroy');
 
       // reinit bottomsheets template, clear all bind events.
       this.init();
@@ -515,8 +539,6 @@
       '<button class="mdl-button mdl-js-button mdl-button--icon qor-bottomsheets__search-button" type="button"><i class="material-icons">search</i></button>' +
     '</div>'
   );
-
-
 
   QorBottomSheets.TEMPLATE = (
     '<div class="qor-bottomsheets">' +

@@ -309,14 +309,16 @@
 
             imageUpload: function (image, json) {
               var $image = $(image);
-              if (json.fromMedialibrary) {
-                $image.attr('from-medialibrary', 'true');
-              }
-
               json.filelink && $image.prop('src',json.filelink);
             },
 
             click: function (e) {
+              var $currentTag = $(this.selection.parent());
+
+              if ($currentTag.is('.redactor-editor')) {
+                $currentTag = $(this.selection.current());
+              }
+              this.selection.$currentTag = $currentTag;
               this.linkTitle = '';
               if (this.link.is()) {
                 this.linkTitle = this.link.get().prop('title');

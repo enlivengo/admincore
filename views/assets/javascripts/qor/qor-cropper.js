@@ -246,6 +246,7 @@
 
         if (/^image\/\w+$/.test(file.type) && URL) {
           this.load(URL.createObjectURL(file));
+          this.$parent.find('.qor-medialibrary__image-desc').show();
         } else {
           this.$list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
         }
@@ -390,7 +391,7 @@
             var cropData = $clone.cropper('getData', true);
             var syncData = [];
             var url;
-            
+
             data.crop = true;
             data[options.key][sizeName] = cropData;
             _this.imageData = $clone.cropper('getImageData');

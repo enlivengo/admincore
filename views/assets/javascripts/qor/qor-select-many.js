@@ -234,15 +234,15 @@
       this.initItems();
     },
 
-    onSelectResults: function (e, data) {
-      this.handleResults(e, data);
+    onSelectResults: function (data) {
+      this.handleResults(data);
     },
 
-    onSubmitResults: function (e, data) {
-      this.handleResults(e, data, true);
+    onSubmitResults: function (data) {
+      this.handleResults(data, true);
     },
 
-    handleResults: function (e, data, isNewData) {
+    handleResults: function (data, isNewData) {
       data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
 
       if (isNewData) {

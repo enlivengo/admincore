@@ -175,6 +175,24 @@
   position: relative;
   box-sizing: border-box;
   z-index: $zindex-bottomsheets;
+  .qor-table--medialibrary{
+    .mdl-card__supporting-text > p.qor-table--video{
+      height: 162px;
+    }
+    .qor-table--video{
+      position: relative;
+      &:after{
+        position: absolute;
+        z-index: 2;
+        content: '';
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 162px;
+        background-color: rgba(0, 0, 0, .2);
+      }
+    }
+  }
   .qor-page__header+.qor-page__body{
     padding-top: 0;
   }

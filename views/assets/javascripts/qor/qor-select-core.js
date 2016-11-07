@@ -17,7 +17,6 @@
   var NAMESPACE = 'qor.selectcore';
   var EVENT_CLICK = 'click.' + NAMESPACE;
   var EVENT_SUBMIT = 'submit.' + NAMESPACE;
-  var CLASS_TABLE_CONTENT = '.qor-table__content';
   var CLASS_CLICK_TABLE = '.qor-table-container tbody tr';
 
   function QorSelectCore(element, options) {
@@ -47,32 +46,29 @@
 
     processingData: function (e) {
       var $this = $(e.target).closest('tr'),
-          $headings = $this.find('[data-heading]'),
-          $heading,
-          $content,
           data = {},
-          name,
-          value,
+          url,
           options = this.options,
           onSelect = options.onSelect;
 
-      $.extend(data, $this.data());
+      data = $.extend({}, data, $this.data());
       data.$clickElement = $this;
 
-      $headings.each(function () {
-        $heading = $(this),
-        $content = $heading.find(CLASS_TABLE_CONTENT);
-        name = $heading.data('heading');
-        value = $content.size() ? $content.html() : $heading.html();
-        if (name) {
-          data[name] = $.trim(value);
+      url = data.mediaLibraryUrl || data.url;
+
+      if (url) {
+        $.getJSON(url, function(json){
+          json.MediaOption && (json.MediaOption = JSON.parse(json.MediaOption));
+          data = $.extend({}, json, data);
+          if (onSelect && $.isFunction(onSelect)) {
+            onSelect(data, e);
+          }
+        });
+      } else {
+        if (onSelect && $.isFunction(onSelect)) {
+          onSelect(data, e);
         }
-      });
-
-      if (onSelect && $.isFunction(onSelect)) {
-        onSelect(e, data);
       }
-
       return false;
     },
 
@@ -108,7 +104,7 @@
             }
 
             if (onSubmit && $.isFunction(onSubmit)) {
-              onSubmit(e, data);
+              onSubmit(data, e);
             } else {
               _this.refresh();
             }
