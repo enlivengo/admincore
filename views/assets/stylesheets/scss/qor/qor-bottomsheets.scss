@@ -112,6 +112,10 @@
     }
     td{
       padding: 10px;
+      &[data-heading="ID"]{
+        width: 42px;
+        padding: 10px 0 10px 10px;
+      }
     }
     thead,td.qor-table__actions{
       display: none;
