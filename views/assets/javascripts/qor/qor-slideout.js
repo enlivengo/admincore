@@ -87,7 +87,7 @@
 
     keyup: function (e) {
       if (e.which === 27) {
-        if ($('.qor-bottomsheets').is(':visible') || $('.qor-modal').is(':visible')) {
+        if ($('.qor-bottomsheets').is(':visible') || $('.qor-modal').is(':visible') || $('#redactor-modal-box').length) {
           return;
         }
 

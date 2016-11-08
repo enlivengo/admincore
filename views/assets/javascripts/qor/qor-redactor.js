@@ -339,7 +339,7 @@
             },
 
             modalClosed: function (name) {
-              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml.length && QorRedactor.LINK_TITLE) {
+              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml && this.link.$linkHtml.length && QorRedactor.LINK_TITLE) {
                 this.link.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
                 QorRedactor.LINK_TITLE = '';
                 this.link.insertedTriggered = false;

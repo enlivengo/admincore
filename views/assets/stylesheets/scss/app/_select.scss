@@ -145,6 +145,11 @@
     }
     .qor-actions{
       padding: 0;
+      margin-right: 6px;
+      max-width: 115px;
+      &:last-child{
+        margin-right: 0;
+      }
     }
   }
 
