@@ -113,6 +113,13 @@
   .select2-results__option--highlighted[aria-selected]{
     background-color: unquote("rgb(#{$color-primary})");
   }
+  .select2-search--inline{
+    float: none;
+    .select2-search__field{
+      width: 90% !important;
+    }
+
+  }
 }
 
 .select2-dropdown{
