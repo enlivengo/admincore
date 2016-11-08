@@ -337,7 +337,6 @@
           actionData = data.actionData,
           resourseData = this.resourseData,
           selectModal = resourseData.selectModal,
-          hasSearch = selectModal && $('.qor-search-container').length,
           ingoreSubmit = resourseData.ingoreSubmit,
           $bottomsheets = this.$bottomsheets,
           $header = this.$header,
@@ -364,11 +363,10 @@
           method: method,
           dataType: dataType,
           success: $.proxy(function (response) {
-            var $response;
-            var $content;
-
             if (method === 'GET') {
-              $response = $(response);
+              var $response = $(response),
+                  $content,
+                  hasSearch = selectModal && $response.find('.qor-search-container').length;
 
               $content = $response.find(CLASS_MAIN_CONTENT);
 
