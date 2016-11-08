@@ -327,7 +327,7 @@
 
               if (this.link.is()) {
                 this.linkTitle = this.link.get().prop('title');
-                this.$linkHtml = $(e.target);
+                this.link.$linkHtml = $(e.target);
               }
 
             },
@@ -339,8 +339,8 @@
             },
 
             modalClosed: function (name) {
-              if (name == 'link' && !this.link.insertedTriggered) {
-                this.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
+              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml.length && QorRedactor.LINK_TITLE) {
+                this.link.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
                 QorRedactor.LINK_TITLE = '';
                 this.link.insertedTriggered = false;
               }
@@ -351,7 +351,6 @@
               this.link.insertedTriggered = true;
               var $link = $(link);
               $link.prop('title', QorRedactor.LINK_TITLE);
-
               QorRedactor.LINK_TITLE = '';
             },
 
