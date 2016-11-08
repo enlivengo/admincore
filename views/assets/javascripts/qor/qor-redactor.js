@@ -17,7 +17,7 @@
   var EVENT_ENABLE = 'enable.' + NAMESPACE;
   var EVENT_DISABLE = 'disable.' + NAMESPACE;
   var EVENT_CLICK = 'click.' + NAMESPACE;
-  var EVENT_BLUR = 'blur.' + NAMESPACE;
+  var EVENT_KEYUP = 'keyup.' + NAMESPACE;
   var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
   var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
   var EVENT_SHOWN = 'shown.qor.modal';
@@ -26,6 +26,7 @@
   var CLASS_WRAPPER = '.qor-cropper__wrapper';
   var CLASS_SAVE = '.qor-cropper__save';
   var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
+  var ID_REDACTOR_LINK_TITLE = '#redactor-link-title';
 
   function encodeCropData(data) {
     var nums = [];
@@ -120,7 +121,7 @@
         on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
         on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
 
-      $(document).on(EVENT_BLUR, '#redactor-link-title', this.getLinkTitle);
+      $(document).on(EVENT_KEYUP, ID_REDACTOR_LINK_TITLE, this.getLinkTitle);
     },
 
     unbind: function () {
@@ -201,7 +202,7 @@
     },
 
     getLinkTitle: function () {
-      QorRedactor.LINK_TITLE = $('#redactor-link-title').val();
+      QorRedactor.LINK_TITLE = $(ID_REDACTOR_LINK_TITLE).val();
     },
 
     destroy: function () {
@@ -210,6 +211,8 @@
       this.$element.removeData(NAMESPACE);
     }
   };
+
+  QorRedactor.LINK_TITLE = '';
 
   QorRedactor.DEFAULTS = {
     remote: false,
@@ -320,6 +323,8 @@
               }
               this.selection.$currentTag = $currentTag;
               this.linkTitle = '';
+              this.link.insertedTriggered = false;
+
               if (this.link.is()) {
                 this.linkTitle = this.link.get().prop('title');
                 this.$linkHtml = $(e.target);
@@ -327,23 +332,26 @@
 
             },
 
-            modalClosed: function (name) {
+            modalOpened: function (name, modal) {
               if (name == 'link') {
-                this.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
-                QorRedactor.LINK_TITLE = '';
+                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.linkTitle + '" type="text" id="redactor-link-title" aria-label="Title" placeholder="Description for Accessibility" /></section>');
               }
             },
 
-            modalOpened: function (name, modal) {
-              if (name == 'link') {
-                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Title</label><input value="' + this.linkTitle + '" type="text" id="redactor-link-title" aria-label="Title" placeholder="This is for Accessibility" /></section>');
+            modalClosed: function (name) {
+              if (name == 'link' && !this.link.insertedTriggered) {
+                this.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
+                QorRedactor.LINK_TITLE = '';
+                this.link.insertedTriggered = false;
               }
-              this.linkTitle = '';
+
             },
 
             insertedLink: function (link) {
+              this.link.insertedTriggered = true;
               var $link = $(link);
               $link.prop('title', QorRedactor.LINK_TITLE);
+
               QorRedactor.LINK_TITLE = '';
             },
 
