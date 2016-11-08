@@ -27,15 +27,11 @@ func (ac *controller) Index(context *Context) {
 	result, err := context.FindMany()
 	context.AddError(err)
 
-	if context.HasError() {
-		http.NotFound(context.Writer, context.Request)
-	} else {
-		responder.With("html", func() {
-			context.Execute("index", result)
-		}).With("json", func() {
-			context.JSON("index", result)
-		}).Respond(context.Request)
-	}
+	responder.With("html", func() {
+		context.Execute("index", result)
+	}).With("json", func() {
+		context.JSON("index", result)
+	}).Respond(context.Request)
 }
 
 func (ac *controller) SearchCenter(context *Context) {

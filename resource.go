@@ -659,7 +659,7 @@ func defaultFieldFilter(res *Resource, columns []string, keyword string, db *gor
 				}
 			}
 		} else {
-			context.AddError(fmt.Errorf("not supported field %v used to filter", column))
+			context.AddError(fmt.Errorf("filter `%v` is not supported", column))
 		}
 	}
 

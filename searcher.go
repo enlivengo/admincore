@@ -71,17 +71,34 @@ func (s *Searcher) Filter(filter *Filter, values *resource.MetaValues) *Searcher
 
 // FindMany find many records based on current conditions
 func (s *Searcher) FindMany() (interface{}, error) {
-	context := s.parseContext()
-	result := s.Resource.NewSlice()
-	err := s.Resource.CallFindMany(result, context)
+	var (
+		err     error
+		context = s.parseContext()
+		result  = s.Resource.NewSlice()
+	)
+
+	if context.HasError() {
+		return result, context.Errors
+	} else {
+		err = s.Resource.CallFindMany(result, context)
+	}
+
 	return result, err
 }
 
 // FindOne find one record based on current conditions
 func (s *Searcher) FindOne() (interface{}, error) {
-	context := s.parseContext()
-	result := s.Resource.NewStruct()
-	err := s.Resource.CallFindOne(result, nil, context)
+	var (
+		err     error
+		context = s.parseContext()
+		result  = s.Resource.NewStruct()
+	)
+
+	if context.HasError() {
+		return result, context.Errors
+	} else {
+		err = s.Resource.CallFindOne(result, nil, context)
+	}
 	return result, err
 }
 
