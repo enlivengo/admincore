@@ -27,6 +27,7 @@
   var CLASS_SAVE = '.qor-cropper__save';
   var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
   var ID_REDACTOR_LINK_TITLE = '#redactor-link-title';
+  var ID_REDACTOR_LINK_TEXT = '#redactor-link-url-text';
 
   function encodeCropData(data) {
     var nums = [];
@@ -272,7 +273,6 @@
           toolbarFixed: true,
           imageResizable: true,
           imagePosition: true,
-          toolbarFixedTarget: '.qor-slideout',
 
           callbacks: {
             init: function () {
@@ -316,7 +316,7 @@
               this.selection.$currentTag = $currentTag;
               this.link.linkDescription = '';
               this.link.insertedTriggered = false;
-              this.link.LINK_TITLE_CHANGED = false;
+              this.link.valueChanged = false;
 
               if (this.link.is()) {
                 this.link.linkDescription = this.link.get().prop('title');
@@ -328,30 +328,55 @@
             modalOpened: function (name, modal) {
               var _this = this;
               if (name == 'link') {
-                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.link.linkDescription + '" type="text" id="redactor-link-title" placeholder="Description for Accessibility" /></section>');
+                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.link.linkDescription + '" type="text" id="redactor-link-title" placeholder="If blank, will use Text value above" /></section>');
+
+                this.link.linkUrlText = $(ID_REDACTOR_LINK_TEXT).val();
+                this.link.description = $(ID_REDACTOR_LINK_TITLE).val();
+
                 $(ID_REDACTOR_LINK_TITLE).on(EVENT_KEYUP, function () {
-                  _this.link.LINK_TITLE_CHANGED = true;
-                  _this.link.LINK_TITLE = $(this).val();
+                  _this.link.valueChanged = true;
+                  _this.link.description = $(this).val();
                 });
+
+                $(ID_REDACTOR_LINK_TEXT).on(EVENT_KEYUP, function () {
+                  _this.link.valueChanged = true;
+                  _this.link.linkUrlText = $(this).val();
+                });
+
               }
             },
 
             modalClosed: function (name) {
-              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml.size() && (this.link.LINK_TITLE_CHANGED || this.link.LINK_TITLE)) {
-                this.link.$linkHtml.prop('title', this.link.LINK_TITLE);
-                this.link.LINK_TITLE = '';
+              var $linkHtml = this.link.$linkHtml,
+                  description = this.link.description;
+
+              if (name == 'link' && !this.link.insertedTriggered && $linkHtml.size() && this.link.valueChanged) {
+
+                if (description) {
+                  $linkHtml.prop('title', description);
+                } else {
+                  $linkHtml.prop('title', this.link.linkUrlText);
+                }
+
+                this.link.description = '';
+                this.link.linkUrlText = '';
                 this.link.insertedTriggered = false;
-                this.link.LINK_TITLE_CHANGED = false;
+                this.link.valueChanged = false;
+
                 $(ID_REDACTOR_LINK_TITLE).off(EVENT_KEYUP);
+                $(ID_REDACTOR_LINK_TEXT).off(EVENT_KEYUP);
               }
 
             },
 
             insertedLink: function (link) {
+              var $link = $(link),
+                  description = this.link.description;
+
+              $link.prop('title', description ? description : $link.text());
+              this.link.description = '';
+              this.link.linkUrlText = '';
               this.link.insertedTriggered = true;
-              var $link = $(link);
-              $link.prop('title', this.link.LINK_TITLE);
-              this.link.LINK_TITLE = '';
             },
 
             fileUpload: function(link, json) {
