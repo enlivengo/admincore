@@ -316,6 +316,7 @@
               this.selection.$currentTag = $currentTag;
               this.link.linkDescription = '';
               this.link.insertedTriggered = false;
+              this.link.LINK_TITLE_CHANGED = false;
 
               if (this.link.is()) {
                 this.link.linkDescription = this.link.get().prop('title');
@@ -329,16 +330,18 @@
               if (name == 'link') {
                 $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.link.linkDescription + '" type="text" id="redactor-link-title" placeholder="Description for Accessibility" /></section>');
                 $(ID_REDACTOR_LINK_TITLE).on(EVENT_KEYUP, function () {
+                  _this.link.LINK_TITLE_CHANGED = true;
                   _this.link.LINK_TITLE = $(this).val();
                 });
               }
             },
 
             modalClosed: function (name) {
-              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml.size() && this.link.LINK_TITLE) {
+              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml.size() && (this.link.LINK_TITLE_CHANGED || this.link.LINK_TITLE)) {
                 this.link.$linkHtml.prop('title', this.link.LINK_TITLE);
                 this.link.LINK_TITLE = '';
                 this.link.insertedTriggered = false;
+                this.link.LINK_TITLE_CHANGED = false;
                 $(ID_REDACTOR_LINK_TITLE).off(EVENT_KEYUP);
               }
 
