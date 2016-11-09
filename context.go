@@ -208,7 +208,12 @@ func (context *Context) JSON(action string, result interface{}) {
 		action = "edit"
 	}
 
-	js, _ := json.MarshalIndent(context.Resource.convertObjectToJSONMap(context, result, action), "", "\t")
+	js, err := json.MarshalIndent(context.Resource.convertObjectToJSONMap(context, result, action), "", "\t")
 	context.Writer.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		result := make(map[string]string)
+		result["error"] = err.Error()
+		js, _ = json.Marshal(result)
+	}
 	context.Writer.Write(js)
 }
