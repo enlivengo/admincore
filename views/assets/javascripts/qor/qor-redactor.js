@@ -120,8 +120,6 @@
       this.$element.
         on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
         on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
-
-      $(document).on(EVENT_KEYUP, ID_REDACTOR_LINK_TITLE, this.getLinkTitle);
     },
 
     unbind: function () {
@@ -201,18 +199,12 @@
       }).qorModal('show').find(CLASS_WRAPPER).append($clone);
     },
 
-    getLinkTitle: function () {
-      QorRedactor.LINK_TITLE = $(ID_REDACTOR_LINK_TITLE).val();
-    },
-
     destroy: function () {
       this.unbind();
       this.$modal.qorModal('hide').remove();
       this.$element.removeData(NAMESPACE);
     }
   };
-
-  QorRedactor.LINK_TITLE = '';
 
   QorRedactor.DEFAULTS = {
     remote: false,
@@ -322,27 +314,32 @@
                 $currentTag = $(this.selection.current());
               }
               this.selection.$currentTag = $currentTag;
-              this.linkTitle = '';
+              this.link.linkDescription = '';
               this.link.insertedTriggered = false;
 
               if (this.link.is()) {
-                this.linkTitle = this.link.get().prop('title');
+                this.link.linkDescription = this.link.get().prop('title');
                 this.link.$linkHtml = $(e.target);
               }
 
             },
 
             modalOpened: function (name, modal) {
+              var _this = this;
               if (name == 'link') {
-                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.linkTitle + '" type="text" id="redactor-link-title" aria-label="Title" placeholder="Description for Accessibility" /></section>');
+                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.link.linkDescription + '" type="text" id="redactor-link-title" placeholder="Description for Accessibility" /></section>');
+                $(ID_REDACTOR_LINK_TITLE).on(EVENT_KEYUP, function () {
+                  _this.link.LINK_TITLE = $(this).val();
+                });
               }
             },
 
             modalClosed: function (name) {
-              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml && this.link.$linkHtml.length && QorRedactor.LINK_TITLE) {
-                this.link.$linkHtml.prop('title', QorRedactor.LINK_TITLE);
-                QorRedactor.LINK_TITLE = '';
+              if (name == 'link' && !this.link.insertedTriggered && this.link.$linkHtml.size() && this.link.LINK_TITLE) {
+                this.link.$linkHtml.prop('title', this.link.LINK_TITLE);
+                this.link.LINK_TITLE = '';
                 this.link.insertedTriggered = false;
+                $(ID_REDACTOR_LINK_TITLE).off(EVENT_KEYUP);
               }
 
             },
@@ -350,8 +347,8 @@
             insertedLink: function (link) {
               this.link.insertedTriggered = true;
               var $link = $(link);
-              $link.prop('title', QorRedactor.LINK_TITLE);
-              QorRedactor.LINK_TITLE = '';
+              $link.prop('title', this.link.LINK_TITLE);
+              this.link.LINK_TITLE = '';
             },
 
             fileUpload: function(link, json) {
