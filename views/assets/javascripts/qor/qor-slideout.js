@@ -287,15 +287,17 @@
           method: method,
           dataType: dataType,
           success: $.proxy(function (response) {
-            var $response;
-            var $content;
+            var $response,
+                $content,
+                $qorFormContainer;
 
             if (method === 'GET') {
               $response = $(response);
 
               $content = $response.find(CLASS_MAIN_CONTENT);
+              $qorFormContainer = $content.find('.qor-form-container');
 
-              this.slideoutType = $content.find('.qor-form-container').data().slideoutType;
+              this.slideoutType = $qorFormContainer.size() && $qorFormContainer.data().slideoutType;
 
               if (!$content.length) {
                 return;
