@@ -273,6 +273,7 @@
           toolbarFixed: true,
           imageResizable: true,
           imagePosition: true,
+          toolbarFixedTarget: '.qor-slideout',
 
           callbacks: {
             init: function () {
