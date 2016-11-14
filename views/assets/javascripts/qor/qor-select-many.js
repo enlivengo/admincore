@@ -172,12 +172,28 @@
       var $selectList = $selectFeild ?  $selectFeild : this.$selectFeild,
           $selectedItems = $selectList.find('[data-primary-key]').not('.' + CLASS_DELETED_ITEM),
           $selector = $selectFeild ? $selectFeild.find(CLASS_SELECT_INPUT) : this.$selector,
-          options = $selector.find('option');
+          $options = $selector.find('option'),
+          $option,
+          data,
+          primaryKey;
 
-      options.prop('selected', false);
+      $options.prop('selected', false);
 
       $selectedItems.each(function () {
-        options.filter('[value="' + $(this).data().primaryKey + '"]').prop('selected', true);
+        primaryKey = $(this).data().primaryKey;
+        $option = $options.filter('[value="' + primaryKey + '"]');
+
+        if (!$option.size()) {
+          data = {
+            primaryKey: primaryKey,
+            displayName: ''
+          };
+          $option = $(Mustache.render(QorSelectMany.SELECT_MANY_OPTION_TEMPLATE, data));
+          $selector.append($option);
+        }
+
+        $option.prop('selected', true);
+
       });
     },
 
@@ -189,7 +205,7 @@
     removeItem: function (data) {
       var primaryKey = data.primaryKey;
 
-      this.$selectFeild.find('[data-primary-key="' + primaryKey + '"]').remove();
+      this.$selectFeild.find('[data-primary-key="' + primaryKey + '"]').find(CLASS_CLEAR_SELECT).click();
       this.changeIcon(data.$clickElement, this.SELECT_MANY_UNSELECTED_ICON);
     },
 
