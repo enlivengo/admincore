@@ -150,12 +150,12 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 				for _, action := range res.Actions {
 					actionController := &controller{Admin: admin, action: action}
 					router.Get(path.Join(prefix, "!action", action.ToParam()), actionController.Action, RouteConfig{
-						Permission:     action.Permission,
+						Permissioner:   action,
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
 					router.Put(path.Join(prefix, "!action", action.ToParam()), actionController.Action, RouteConfig{
-						Permission:     action.Permission,
+						Permissioner:   action,
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
@@ -181,12 +181,12 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 				for _, action := range res.Actions {
 					actionController := &controller{Admin: admin, action: action}
 					router.Get(path.Join(prefix, primaryKey, action.ToParam()), actionController.Action, RouteConfig{
-						Permission:     action.Permission,
+						Permissioner:   action,
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
 					router.Put(path.Join(prefix, primaryKey, action.ToParam()), actionController.Action, RouteConfig{
-						Permission:     action.Permission,
+						Permissioner:   action,
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
