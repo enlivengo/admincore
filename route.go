@@ -186,6 +186,7 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 						Resource:       res,
 					})
 					router.Put(path.Join(prefix, primaryKey, action.ToParam()), actionController.Action, RouteConfig{
+						Permission:     action.Permission,
 						PermissionMode: roles.Update,
 						Resource:       res,
 					})
