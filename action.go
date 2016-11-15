@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
 )
@@ -59,8 +60,8 @@ func (action Action) ToParam() string {
 	return utils.ToParamString(action.Name)
 }
 
-// HasPermission check if current user has permission for the action
-func (action Action) HasPermission(mode roles.PermissionMode, context *Context, records ...interface{}) bool {
+// IsAllowed check if current user has permission to view the action
+func (action Action) IsAllowed(mode roles.PermissionMode, context *Context, records ...interface{}) bool {
 	if action.Visible != nil {
 		for _, record := range records {
 			if !action.Visible(record, context) {
@@ -69,11 +70,23 @@ func (action Action) HasPermission(mode roles.PermissionMode, context *Context, 
 		}
 	}
 
-	if action.Permission == nil {
-		return true
+	if action.Permission != nil {
+		return action.HasPermission(mode, context.Context)
 	}
 
-	return action.Permission.HasPermission(mode, context.Roles...)
+	if context.Resource != nil {
+		return context.Resource.HasPermission(mode, context.Context)
+	}
+	return true
+}
+
+// HasPermission check if current user has permission for the action
+func (action Action) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
+	if action.Permission != nil {
+		return action.Permission.HasPermission(mode, context.Roles...)
+	}
+
+	return true
 }
 
 // FindSelectedRecords find selected records when run bulk actions
