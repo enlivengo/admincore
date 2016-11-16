@@ -230,7 +230,7 @@
 
       if (isNewData) {
         $option = $(Mustache.render(QorSelectMany.SELECT_MANY_OPTION_TEMPLATE, data));
-        this.$selector.append($option);
+        $option.appendTo(this.$selector);
         $option.prop('selected', true);
         this.BottomSheets.hide();
         return;
