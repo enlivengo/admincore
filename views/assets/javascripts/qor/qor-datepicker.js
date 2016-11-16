@@ -156,7 +156,7 @@
 
       }
 
-      $targetInput.val(newValue);
+      $targetInput.val(newValue).trigger('change');
       this.$modal.qorModal('hide');
     },
 
