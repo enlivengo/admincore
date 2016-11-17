@@ -148,6 +148,10 @@
 
       data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
 
+      if (!$select.size()) {
+        return;
+      }
+
       $select[0].value = data.primaryKey;
       template = this.renderSelectOne(data);
 
@@ -162,6 +166,8 @@
         $select.append(Mustache.render(QorSelectOne.SELECT_ONE_OPTION_TEMPLATE, data));
         $select[0].value = data.primaryKey;
       }
+
+      this.$element.trigger('qor.selectone.selected', [data]);
 
       $(CLASS_BOTTOMSHEETS).qorSelectCore('destroy');
       this.BottomSheets.hide();
