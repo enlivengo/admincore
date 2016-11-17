@@ -172,8 +172,8 @@ table{
       }
     }
   }
-  tbody{
-      tr{
+  > tbody{
+      > tr{
         vertical-align: top;
         display: inline-flex;
       td{
