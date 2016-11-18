@@ -41,7 +41,6 @@
       }
 
       $template = $all.filter(options.newClass);
-
       if (!$template.length) {
         return;
       }
@@ -148,8 +147,9 @@
       } else {
 
         if ($target.length) {
-          $item = $(this.template.replace(/\{\{index\}\}/g, ++this.index));
+          $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
           $target.before($item.show());
+          this.index++;
         }
       }
 
