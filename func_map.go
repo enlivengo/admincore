@@ -189,8 +189,9 @@ func (context *Context) renderSections(value interface{}, sections []*Section, p
 		}
 
 		var data = map[string]interface{}{
-			"Title": template.HTML(section.Title),
-			"Rows":  rows,
+			"Section": section,
+			"Title":   template.HTML(section.Title),
+			"Rows":    rows,
 		}
 		if content, err := context.Asset("metas/section.tmpl"); err == nil {
 			if tmpl, err := template.New("section").Funcs(context.FuncMap()).Parse(string(content)); err == nil {
