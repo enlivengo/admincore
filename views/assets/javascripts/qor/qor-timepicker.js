@@ -104,6 +104,10 @@
       var timeReg = /\d{1,2}:\d{1,2}/;
       var dateReg = /^\d{4}-\d{1,2}-\d{1,2}/;
 
+      if (!inputValue) {
+        return;
+      }
+
       if (inputArrLen == 1) {
         if (dateReg.test(inputArr[0])) {
           newDateValue = inputArr[0];
