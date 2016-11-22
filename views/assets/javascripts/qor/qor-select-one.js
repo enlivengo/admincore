@@ -51,7 +51,7 @@
                 on(EVENT_RELOAD, '.' + CLASS_ONE, this.reloadData.bind(this));
 
       this.$element.
-        on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect).
+        on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).
         on(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
     },
 
@@ -60,17 +60,19 @@
                 off(EVENT_RELOAD, '.' + CLASS_ONE, this.reloadData.bind(this));
 
       this.$element.
-        off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect).
+        off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).
         off(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
     },
 
-    clearSelect: function () {
-      var $target = $(this),
+    clearSelect: function (e) {
+      var $target = $(e.target),
           $parent = $target.closest(CLASS_PARENT);
 
       $parent.find(CLASS_SELECT_FIELD).remove();
       $parent.find(CLASS_SELECT_INPUT)[0].value = '';
       $parent.find(CLASS_SELECT_TRIGGER).show();
+
+      this.$element.trigger('qor.selectone.unselected');
 
       return false;
     },
