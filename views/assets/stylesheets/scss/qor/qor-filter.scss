@@ -1,0 +1,28 @@
+// Filter
+// --------------------------------------------------
+
+.qor-actions__filter-time{
+  position: relative;
+  .qor-filter__block{
+    position: absolute;
+    top: 40px;
+    left: 0;
+    min-width: 300px;
+    background-color: #fff;
+    padding: 12px;
+    @include shadow-2dp();
+  }
+  .qor-field__datetimepicker{
+    margin-bottom: 24px;
+  }
+  .qor-filter__block-buttons{
+    margin-bottom: 24px;
+    button{
+      font-size: 12px;
+    }
+  }
+  .qor-filter__button-search{
+    float: right;
+    margin:  12px 0;
+  }
+}
