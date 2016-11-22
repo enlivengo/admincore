@@ -23,7 +23,9 @@ func (res *Resource) Filter(filter *Filter) {
 		// generate default handler
 		filter.Handler = func(db *gorm.DB, filterArgument *FilterArgument) *gorm.DB {
 			if metaValue := filterArgument.Value.Get("Value"); metaValue != nil {
-				return defaultFieldFilter(res, []string{filter.Name}, utils.ToString(metaValue.Value), db, filterArgument.Context)
+				if keyword := utils.ToString(metaValue.Value); keyword != "" {
+					return defaultFieldFilter(res, []string{filter.Name}, keyword, db, filterArgument.Context)
+				}
 			}
 			return db
 		}
