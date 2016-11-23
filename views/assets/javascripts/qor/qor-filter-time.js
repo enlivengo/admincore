@@ -23,6 +23,7 @@
   var CLASS_DATE_START = '.qor-filter__start';
   var CLASS_DATE_END = '.qor-filter__end';
   var CLASS_SEARCH_PARAM = '[data-search-param]';
+  var CLASS_IS_SELECTED = 'is-selected';
 
   function QorFilterTime(element, options) {
     this.$element = $(element);
@@ -65,13 +66,35 @@
     },
 
     show: function () {
+      var scheduleStartAt = this.getUrlParameter('schedule_start_at'),
+          scheduleEndAt = this.getUrlParameter('schedule_end_at');
+
+      if (scheduleStartAt || scheduleEndAt) {
+        this.$timeStart.val(scheduleStartAt);
+        this.$timeEnd.val(scheduleEndAt);
+      }
+
       this.$element.find('.qor-filter__block').toggle();
     },
 
     setFilterTime: function (e) {
       var $target = $(e.target),
-          range = $target.data().filterRange,
+          data = $target.data(),
+          range = data.filterRange,
           startTime, endTime, startDate, endDate;
+
+      if (!range) {
+        return false;
+      }
+
+      $(this.options.label).removeClass(CLASS_IS_SELECTED);
+      $target.addClass(CLASS_IS_SELECTED);
+
+      if (range == 'events') {
+        this.$timeStart.val(data.scheduleStartAt);
+        this.$timeEnd.val(data.scheduleEndAt);
+        return false;
+      }
 
       switch(range) {
         case 'today':
@@ -85,6 +108,10 @@
           startDate = this.startMonthDate;
           endDate = this.endMonthDate;
           break;
+      }
+
+      if (!startDate || !endDate) {
+        return false;
       }
 
       startTime = this.getTime(startDate) + ' 00:00';
@@ -102,6 +129,14 @@
       date = (date < 10) ? ('0' + date) : date;
 
       return (dateNow.getFullYear() + '-' + month + '-' + date);
+    },
+
+    getUrlParameter: function(name) {
+      var search = location.search;
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
 
     updateQueryStringParameter: function(key, value, uri) {
