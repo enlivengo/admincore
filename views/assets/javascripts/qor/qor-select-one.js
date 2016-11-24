@@ -72,8 +72,7 @@
       $parent.find(CLASS_SELECT_INPUT)[0].value = '';
       $parent.find(CLASS_SELECT_TRIGGER).show();
 
-      this.$element.trigger('qor.selectone.unselected');
-
+      $parent.trigger('qor.selectone.unselected');
       return false;
     },
 
@@ -169,7 +168,7 @@
         $select[0].value = data.primaryKey;
       }
 
-      this.$element.trigger('qor.selectone.selected', [data]);
+      $parent.trigger('qor.selectone.selected', [data]);
 
       $(CLASS_BOTTOMSHEETS).qorSelectCore('destroy');
       this.BottomSheets.hide();
