@@ -228,6 +228,12 @@
 
   );
 
+  QorRedactor.escapeHtml = function (str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  };
+
   QorRedactor.MODAL = (
     '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
       '<div class="mdl-card mdl-shadow--2dp" role="document">' +
@@ -336,12 +342,12 @@
 
                 $(ID_REDACTOR_LINK_TITLE).on(EVENT_KEYUP, function () {
                   _this.link.valueChanged = true;
-                  _this.link.description = $(this).val();
+                  _this.link.description = window._.escape($(this).val());
                 });
 
                 $(ID_REDACTOR_LINK_TEXT).on(EVENT_KEYUP, function () {
                   _this.link.valueChanged = true;
-                  _this.link.linkUrlText = $(this).val();
+                  _this.link.linkUrlText = window._.escape($(this).val());
                 });
 
               }
