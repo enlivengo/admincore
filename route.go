@@ -55,6 +55,10 @@ func newRouter() *Router {
 	}}
 }
 
+func (r *Router) Mounted() bool {
+	return r.Prefix != ""
+}
+
 // Use reigster a middleware to the router
 func (r *Router) Use(middleware *Middleware) {
 	// compile middleware
