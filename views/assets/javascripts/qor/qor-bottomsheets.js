@@ -48,13 +48,22 @@
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
   }
 
-  function updateQueryStringParameter(uri, key, value) {
-    var escapedkey = String(key).replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
-    var re = new RegExp('([?&])' + escapedkey + '=.*?(&|$)', 'i');
-    var separator = uri.indexOf('?') !== -1 ? '&' : '?';
+  function updateQueryStringParameter(key, value, uri) {
+    var escapedkey = String(key).replace(/[\\^$*+?.()|[\]{}]/g, '\\$&'),
+        re = new RegExp('([?&])' + escapedkey + '=.*?(&|$)', 'i'),
+        separator = uri.indexOf('?') !== -1 ? '&' : '?';
+
     if (uri.match(re)) {
-      return uri.replace(re, '$1' + key + '=' + value + '$2');
-    } else {
+      if (value) {
+        return uri.replace(re, '$1' + key + '=' + value + '$2');
+      } else {
+        if (RegExp.$1 === '?' || RegExp.$1 === RegExp.$2) {
+          return uri.replace(re, '$1');
+        } else {
+          return uri.replace(re, '');
+        }
+      }
+    } else if (value){
       return uri + separator + key + '=' + value;
     }
   }
@@ -217,7 +226,7 @@
 
       fakeURL = new URL(URL_GETQOR + url);
       value = getUrlParameter(key, fakeURL.search);
-      filterURL = this.filterURL = updateQueryStringParameter(filterURL, key, value);
+      filterURL = this.filterURL = updateQueryStringParameter(key, value, filterURL);
 
       return filterURL;
     },

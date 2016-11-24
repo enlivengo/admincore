@@ -146,14 +146,22 @@
           separator = href.indexOf('?') !== -1 ? '&' : '?';
 
       if (href.match(re)) {
-        return href.replace(re, '$1' + key + '=' + value + '$2');
-      } else {
+        if (value) {
+          return href.replace(re, '$1' + key + '=' + value + '$2');
+        } else {
+          if (RegExp.$1 === '?' || RegExp.$1 === RegExp.$2) {
+            return href.replace(re, '$1');
+          } else {
+            return href.replace(re, '');
+          }
+        }
+      } else if (value){
         return href + separator + key + '=' + value;
       }
     },
 
     search: function () {
-      var $searchParam = this.$searchParam, uri, _this = this;
+      var $searchParam = this.$searchParam, uri, _this = this, type = 'qor.filter.time';
 
 
       if (!$searchParam.size()) {
@@ -161,17 +169,15 @@
       }
 
       $searchParam.each(function () {
-        var $this = $(this);
-        uri = _this.updateQueryStringParameter($this.data().searchParam, $this.val(), uri);
+        var $this = $(this), searchParam = $this.data().searchParam, val = $this.val();
+        uri = _this.updateQueryStringParameter(searchParam, val, uri);
       });
 
       if (this.$element.closest(CLASS_BOTTOMSHEETS).length) {
-        // $(CLASS_BOTTOMSHEETS).trigger(EVENT_FILTER_CHANGE, [search, paramName]);
+        $(CLASS_BOTTOMSHEETS).trigger(EVENT_FILTER_CHANGE, [uri, type]);
       } else {
         location.href = uri;
       }
-
-
     },
 
     destroy: function () {
