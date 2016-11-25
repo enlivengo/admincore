@@ -596,13 +596,24 @@ func (context *Context) patchURL(url string, params ...interface{}) (patchedURL 
 }
 
 func (context *Context) themesClass() (result string) {
-	var results []string
+	var results = map[string]bool{}
 	if context.Resource != nil {
 		for _, theme := range context.Resource.Config.Themes {
-			results = append(results, "qor-theme-"+theme.GetName())
+			if strings.HasPrefix(theme.GetName(), "-") {
+				results[strings.TrimPrefix(theme.GetName(), "-")] = false
+			} else if _, ok := results[theme.GetName()]; !ok {
+				results[theme.GetName()] = true
+			}
 		}
 	}
-	return strings.Join(results, " ")
+
+	var names []string
+	for name, enabled := range results {
+		if enabled {
+			names = append(names, "qor-theme-"+name)
+		}
+	}
+	return strings.Join(names, " ")
 }
 
 func (context *Context) javaScriptTag(names ...string) template.HTML {

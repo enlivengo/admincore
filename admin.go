@@ -160,6 +160,7 @@ func (admin *Admin) NewResource(value interface{}, config ...*Config) *Resource 
 // AddResource make a model manageable from admin interface
 func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource {
 	res := admin.newResource(value, config...)
+	res.UseTheme("slideout")
 
 	if !res.Config.Invisible {
 		var menuName string
