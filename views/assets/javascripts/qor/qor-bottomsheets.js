@@ -316,6 +316,7 @@
                         var $error;
 
                         if (xhr.status === 422) {
+
                             $body.find('.qor-error').remove();
                             $form.find('.qor-field').removeClass('is-error').find('.qor-field__error').remove();
 
