@@ -94,7 +94,6 @@ $(function() {
                     window.location = openData.url;
                     return false;
                 }
-                return false;
             }
 
             // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
