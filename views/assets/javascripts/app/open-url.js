@@ -1,4 +1,4 @@
-$(function () {
+$(function() {
 
     'use strict';
 
@@ -9,10 +9,10 @@ $(function () {
         CLASS_IS_SELECTED = 'is-selected',
 
         hasSlideoutTheme = $body.hasClass('qor-theme-slideout'),
-        isSlideoutOpened = function(){
+        isSlideoutOpened = function() {
             return $body.hasClass('qor-slideout-open');
         },
-        isBottomsheetsOpened = function(){
+        isBottomsheetsOpened = function() {
             return $body.hasClass('qor-bottomsheets-open');
         };
 
@@ -25,16 +25,16 @@ $(function () {
     Slideout = $body.data('qor.slideout');
     BottomSheets = $body.data('qor.bottomsheets');
 
-    function clearSelectedCss () {
+    function clearSelectedCss() {
         $('[data-url]').removeClass(CLASS_IS_SELECTED);
     }
 
-    function toggleSelectedCss (ele) {
+    function toggleSelectedCss(ele) {
         $('[data-url]').removeClass(CLASS_IS_SELECTED);
         ele.addClass(CLASS_IS_SELECTED);
     }
 
-    function collectSelectID () {
+    function collectSelectID() {
         var $checked = $('.qor-table tbody').find('.mdl-checkbox__input:checked'),
             IDs = [];
 
@@ -42,14 +42,14 @@ $(function () {
             return;
         }
 
-        $checked.each(function () {
+        $checked.each(function() {
             IDs.push($(this).closest('tr').data('primary-key'));
         });
 
         return IDs;
     }
 
-    $(document).on('click.qor.openUrl', '[data-url]', function (e) {
+    $(document).on('click.qor.openUrl', '[data-url]', function(e) {
         var $this = $(this),
             $target = $(e.target),
             isNewButton = $this.hasClass('qor-button--new'),
@@ -91,9 +91,10 @@ $(function () {
                         return false;
                     }
                 } else {
-                    window.location = openData('url');
+                    window.location = openData.url;
+                    return false;
                 }
-                return;
+                return false;
             }
 
             // Open in BottmSheet: slideout is opened or openType is Bottom Sheet
