@@ -289,7 +289,7 @@
                     beforeSend: function() {
                         $submit.prop('disabled', true);
                     },
-                    success: function(data) {
+                    success: function() {
 
                         $('.qor-error').remove();
 
