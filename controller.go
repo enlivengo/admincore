@@ -202,6 +202,7 @@ func (ac *controller) Action(context *Context) {
 				context.JSON("OK", map[string]string{"message": message, "status": "ok"})
 			}).Respond(context.Request)
 		} else {
+			context.Writer.WriteHeader(HTTPUnprocessableEntity)
 			message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
 			context.JSON("OK", map[string]string{"error": message, "status": "error"})
 		}
