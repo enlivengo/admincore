@@ -14,6 +14,7 @@
     'use strict';
 
     var location = window.location;
+    var $document = $(document);
     var NAMESPACE = 'qor.filter';
     var EVENT_FILTER_CHANGE = 'filterChanged.' + NAMESPACE;
     var EVENT_ENABLE = 'enable.' + NAMESPACE;
@@ -23,6 +24,8 @@
     var CLASS_DATE_START = '.qor-filter__start';
     var CLASS_DATE_END = '.qor-filter__end';
     var CLASS_SEARCH_PARAM = '[data-search-param]';
+    var CLASS_FILTER_SELECTOR = '.qor-filter__dropdown';
+    var CLASS_FILTER_TOGGLE = '.qor-filter-toggle';
     var CLASS_IS_SELECTED = 'is-selected';
 
     function QorFilterTime(element, options) {
@@ -36,9 +39,12 @@
 
         init: function() {
             this.bind();
-            this.$timeStart = this.$element.find(CLASS_DATE_START);
-            this.$timeEnd = this.$element.find(CLASS_DATE_END);
-            this.$searchParam = this.$element.find(CLASS_SEARCH_PARAM);
+            var $element = this.$element;
+
+            this.$timeStart = $element.find(CLASS_DATE_START);
+            this.$timeEnd = $element.find(CLASS_DATE_END);
+            this.$searchParam = $element.find(CLASS_SEARCH_PARAM);
+            this.$searchButton = $element.find(this.options.button);
 
             this.startWeekDate = window.moment().startOf('isoweek').toDate();
             this.endWeekDate = window.moment().endOf('isoweek').toDate();
@@ -55,7 +61,10 @@
             this.$element.
             on(EVENT_CLICK, options.trigger, this.show.bind(this)).
             on(EVENT_CLICK, options.label, this.setFilterTime.bind(this)).
+            on(EVENT_CLICK, options.clear, this.clear.bind(this)).
             on(EVENT_CLICK, options.button, this.search.bind(this));
+
+            $document.on(EVENT_CLICK, this.close);
         },
 
         unbind: function() {
@@ -63,6 +72,7 @@
             this.$element.
             off(EVENT_CLICK, options.trigger, this.show.bind(this)).
             off(EVENT_CLICK, options.label, this.setFilterTime.bind(this)).
+            off(EVENT_CLICK, options.clear, this.clear.bind(this)).
             off(EVENT_CLICK, options.button, this.search.bind(this));
         },
 
@@ -85,6 +95,16 @@
             this.$element.find('.qor-filter__block').toggle();
         },
 
+        close: function(e) {
+            var $target = $(e.target),
+                $filter = $(CLASS_FILTER_SELECTOR),
+                isInFilter = $target.closest(CLASS_FILTER_SELECTOR).size() || $target.closest(CLASS_FILTER_TOGGLE).size();
+
+            if (!isInFilter && $filter.is(':visible')) {
+                $filter.hide();
+            }
+        },
+
         setFilterTime: function(e) {
             var $target = $(e.target),
                 data = $target.data(),
@@ -101,6 +121,7 @@
             if (range == 'events') {
                 this.$timeStart.val(data.scheduleStartAt);
                 this.$timeEnd.val(data.scheduleEndAt);
+                this.$searchButton.click();
                 return false;
             }
 
@@ -127,6 +148,7 @@
 
             this.$timeStart.val(startTime);
             this.$timeEnd.val(endTime);
+            this.$searchButton.click();
         },
 
         getTime: function(dateNow) {
@@ -137,6 +159,20 @@
             date = (date < 10) ? ('0' + date) : date;
 
             return (dateNow.getFullYear() + '-' + month + '-' + date);
+        },
+
+        clear: function() {
+            var $trigger = $(this.options.trigger),
+                $label = $trigger.find('.qor-selector-label');
+
+            $trigger.removeClass('active clearable');
+            $label.html($label.data('label'));
+            this.$timeStart.val('');
+            this.$timeEnd.val('');
+
+            this.$searchButton.click();
+            return false;
+
         },
 
         getUrlParameter: function(name) {
@@ -201,7 +237,8 @@
     QorFilterTime.DEFAULTS = {
         label: false,
         trigger: false,
-        button: false
+        button: false,
+        clear: false
     };
 
     QorFilterTime.plugin = function(options) {
@@ -229,7 +266,8 @@
         var options = {
             label: '.qor-filter__block-buttons button',
             trigger: 'a.qor-filter-toggle',
-            button: '.qor-filter__button-search'
+            button: '.qor-filter__button-search',
+            clear: '.qor-selector-clear'
         };
 
         $(document).
