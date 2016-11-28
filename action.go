@@ -23,6 +23,14 @@ func (res *Resource) Action(action *Action) {
 		}
 	}
 
+	if action.URLOpenType == "" {
+		if action.Resource != nil {
+			action.URLOpenType = "bottom-sheet"
+		} else if action.Method == "GET" {
+			action.URLOpenType = "_blank"
+		}
+	}
+
 	res.Actions = append(res.Actions, action)
 }
 
@@ -44,15 +52,16 @@ type ActionArgument struct {
 
 // Action action definiation
 type Action struct {
-	Name       string
-	Label      string
-	Method     string
-	URL        func(record interface{}, context *Context) string
-	Visible    func(record interface{}, context *Context) bool
-	Handle     func(argument *ActionArgument) error
-	Modes      []string
-	Resource   *Resource
-	Permission *roles.Permission
+	Name        string
+	Label       string
+	Method      string
+	URL         func(record interface{}, context *Context) string
+	URLOpenType string
+	Visible     func(record interface{}, context *Context) bool
+	Handle      func(argument *ActionArgument) error
+	Modes       []string
+	Resource    *Resource
+	Permission  *roles.Permission
 }
 
 // ToParam used to register routes for actions
