@@ -25,14 +25,6 @@ $(function() {
     Slideout = $body.data('qor.slideout');
     BottomSheets = $body.data('qor.bottomsheets');
 
-    function getUrlParameter(name, url) {
-        var search = url || window.location.search;
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    }
-
     function clearSelectedCss() {
         $('[data-url]').removeClass(CLASS_IS_SELECTED);
     }
@@ -65,8 +57,7 @@ $(function() {
             isInTable = $this.is('.qor-table tr[data-url]') || $this.closest('.qor-js-table').length,
             openData = $this.data(),
             actionData,
-            search = openData.url.split('?')[1],
-            openType = getUrlParameter('qor_open_type', search ? '?' + search : undefined),
+            openType = openData.openType,
             isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
 
 
@@ -84,13 +75,13 @@ $(function() {
 
         if (!openData.method || openData.method.toUpperCase() == "GET") {
             // Open in BottmSheet: is action button, open type is bottom-sheet
-            if (isActionButton || openData.openType == 'bottom-sheet' || openType == 'bottomsheet') {
+            if (isActionButton || openType == 'bottomsheet') {
                 BottomSheets.open(openData);
                 return false;
             }
 
             // Slideout or New Page: table items, new button, edit button
-            if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openData.openType == 'slideout' || openType == 'slideout') {
+            if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openType == 'slideout') {
                 if (hasSlideoutTheme) {
                     if ($this.hasClass(CLASS_IS_SELECTED)) {
                         Slideout.hide();
