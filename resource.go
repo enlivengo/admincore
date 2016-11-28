@@ -491,7 +491,7 @@ func (res *Resource) allowedSections(sections []*Section, context *Context, role
 }
 
 func (res *Resource) configure() {
-	modelType := res.GetAdmin().Config.DB.NewScope(res.Value).GetModelStruct().ModelType
+	modelType := utils.ModelType(res.Value)
 	for i := 0; i < modelType.NumField(); i++ {
 		if fieldStruct := modelType.Field(i); fieldStruct.Anonymous {
 			if injector, ok := reflect.New(fieldStruct.Type).Interface().(resource.ConfigureResourceInterface); ok {

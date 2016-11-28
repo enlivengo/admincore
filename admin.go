@@ -127,7 +127,7 @@ func (admin *Admin) newResource(value interface{}, config ...*Config) *Resource 
 	}
 
 	// Configure resource when initializing
-	modelType := admin.Config.DB.NewScope(res.Value).GetModelStruct().ModelType
+	modelType := utils.ModelType(res.Value)
 	for i := 0; i < modelType.NumField(); i++ {
 		if fieldStruct := modelType.Field(i); fieldStruct.Anonymous {
 			if injector, ok := reflect.New(fieldStruct.Type).Interface().(resource.ConfigureResourceBeforeInitializeInterface); ok {
