@@ -4,6 +4,8 @@ Instantly create a beautiful, cross platform, configurable Admin Interface and A
 
 [![GoDoc](https://godoc.org/github.com/qor/admin?status.svg)](https://godoc.org/github.com/qor/admin)
 
+**For security issues, please send us an email to security@getqor.com and give us time to respond BEFORE posting as an issue or reporting on public forums.**
+
 ## Documentation
 
 <https://doc.getqor.com/chapter2/setup.html>
