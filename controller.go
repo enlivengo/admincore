@@ -193,18 +193,22 @@ func (ac *controller) Action(context *Context) {
 			actionArgument.Argument = result
 		}
 
-		if err := action.Handle(&actionArgument); err == nil {
-			message := string(context.t("qor_admin.actions.executed_successfully", "Action {{.Name}}: Executed successfully", action))
-			responder.With("html", func() {
-				context.Flash(message, "success")
-				http.Redirect(context.Writer, context.Request, context.Request.Referer(), http.StatusFound)
-			}).With("json", func() {
-				context.JSON("OK", map[string]string{"message": message, "status": "ok"})
-			}).Respond(context.Request)
-		} else {
-			context.Writer.WriteHeader(HTTPUnprocessableEntity)
-			message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
-			context.JSON("OK", map[string]string{"error": message, "status": "error"})
+		err := action.Handle(&actionArgument)
+
+		if !actionArgument.SkipDefaultResponse {
+			if err == nil {
+				message := string(context.t("qor_admin.actions.executed_successfully", "Action {{.Name}}: Executed successfully", action))
+				responder.With("html", func() {
+					context.Flash(message, "success")
+					http.Redirect(context.Writer, context.Request, context.Request.Referer(), http.StatusFound)
+				}).With("json", func() {
+					context.JSON("OK", map[string]string{"message": message, "status": "ok"})
+				}).Respond(context.Request)
+			} else {
+				context.Writer.WriteHeader(HTTPUnprocessableEntity)
+				message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
+				context.JSON("OK", map[string]string{"error": message, "status": "error"})
+			}
 		}
 	}
 }

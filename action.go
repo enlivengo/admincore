@@ -45,9 +45,10 @@ func (res *Resource) GetAction(name string) *Action {
 
 // ActionArgument action argument that used in handle
 type ActionArgument struct {
-	PrimaryValues []string
-	Context       *Context
-	Argument      interface{}
+	PrimaryValues       []string
+	Context             *Context
+	Argument            interface{}
+	SkipDefaultResponse bool
 }
 
 // Action action definiation
