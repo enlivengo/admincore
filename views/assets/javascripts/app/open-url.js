@@ -73,8 +73,6 @@ $(function() {
             });
         }
 
-        console.log(openData)
-
         if (!openData.method || openData.method.toUpperCase() == "GET") {
             // Open in BottmSheet: is action button, open type is bottom-sheet
             if (isActionButton || openType == 'bottomsheet') {
