@@ -283,6 +283,10 @@
             // <form action="/admin/products/!action/localize" method="POST" enctype="multipart/form-data" data-normal-submit="true"></form>
             var normalSubmit = $form.data().normalSubmit;
 
+            if (normalSubmit) {
+                return;
+            }
+
             if (FormData) {
                 e.preventDefault();
 
@@ -296,11 +300,6 @@
                         $submit.prop('disabled', true);
                     },
                     success: function() {
-
-                        if (normalSubmit) {
-                            $form.submit();
-                            return;
-                        }
 
                         $('.qor-error').remove();
 
@@ -340,7 +339,6 @@
                     }
                 });
             }
-            return false;
         },
 
         load: function(url, data, callback) {

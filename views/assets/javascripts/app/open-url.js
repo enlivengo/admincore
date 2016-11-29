@@ -35,7 +35,7 @@ $(function() {
     }
 
     function collectSelectID() {
-        var $checked = $('.qor-table tbody').find('.mdl-checkbox__input:checked'),
+        var $checked = $('.qor-js-table tbody').find('.mdl-checkbox__input:checked'),
             IDs = [];
 
         if (!$checked.length) {
@@ -72,6 +72,8 @@ $(function() {
                 actionData: actionData
             });
         }
+
+        console.log(openData)
 
         if (!openData.method || openData.method.toUpperCase() == "GET") {
             // Open in BottmSheet: is action button, open type is bottom-sheet
