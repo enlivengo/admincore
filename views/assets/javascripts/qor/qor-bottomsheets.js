@@ -299,6 +299,7 @@
 
                         if (normalSubmit) {
                             $form.submit();
+                            return;
                         }
 
                         $('.qor-error').remove();
