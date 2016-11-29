@@ -276,17 +276,12 @@
             var $form = $(form);
             var _this = this;
             var $submit = $form.find(':submit');
-            var normalSubmit = $form.data().normalSubmit;
 
             // will submit form as normal, 
             // if you need download file after submit form or other things, please add
             // data-use-normal-submit="true" to form tag
             // <form action="/admin/products/!action/localize" method="POST" enctype="multipart/form-data" data-normal-submit="true"></form>
-
-            if (normalSubmit) {
-                return;
-            }
-
+            var normalSubmit = $form.data().normalSubmit;
 
             if (FormData) {
                 e.preventDefault();
@@ -301,6 +296,10 @@
                         $submit.prop('disabled', true);
                     },
                     success: function() {
+
+                        if (normalSubmit) {
+                            $form.submit();
+                        }
 
                         $('.qor-error').remove();
 
@@ -340,6 +339,7 @@
                     }
                 });
             }
+            return false;
         },
 
         load: function(url, data, callback) {
