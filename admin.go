@@ -44,6 +44,7 @@ func New(config *qor.Config) *Admin {
 	}
 
 	admin.SetAssetFS(&AssetFileSystem{})
+	admin.registerCompositePrimaryKeyCallback()
 	return &admin
 }
 

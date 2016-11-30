@@ -101,7 +101,7 @@ func (context *Context) URLFor(value interface{}, resources ...*Resource) string
 
 			for _, field := range scope.PrimaryFields() {
 				if field.DBName != primaryField.DBName {
-					primaryValues[fmt.Sprintf("primary_key[%v]", field.DBName)] = fmt.Sprint(reflect.Indirect(field.Field).Interface())
+					primaryValues[fmt.Sprintf("primary_key[%v_%v]", scope.TableName(), field.DBName)] = fmt.Sprint(reflect.Indirect(field.Field).Interface())
 				}
 			}
 
