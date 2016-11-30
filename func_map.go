@@ -107,10 +107,11 @@ func (context *Context) URLFor(value interface{}, resources ...*Resource) string
 
 			result := path.Join(getPrefix(res), res.ToParam(), primaryKey)
 			if len(primaryValues) > 0 {
-				result = result + "?"
+				var primaryValueParams []string
 				for key, value := range primaryValues {
-					result = fmt.Sprintf("%v%v=%v", result, key, url.QueryEscape(value))
+					primaryValueParams = append(primaryValueParams, fmt.Sprintf("%v=%v", key, url.QueryEscape(value)))
 				}
+				result = result + "?" + strings.Join(primaryValueParams, "&")
 			}
 			return result
 		}
