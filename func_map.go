@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"net/url"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -91,8 +92,27 @@ func (context *Context) URLFor(value interface{}, resources ...*Resource) string
 				return path.Join(getPrefix(res), res.ToParam())
 			}
 
-			primaryKey := fmt.Sprint(context.GetDB().NewScope(value).PrimaryKeyValue())
-			return path.Join(getPrefix(res), res.ToParam(), primaryKey)
+			var (
+				scope         = context.GetDB().NewScope(value)
+				primaryField  = scope.PrimaryField()
+				primaryKey    = fmt.Sprint(reflect.Indirect(primaryField.Field).Interface())
+				primaryValues = map[string]string{}
+			)
+
+			for _, field := range scope.PrimaryFields() {
+				if field.DBName != primaryField.DBName {
+					primaryValues[fmt.Sprintf("primary_key[%v]", field.DBName)] = fmt.Sprint(reflect.Indirect(field.Field).Interface())
+				}
+			}
+
+			result := path.Join(getPrefix(res), res.ToParam(), primaryKey)
+			if len(primaryValues) > 0 {
+				result = result + "?"
+				for key, value := range primaryValues {
+					result = fmt.Sprintf("%v%v=%v", result, key, url.QueryEscape(value))
+				}
+			}
+			return result
 		}
 	}
 	return ""
