@@ -202,6 +202,8 @@
             } else if (value) {
                 return href + separator + key + '=' + value;
             }
+
+            return uri;
         },
 
         search: function() {
