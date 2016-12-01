@@ -36,7 +36,7 @@ func (admin Admin) registerCompositePrimaryKeyCallback() {
 func compositePrimaryKeyQueryCallback(scope *gorm.Scope) {
 	tableName := scope.TableName()
 	for _, primaryField := range scope.PrimaryFields() {
-		if value, ok := scope.Get(fmt.Sprintf("primary_key[%v_%v]", tableName, primaryField.DBName)); ok {
+		if value, ok := scope.Get(fmt.Sprintf("primary_key[%v_%v]", tableName, primaryField.DBName)); ok && value != "" {
 			scope.Search.Where(fmt.Sprintf("%v = ?", scope.Quote(primaryField.DBName)), value)
 		}
 	}
