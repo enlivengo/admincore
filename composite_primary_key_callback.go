@@ -28,12 +28,18 @@ func (admin Admin) registerCompositePrimaryKeyCallback() {
 			},
 		})
 
-		db.Callback().Query().Before("gorm:query").Register("admin:query_composite_primary_key", compositePrimaryKeyQueryCallback)
-		db.Callback().RowQuery().Before("gorm:query").Register("admin:query_composite_primary_key", compositePrimaryKeyQueryCallback)
+		db.Callback().Query().Before("gorm:query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
+		db.Callback().RowQuery().Before("gorm:query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
 	}
 }
 
+var DisableCompositePrimaryKeyMode = "composite_primary_key:query:disable"
+
 func compositePrimaryKeyQueryCallback(scope *gorm.Scope) {
+	if value, ok := scope.Get(DisableCompositePrimaryKeyMode); ok && value != "" {
+		return
+	}
+
 	tableName := scope.TableName()
 	for _, primaryField := range scope.PrimaryFields() {
 		if value, ok := scope.Get(fmt.Sprintf("primary_key[%v_%v]", tableName, primaryField.DBName)); ok && value != "" {
