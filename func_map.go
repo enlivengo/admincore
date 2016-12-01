@@ -616,6 +616,16 @@ func (context *Context) patchURL(url string, params ...interface{}) (patchedURL 
 	return utils.PatchURL(url, params...)
 }
 
+// JoinCurrentURL is a convinent wrapper for qor/utils.JoinURL
+func (context *Context) joinCurrentURL(params ...interface{}) (joinedURL string, err error) {
+	return utils.JoinURL(context.Request.URL.String(), params...)
+}
+
+// JoinURL is a convinent wrapper for qor/utils.JoinURL
+func (context *Context) joinURL(url string, params ...interface{}) (joinedURL string, err error) {
+	return utils.JoinURL(url, params...)
+}
+
 func (context *Context) themesClass() (result string) {
 	var results = map[string]bool{}
 	if context.Resource != nil {
@@ -996,6 +1006,8 @@ func (context *Context) FuncMap() template.FuncMap {
 		"link_to":            context.linkTo,
 		"patch_current_url":  context.patchCurrentURL,
 		"patch_url":          context.patchURL,
+		"join_current_url":   context.joinCurrentURL,
+		"join_url":           context.joinURL,
 		"logout_url":         context.logoutURL,
 		"search_center_path": func() string { return path.Join(context.Admin.router.Prefix, "!search") },
 		"new_resource_path":  context.newResourcePath,
