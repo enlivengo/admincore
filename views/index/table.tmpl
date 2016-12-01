@@ -22,6 +22,8 @@
     <tbody>
       {{range $result := .Result}}
         {{$primaryKey := primary_key_of $result}}
+        {{$uniqueKey := unique_key_of $result}}
+
         <tr data-primary-key="{{$primaryKey}}" data-url="{{url_for $result $resource}}">
           {{range $meta := $metas}}
             {{$value := render_meta $result $meta}}
@@ -33,11 +35,11 @@
           <td class="mdl-data-table__cell--non-numeric qor-table__actions">
             {{$allowed_actions := allowed_actions $resource.Actions "menu_item" $result}}
             {{if $allowed_actions}}
-              <button id="actions-for-{{$primaryKey}}" class="mdl-button mdl-js-button mdl-button--icon qor-button--actions">
+              <button id="actions-for-{{$uniqueKey}}" class="mdl-button mdl-js-button mdl-button--icon qor-button--actions">
                 <i class="material-icons">more_vert</i>
               </button>
 
-              <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu" for="actions-for-{{$primaryKey}}">
+              <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu" for="actions-for-{{$uniqueKey}}">
                 {{range $action := $allowed_actions}}
                   <li class="mdl-menu__item" qor-icon-name="{{$action.Name}}">
                     {{if (eq $action.URLOpenType "_blank")}}

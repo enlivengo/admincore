@@ -47,6 +47,18 @@ func (context *Context) primaryKeyOf(value interface{}) interface{} {
 	return fmt.Sprint(value)
 }
 
+func (context *Context) uniqueKeyOf(value interface{}) interface{} {
+	if reflect.Indirect(reflect.ValueOf(value)).Kind() == reflect.Struct {
+		scope := &gorm.Scope{Value: value}
+		var primaryValues []string
+		for _, primaryField := range scope.PrimaryFields() {
+			primaryValues = append(primaryValues, fmt.Sprint(primaryField.Field.Interface()))
+		}
+		return url.QueryEscape(strings.Join(primaryValues, "_ "))
+	}
+	return fmt.Sprint(value)
+}
+
 func (context *Context) isNewRecord(value interface{}) bool {
 	if value == nil {
 		return true
@@ -947,6 +959,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"is_equal":             context.isEqual,
 		"is_included":          context.isIncluded,
 		"primary_key_of":       context.primaryKeyOf,
+		"unique_key_of":        context.uniqueKeyOf,
 		"formatted_value_of":   context.FormattedValueOf,
 		"raw_value_of":         context.RawValueOf,
 
