@@ -7,7 +7,7 @@
   <div class="qor-action-forms" data-toggle="qor.action.bulk">
     {{range $action := $allowed_actions}}
       <button class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button qor-action-button" type="button"
-              data-url="{{if $action.URL}}{{call $action.URL $result $context}}{{else}}{{url_for $result $resource}}/{{$action.ToParam}}{{end}}"
+              data-url="{{if $action.URL}}{{call $action.URL $result $context}}{{else}}{{join_url (url_for $result $resource) $action.ToParam}}{{end}}"
               {{if $action.URLOpenType}}data-open-type="{{$action.URLOpenType}}"
               {{else if (and (not $action.Resource) (ne $action.Method "GET"))}}
               data-ajax-form="true" data-dataType="json" data-confirm="{{t "qor_admin.form.are_you_sure" "Are You Sure?"}}" data-method="{{$action.Method}}"{{end}}>
