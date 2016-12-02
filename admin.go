@@ -148,6 +148,8 @@ func (admin *Admin) newResource(value interface{}, config ...*Config) *Resource 
 		}
 		return findOneHandler(result, metaValues, context)
 	}
+
+	res.UseTheme("slideout")
 	return res
 }
 
@@ -161,7 +163,6 @@ func (admin *Admin) NewResource(value interface{}, config ...*Config) *Resource 
 // AddResource make a model manageable from admin interface
 func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource {
 	res := admin.newResource(value, config...)
-	res.UseTheme("slideout")
 
 	if !res.Config.Invisible {
 		var menuName string
