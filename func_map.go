@@ -107,9 +107,13 @@ func (context *Context) URLFor(value interface{}, resources ...*Resource) string
 			var (
 				scope         = context.GetDB().NewScope(value)
 				primaryField  = scope.PrimaryField()
-				primaryKey    = fmt.Sprint(reflect.Indirect(primaryField.Field).Interface())
+				primaryKey    string
 				primaryValues = map[string]string{}
 			)
+
+			if primaryField != nil {
+				primaryKey = fmt.Sprint(reflect.Indirect(primaryField.Field).Interface())
+			}
 
 			for _, field := range scope.PrimaryFields() {
 				if field.DBName != primaryField.DBName {
