@@ -140,6 +140,7 @@ func (selectOneConfig *SelectOneConfig) prepareDataSource(field *gorm.StructFiel
 			cloneContext := context.clone()
 			cloneContext.setResource(selectOneConfig.RemoteDataResource)
 			searcher := &Searcher{Context: cloneContext}
+			searcher.Pagination.CurrentPage = -1
 			searchResults, _ := searcher.FindMany()
 
 			reflectValues := reflect.Indirect(reflect.ValueOf(searchResults))
