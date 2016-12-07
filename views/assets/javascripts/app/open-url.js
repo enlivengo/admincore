@@ -18,9 +18,7 @@ $(function() {
 
 
     $body.qorBottomSheets();
-    if (hasSlideoutTheme) {
-        $body.qorSlideout();
-    }
+    $body.qorSlideout();
 
     Slideout = $body.data('qor.slideout');
     BottomSheets = $body.data('qor.bottomsheets');
@@ -82,7 +80,7 @@ $(function() {
 
             // Slideout or New Page: table items, new button, edit button
             if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openType == 'slideout') {
-                if (hasSlideoutTheme) {
+                if (hasSlideoutTheme || openType == 'slideout') {
                     if ($this.hasClass(CLASS_IS_SELECTED)) {
                         Slideout.hide();
                         clearSelectedCss();
@@ -112,8 +110,6 @@ $(function() {
                 BottomSheets.open(openData);
                 return false;
             }
-
         }
     });
-
 });

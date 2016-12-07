@@ -25,7 +25,7 @@ func (res *Resource) Action(action *Action) {
 
 	if action.URLOpenType == "" {
 		if action.Resource != nil {
-			action.URLOpenType = "bottom-sheet"
+			action.URLOpenType = "bottomsheet"
 		} else if action.Method == "GET" {
 			action.URLOpenType = "_blank"
 		}
