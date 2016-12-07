@@ -164,7 +164,7 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 		clone.Result = results[0]
 	}
 
-	return context.renderWith(name, clone)
+	return clone.renderWith(name, clone)
 }
 
 // Execute execute template with layout
