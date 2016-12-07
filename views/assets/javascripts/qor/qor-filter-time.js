@@ -119,8 +119,8 @@
             $target.addClass(CLASS_IS_SELECTED);
 
             if (range == 'events') {
-                this.$timeStart.val(data.scheduleStartAt);
-                this.$timeEnd.val(data.scheduleEndAt);
+                this.$timeStart.val(data.scheduleStartAt || '');
+                this.$timeEnd.val(data.scheduleEndAt || '');
                 this.$searchButton.click();
                 return false;
             }
@@ -203,12 +203,13 @@
                 return href + separator + key + '=' + value;
             }
 
-            return uri;
+            return href;
         },
 
         search: function() {
             var $searchParam = this.$searchParam,
-                uri, _this = this,
+                uri,
+                _this = this,
                 type = 'qor.filter.time';
 
 
