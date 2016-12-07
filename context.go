@@ -50,6 +50,7 @@ func (context *Context) clone() *Context {
 		Content:  context.Content,
 		Settings: context.Settings,
 		Action:   context.Action,
+		funcMaps: context.funcMaps,
 	}
 }
 
