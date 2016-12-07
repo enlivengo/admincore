@@ -817,8 +817,8 @@ func (context *Context) loadActions(action string) template.HTML {
 }
 
 func (context *Context) logoutURL() string {
-	if context.Admin.auth != nil {
-		return context.Admin.auth.LogoutURL(context)
+	if context.Admin.Auth != nil {
+		return context.Admin.Auth.LogoutURL(context)
 	}
 	return ""
 }

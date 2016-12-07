@@ -382,9 +382,9 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// Set Current User
 	var currentUser qor.CurrentUser
-	if admin.auth != nil {
-		if currentUser = admin.auth.GetCurrentUser(context); currentUser == nil {
-			http.Redirect(w, req, admin.auth.LoginURL(context), http.StatusSeeOther)
+	if admin.Auth != nil {
+		if currentUser = admin.Auth.GetCurrentUser(context); currentUser == nil {
+			http.Redirect(w, req, admin.Auth.LoginURL(context), http.StatusSeeOther)
 			return
 		}
 		context.CurrentUser = currentUser

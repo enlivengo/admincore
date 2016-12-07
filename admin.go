@@ -23,7 +23,7 @@ type Admin struct {
 	menus            []*Menu
 	resources        []*Resource
 	searchResources  []*Resource
-	auth             Auth
+	Auth             Auth
 	router           *Router
 	funcMaps         template.FuncMap
 	metaConfigorMaps map[string]func(*Meta)
@@ -56,7 +56,7 @@ func (admin *Admin) SetSiteName(siteName string) {
 
 // SetAuth set admin's authorization gateway
 func (admin *Admin) SetAuth(auth Auth) {
-	admin.auth = auth
+	admin.Auth = auth
 }
 
 // SetAssetFS set AssetFS for admin
