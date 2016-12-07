@@ -92,17 +92,21 @@
         },
 
         show: function() {
-            this.$element.find('.qor-filter__block').toggle();
+            this.$element.find(CLASS_FILTER_SELECTOR).toggle();
         },
 
         close: function(e) {
             var $target = $(e.target),
                 $filter = $(CLASS_FILTER_SELECTOR),
-                isInFilter = $target.closest(CLASS_FILTER_SELECTOR).size() || $target.closest(CLASS_FILTER_TOGGLE).size();
+                filterVisible = $filter.is(':visible'),
+                isInFilter = $target.closest(CLASS_FILTER_SELECTOR).size(),
+                isInToggle = $target.closest(CLASS_FILTER_TOGGLE).size(),
+                isInModal = $target.closest('.qor-modal').size();
 
-            if (!isInFilter && $filter.is(':visible')) {
-                $filter.hide();
+            if (filterVisible && (isInFilter || isInToggle || isInModal)) {
+                return;
             }
+            $filter.hide();
         },
 
         setFilterTime: function(e) {
