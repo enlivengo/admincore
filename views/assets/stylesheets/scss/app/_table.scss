@@ -114,6 +114,7 @@ table {
 
 .qor-table--medialibrary {
     margin-left: 24px;
+    width: calc(100% - 48px);
     .qor-sorting__hover {
         td {
             border: 0;
