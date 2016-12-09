@@ -192,7 +192,7 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 		admin.generateMenuLinks()
 		res.configure()
 		if !res.Config.Invisible {
-			adminController := &controller{Admin: admin}
+			adminController := &Controller{Admin: admin}
 			admin.registerResourceToRouter(adminController, res, "create", "update", "read", "delete")
 		}
 	}

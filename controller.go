@@ -11,7 +11,7 @@ import (
 	"github.com/qor/responder"
 )
 
-type controller struct {
+type Controller struct {
 	*Admin
 	action *Action
 }
@@ -19,11 +19,11 @@ type controller struct {
 // HTTPUnprocessableEntity error status code
 const HTTPUnprocessableEntity = 422
 
-func (ac *controller) Dashboard(context *Context) {
+func (ac *Controller) Dashboard(context *Context) {
 	context.Execute("dashboard", nil)
 }
 
-func (ac *controller) Index(context *Context) {
+func (ac *Controller) Index(context *Context) {
 	result, err := context.FindMany()
 	context.AddError(err)
 
@@ -34,7 +34,7 @@ func (ac *controller) Index(context *Context) {
 	}).Respond(context.Request)
 }
 
-func (ac *controller) SearchCenter(context *Context) {
+func (ac *Controller) SearchCenter(context *Context) {
 	type Result struct {
 		Context  *Context
 		Resource *Resource
@@ -57,11 +57,11 @@ func (ac *controller) SearchCenter(context *Context) {
 	context.Execute("search_center", searchResults)
 }
 
-func (ac *controller) New(context *Context) {
+func (ac *Controller) New(context *Context) {
 	context.Execute("new", context.Resource.NewStruct())
 }
 
-func (ac *controller) Create(context *Context) {
+func (ac *Controller) Create(context *Context) {
 	res := context.Resource
 	result := res.NewStruct()
 	if context.AddError(res.Decode(context.Context, result)); !context.HasError() {
@@ -86,7 +86,7 @@ func (ac *controller) Create(context *Context) {
 	}
 }
 
-func (ac *controller) Show(context *Context) {
+func (ac *Controller) Show(context *Context) {
 	var result interface{}
 	var err error
 
@@ -109,7 +109,7 @@ func (ac *controller) Show(context *Context) {
 	}).Respond(context.Request)
 }
 
-func (ac *controller) Edit(context *Context) {
+func (ac *Controller) Edit(context *Context) {
 	result, err := context.FindOne()
 	context.AddError(err)
 
@@ -120,7 +120,7 @@ func (ac *controller) Edit(context *Context) {
 	}).Respond(context.Request)
 }
 
-func (ac *controller) Update(context *Context) {
+func (ac *Controller) Update(context *Context) {
 	var result interface{}
 	var err error
 
@@ -157,7 +157,7 @@ func (ac *controller) Update(context *Context) {
 	}
 }
 
-func (ac *controller) Delete(context *Context) {
+func (ac *Controller) Delete(context *Context) {
 	res := context.Resource
 	status := http.StatusOK
 
@@ -173,7 +173,7 @@ func (ac *controller) Delete(context *Context) {
 	}).Respond(context.Request)
 }
 
-func (ac *controller) Action(context *Context) {
+func (ac *Controller) Action(context *Context) {
 	var action = ac.action
 	if context.Request.Method == "GET" {
 		context.Execute("action", action)
@@ -213,7 +213,7 @@ func (ac *controller) Action(context *Context) {
 	}
 }
 
-func (ac *controller) Asset(context *Context) {
+func (ac *Controller) Asset(context *Context) {
 	file := strings.TrimPrefix(context.Request.URL.Path, ac.GetRouter().Prefix)
 
 	if content, err := context.Asset(file); err == nil {

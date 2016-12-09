@@ -101,7 +101,7 @@ func (r *Router) Delete(path string, handle requestHandler, config ...RouteConfi
 	r.routers["DELETE"] = append(r.routers["DELETE"], newRouteHandler(path, handle, config...))
 }
 
-func (admin *Admin) registerResourceToRouter(adminController *controller, res *Resource, modes ...string) {
+func (admin *Admin) registerResourceToRouter(adminController *Controller, res *Resource, modes ...string) {
 	var (
 		prefix     string
 		router     = admin.router
@@ -152,7 +152,7 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 			} else {
 				// Action
 				for _, action := range res.Actions {
-					actionController := &controller{Admin: admin, action: action}
+					actionController := &Controller{Admin: admin, action: action}
 					router.Get(path.Join(prefix, "!action", action.ToParam()), actionController.Action, RouteConfig{
 						Permissioner:   action,
 						PermissionMode: roles.Update,
@@ -183,7 +183,7 @@ func (admin *Admin) registerResourceToRouter(adminController *controller, res *R
 
 				// Action
 				for _, action := range res.Actions {
-					actionController := &controller{Admin: admin, action: action}
+					actionController := &Controller{Admin: admin, action: action}
 					router.Get(path.Join(prefix, primaryKey, action.ToParam()), actionController.Action, RouteConfig{
 						Permissioner:   action,
 						PermissionMode: roles.Update,
@@ -268,7 +268,7 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 
 	admin.generateMenuLinks()
 
-	adminController := &controller{Admin: admin}
+	adminController := &Controller{Admin: admin}
 	router.Get("", adminController.Dashboard)
 	router.Get("/!search", adminController.SearchCenter)
 
@@ -369,7 +369,7 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) && strings.ToUpper(context.Request.Method) == "GET" {
-		(&controller{Admin: admin}).Asset(context)
+		(&Controller{Admin: admin}).Asset(context)
 		return
 	}
 

@@ -157,7 +157,7 @@ func (selectOneConfig *SelectOneConfig) prepareDataSource(field *gorm.StructFiel
 		if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
 			if remoteDataResource.params == "" {
 				remoteDataResource.params = path.Join(routePrefix, res.ToParam(), field.Name)
-				remoteDataSearcherController := &controller{Admin: res.GetAdmin()}
+				remoteDataSearcherController := &Controller{Admin: res.GetAdmin()}
 				res.GetAdmin().registerResourceToRouter(remoteDataSearcherController, remoteDataResource, "create", "update", "read", "delete")
 			}
 		} else {
