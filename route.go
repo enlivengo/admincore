@@ -101,12 +101,13 @@ func (r *Router) Delete(path string, handle requestHandler, config ...RouteConfi
 	r.routers["DELETE"] = append(r.routers["DELETE"], newRouteHandler(path, handle, config...))
 }
 
-func (admin *Admin) registerResourceToRouter(adminController *Controller, res *Resource, modes ...string) {
+func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 	var (
-		prefix     string
-		router     = admin.router
-		param      = res.ToParam()
-		primaryKey = res.ParamIDName()
+		prefix          string
+		router          = admin.router
+		param           = res.ToParam()
+		primaryKey      = res.ParamIDName()
+		adminController = &Controller{Admin: admin}
 	)
 
 	if prefix = func(r *Resource) string {
@@ -237,7 +238,7 @@ func (admin *Admin) registerResourceToRouter(adminController *Controller, res *R
 		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
 				if len(meta.Resource.newSections) > 0 {
-					admin.registerResourceToRouter(adminController, meta.Resource, "create")
+					admin.RegisterResourceRouters(meta.Resource, "create")
 				}
 			}
 		}
@@ -245,7 +246,7 @@ func (admin *Admin) registerResourceToRouter(adminController *Controller, res *R
 		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
 				if len(meta.Resource.showSections) > 0 {
-					admin.registerResourceToRouter(adminController, meta.Resource, "read")
+					admin.RegisterResourceRouters(meta.Resource, "read")
 				}
 			}
 		}
@@ -253,7 +254,7 @@ func (admin *Admin) registerResourceToRouter(adminController *Controller, res *R
 		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
 				if len(meta.Resource.editSections) > 0 {
-					admin.registerResourceToRouter(adminController, meta.Resource, "update", "delete")
+					admin.RegisterResourceRouters(meta.Resource, "update", "delete")
 				}
 			}
 		}
@@ -275,7 +276,7 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 	for _, res := range admin.resources {
 		res.configure()
 		if !res.Config.Invisible {
-			admin.registerResourceToRouter(adminController, res, "create", "update", "read", "delete")
+			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
 		}
 	}
 
