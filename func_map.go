@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"math/rand"
 	"net/url"
 	"path"
 	"path/filepath"
@@ -54,6 +55,7 @@ func (context *Context) uniqueKeyOf(value interface{}) interface{} {
 		for _, primaryField := range scope.PrimaryFields() {
 			primaryValues = append(primaryValues, fmt.Sprint(primaryField.Field.Interface()))
 		}
+		primaryValues = append(primaryValues, fmt.Sprint(rand.Intn(1000)))
 		return url.QueryEscape(strings.Join(primaryValues, "_ "))
 	}
 	return fmt.Sprint(value)
