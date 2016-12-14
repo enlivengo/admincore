@@ -206,8 +206,13 @@ func (ac *Controller) Action(context *Context) {
 				}).Respond(context.Request)
 			} else {
 				context.Writer.WriteHeader(HTTPUnprocessableEntity)
-				message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
-				context.JSON("OK", map[string]string{"error": message, "status": "error"})
+				responder.With("html", func() {
+					context.AddError(err)
+					context.Execute("action", action)
+				}).With("json", func() {
+					message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
+					context.JSON("OK", map[string]string{"error": message, "status": "error"})
+				}).Respond(context.Request)
 			}
 		}
 	}
