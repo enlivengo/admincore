@@ -1,8 +1,24 @@
-// Common
 @import "variables";
 @import "mixins";
-@import "app/utilities";
+.qor-modal {
+    &.shown,
+    &.is-shown {
+        display: block !important;
+    }
+    &.hidden,
+    &.is-hidden {
+        display: none !important;
+    }
+    &.fade {
+        opacity: 0;
+        transition: opacity .2s linear;
+        &.in {
+            opacity: 1;
+        }
+    }
+}
+
+@import "qor/qor-filter";
 @import "qor/datepicker";
 @import "qor/qor-datepicker";
 @import "qor/qor-modal";
-@import "qor/qor-filter";
