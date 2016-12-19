@@ -312,7 +312,8 @@
                             // end
 
                             $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
-                            this.$title.html($response.find(options.title).html());
+                            this.$title.html($response.find(options.title).html()).show();
+                            $('.qor-slideout__show_title').remove();
                             this.$body.html($content.html());
                             this.$body.find(CLASS_HEADER_LOCALE).remove();
 
