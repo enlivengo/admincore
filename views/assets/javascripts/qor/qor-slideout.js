@@ -56,14 +56,10 @@
             var $slideout;
 
             this.$slideout = $slideout = $(QorSlideout.TEMPLATE).appendTo('body');
-            this.$title = $slideout.find('.qor-slideout__title');
-            this.$body = $slideout.find('.qor-slideout__body');
-            this.$bodyClass = $('body').prop('class');
+            this.$slideoutTemplate = $slideout.html();
         },
 
         unbuild: function() {
-            this.$title = null;
-            this.$body = null;
             this.$slideout.remove();
         },
 
@@ -272,6 +268,8 @@
             var method;
             var dataType;
             var load;
+            var $slideout = this.$slideout;
+            var $title;
 
             if (!url) {
                 return;
@@ -309,15 +307,19 @@
                             if (bodyHtml) {
                                 this.loadExtraResource(bodyHtml, $response, url, response);
                             }
-                            // end
 
                             $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
-                            this.$title.html($response.find(options.title).html()).show();
-                            $('.qor-slideout__show_title').remove();
+
+                            // reset slideout header and body
+                            $slideout.html(this.$slideoutTemplate);
+                            $title = $slideout.find('.qor-slideout__title');
+                            this.$body = $slideout.find('.qor-slideout__body');
+
+                            $title.html($response.find(options.title).html());
                             this.$body.html($content.html());
                             this.$body.find(CLASS_HEADER_LOCALE).remove();
 
-                            this.$slideout.one(EVENT_SHOWN, function() {
+                            $slideout.one(EVENT_SHOWN, function() {
 
                                 // Enable all Qor components within the slideout
                                 $(this).trigger('enable');
