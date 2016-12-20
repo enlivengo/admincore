@@ -289,7 +289,7 @@
 
                     callbacks: {
                         init: function() {
-                            var button, buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule'];
+                            var button, buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule', 'table'];
                             buttons.forEach(function(item) {
                                 button = this.button.get(item);
                                 this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
