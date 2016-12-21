@@ -248,6 +248,7 @@
             var script = document.createElement('script');
             script.src = src;
             document.body.appendChild(script);
+            this.scriptAdded = true;
         },
 
         loadMedialibraryJS: function($response) {
@@ -354,7 +355,6 @@
                 $header = this.$header,
                 $body = this.$body;
 
-
             if (!url) {
                 return;
             }
@@ -400,7 +400,7 @@
                                 if (selectModal != 'one' && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
                                     $body.addClass('has-hint');
                                 }
-                                if (selectModal == 'mediabox') {
+                                if (selectModal == 'mediabox' && !this.scriptAdded) {
                                     this.loadMedialibraryJS($response);
                                 }
                             }
