@@ -23,6 +23,7 @@
     var EVENT_SHOW = 'show.' + NAMESPACE;
     var EVENT_SLIDEOUT_SUBMIT_COMPLEMENT = 'slideoutSubmitComplete.' + NAMESPACE;
     var EVENT_SLIDEOUT_CLOSED = 'slideoutClosed.' + NAMESPACE;
+    var EVENT_SLIDEOUT_LOADED = 'slideoutLoaded.' + NAMESPACE;
     var EVENT_SHOWN = 'shown.' + NAMESPACE;
     var EVENT_HIDE = 'hide.' + NAMESPACE;
     var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
@@ -333,8 +334,8 @@
                             this.show();
 
                             // callback for after slider loaded HTML
+                            // this callback is deprecated, use slideoutLoaded.qor.slideout event.
                             var qorSliderAfterShow = $.fn.qorSliderAfterShow;
-
                             if (qorSliderAfterShow) {
                                 for (var name in qorSliderAfterShow) {
                                     if (qorSliderAfterShow.hasOwnProperty(name) && $.isFunction(qorSliderAfterShow[name])) {
@@ -344,6 +345,8 @@
                                 }
                             }
 
+                            // will trigger slideoutLoaded.qor.slideout event after slideout loaded
+                            $slideout.trigger(EVENT_SLIDEOUT_LOADED, [url, response]);
 
                         } else {
                             if (data.returnUrl) {
@@ -455,9 +458,6 @@
             if (hideEvent.isDefaultPrevented()) {
                 return;
             }
-
-            // empty body html when hide slideout
-            this.$body.html('');
 
             $slideout.
             one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).

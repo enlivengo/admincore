@@ -18,6 +18,8 @@
     var EVENT_CLICK = 'click.' + NAMESPACE;
     var EVENT_SUBMIT = 'submit.' + NAMESPACE;
     var EVENT_RELOAD = 'reload.' + NAMESPACE;
+    var EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE;
+    var EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE;
     var EVENT_HIDE = 'hide.' + NAMESPACE;
     var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
     var EVENT_KEYUP = 'keyup.' + NAMESPACE;
@@ -77,12 +79,9 @@
         },
 
         build: function() {
-            var $bottomsheets = $(CLASS_BOTTOMSHEETS);
+            var $bottomsheets;
 
-            if ($bottomsheets.size()) {
-                $bottomsheets.remove();
-            }
-
+            $(CLASS_BOTTOMSHEETS).remove();
             this.$bottomsheets = $bottomsheets = $(QorBottomSheets.TEMPLATE).appendTo('body');
             this.$body = $bottomsheets.find('.qor-bottomsheets__body');
             this.$title = $bottomsheets.find('.qor-bottomsheets__title');
@@ -343,6 +342,7 @@
         },
 
         load: function(url, data, callback) {
+            this.init();
             var options = this.options,
                 method,
                 dataType,
@@ -434,16 +434,7 @@
                             }
 
                             // callback for after bottomSheets loaded HTML
-                            // if (options.afterShow){
-                            //   var qorBottomsheetsAfterShow = $.fn.qorBottomsheetsAfterShow;
-
-                            //   for (var name in qorBottomsheetsAfterShow) {
-                            //     if (qorBottomsheetsAfterShow.hasOwnProperty(name) && $.isFunction(qorBottomsheetsAfterShow[name])) {
-                            //       qorBottomsheetsAfterShow[name].call(this, url, response);
-                            //     }
-                            //   }
-
-                            // }
+                            $bottomsheets.trigger(EVENT_BOTTOMSHEET_LOADED, [url, response]);
 
                         } else {
                             if (data.returnUrl) {
@@ -504,9 +495,6 @@
                 return;
             }
 
-            // empty body html when hide slideout
-            this.$body.html('');
-
             $bottomsheets.
             removeClass(CLASS_IS_SLIDED).
             removeClass(CLASS_IS_SHOWN).
@@ -515,9 +503,7 @@
             $('body').removeClass(CLASS_OPEN);
             $bottomsheets.qorSelectCore('destroy');
 
-            // reinit bottomsheets template, clear all bind events.
-            this.init();
-
+            $bottomsheets.trigger(EVENT_BOTTOMSHEET_CLOSED);
             return false;
         },
 
