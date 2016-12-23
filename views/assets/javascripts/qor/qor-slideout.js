@@ -174,6 +174,10 @@
             this.$element.find('[data-url]').removeClass(CLASS_IS_SELECTED);
         },
 
+        addLoading: function() {
+            // TODO: add loading for load slideout
+        },
+
         submit: function(e) {
             var $slideout = this.$slideout;
             var $body = this.$body;
@@ -384,6 +388,7 @@
         },
 
         open: function(options) {
+            this.addLoading();
             this.load(options.url, options.data);
         },
 
@@ -496,16 +501,20 @@
     };
 
     QorSlideout.TEMPLATE = (
-        '<div class="qor-slideout">' +
-        '<div class="qor-slideout__header">' +
-        '<button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">' +
-        '<span class="material-icons">close</span>' +
-        '</button>' +
-        '<h3 class="qor-slideout__title"></h3>' +
-        '</div>' +
-        '<div class="qor-slideout__body"></div>' +
-        '</div>'
+        `<div class="qor-slideout">
+        <div class="qor-slideout__header">
+        <button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">
+        <span class="material-icons">close</span>
+        </button>
+        <h3 class="qor-slideout__title"></h3>
+        </div>
+        <div class="qor-slideout__body"></div>
+        </div>`
     );
+
+    QorSlideout.TEMPLATE_LOADING = (
+        `<div class="qor-body__loading"></div>`
+    )
 
     QorSlideout.plugin = function(options) {
         return this.each(function() {

@@ -50,7 +50,6 @@
             $template.trigger('disable');
 
             this.$template = $template;
-            this.multipleTemplates = {};
             var $filteredTemplateHtml = $template.filter($this.children(options.childrenClass).children(options.newClass));
 
             if (this.isMultipleTemplate) {
@@ -111,56 +110,49 @@
         },
 
         add: function(e) {
-            var options = this.options;
-            var self = this;
-            var $target = $(e.target).closest(this.options.addClass);
-            var templateName = $target.data().template;
-            var parents = $target.closest(this.$element);
-            var parentsChildren = parents.children(options.childrenClass);
-            var $item = this.$template;
+            var options = this.options,
+                $target = $(e.target).closest(options.addClass),
+                templateName = $target.data().template,
+                parents = $target.closest(options.selector),
+                parentsChildren = parents.children(options.childrenClass),
+                isMultipleTemplate = parents.data().isMultiple,
+                $item = this.$template,
+                $muptipleTargetTempalte,
+                $childrenFieldset = $target.closest(options.childrenClass).children('fieldset'),
+                multipleTemplates = {};
 
-            // For multiple fieldset template
-            if (this.isMultipleTemplate) {
+            if (isMultipleTemplate) { // For multiple fieldset template
                 this.$template.each(function() {
-                    self.multipleTemplates[$(this).data().fieldsetName] = $(this);
+                    multipleTemplates[$(this).data().fieldsetName] = $(this);
                 });
-            }
-            var $muptipleTargetTempalte = this.multipleTemplates[templateName];
-            if (this.isMultipleTemplate) {
-                // For multiple template
-                if ($target.length) {
-                    this.template = $muptipleTargetTempalte.prop('outerHTML');
-                    this.parse(true);
-                    $item = $(this.template.replace(/\{\{index\}\}/g, ++this.index));
-                    for (var dataKey in $target.data()) {
-                        if (dataKey.match(/^sync/)) {
-                            var k = dataKey.replace(/^sync/, '');
-                            $item.find('input[name*=\'.' + k + '\']').val($target.data(dataKey));
-                        }
-                    }
-                    if ($target.closest(options.childrenClass).children('fieldset').size()) {
-                        $target.closest(options.childrenClass).children('fieldset').last().after($item.show());
-                    } else {
-                        // If user delete all template
-                        parentsChildren.prepend($item.show());
+
+                $muptipleTargetTempalte = multipleTemplates[templateName];
+                this.template = $muptipleTargetTempalte.prop('outerHTML');
+                this.parse(true);
+                $item = $(this.template.replace(/\{\{index\}\}/g, ++this.index));
+
+                for (var dataKey in $target.data()) {
+                    if (dataKey.match(/^sync/)) {
+                        var k = dataKey.replace(/^sync/, '');
+                        $item.find('input[name*=\'.' + k + '\']').val($target.data(dataKey));
                     }
                 }
-            } else {
 
-                if ($target.length) {
-                    $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
-                    $target.before($item.show());
-                    this.index++;
+                if ($childrenFieldset.size()) {
+                    $childrenFieldset.last().after($item.show());
+                } else {
+                    // If user delete all template
+                    parentsChildren.prepend($item.show());
                 }
+            } else { //For individual fieldset tempalte 
+                $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
+                $target.before($item.show());
+                this.index++;
             }
 
-            if ($item) {
-                // Enable all JavaScript components within the fieldset
-                $item.trigger('enable');
-            }
-
+            $item && $item.trigger('enable');
             $(document).trigger(EVENT_REPLICATOR_ADDED, [$item]);
-            e.stopPropagation();
+            return false;
         },
 
         del: function(e) {
@@ -221,6 +213,7 @@
     $(function() {
         var selector = '.qor-fieldset-container';
         var options = {
+            selector: '.qor-fieldset-container',
             itemClass: '.qor-fieldset',
             newClass: '.qor-fieldset--new',
             addClass: '.qor-fieldset__add',
