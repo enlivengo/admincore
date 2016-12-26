@@ -36,6 +36,7 @@
     var CLASS_IS_SELECTED = 'is-selected';
     var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
     var CLASS_HEADER_LOCALE = '.qor-actions__locale';
+    var CLASS_BODY_LOADING = '.qor-body__loading';
 
     function QorSlideout(element, options) {
         this.$element = $(element);
@@ -176,7 +177,9 @@
         },
 
         addLoading: function() {
-            // TODO: add loading for load slideout
+            $(CLASS_BODY_LOADING).remove();
+            var $loading = $(QorSlideout.TEMPLATE_LOADING);
+            $loading.appendTo($('body')).trigger('enable');
         },
 
         submit: function(e) {
@@ -297,6 +300,8 @@
                             $content,
                             $qorFormContainer;
 
+                        $(CLASS_BODY_LOADING).remove();
+
                         if (method === 'GET') {
                             $response = $(response);
 
@@ -369,6 +374,7 @@
 
                     error: $.proxy(function(response) {
                         var errors;
+                        $(CLASS_BODY_LOADING).remove();
                         if ($('.qor-error span').size() > 0) {
                             errors = $('.qor-error span').map(function() {
                                 return $(this).text();
@@ -505,18 +511,20 @@
 
     QorSlideout.TEMPLATE = (
         `<div class="qor-slideout">
-        <div class="qor-slideout__header">
-        <button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">
-        <span class="material-icons">close</span>
-        </button>
-        <h3 class="qor-slideout__title"></h3>
-        </div>
-        <div class="qor-slideout__body"></div>
+            <div class="qor-slideout__header">
+            <button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">
+                <span class="material-icons">close</span>
+            </button>
+                <h3 class="qor-slideout__title"></h3>
+            </div>
+            <div class="qor-slideout__body"></div>
         </div>`
     );
 
     QorSlideout.TEMPLATE_LOADING = (
-        `<div class="qor-body__loading"></div>`
+        `<div class="qor-body__loading">
+            <div><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>
+        </div>`
     );
 
     QorSlideout.plugin = function(options) {

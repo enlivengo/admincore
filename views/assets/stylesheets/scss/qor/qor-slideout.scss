@@ -101,3 +101,17 @@
     box-shadow: none;
     background-color: transparent;
 }
+
+.qor-body__loading {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    width: 100px;
+    padding: 30px 0;
+    border-radius: 2px;
+    z-index: 9999;
+    background-color: unquote("rgba(#{$color-black}, 0.72)");
+    >div {
+        text-align: center;
+    }
+}
