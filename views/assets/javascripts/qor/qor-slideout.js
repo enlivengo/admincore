@@ -186,6 +186,8 @@
             var _this = this;
             var $submit = $form.find(':submit');
 
+            $slideout.trigger('beforeSend.qor.slideout');
+
             if (FormData) {
                 e.preventDefault();
 
@@ -514,7 +516,7 @@
 
     QorSlideout.TEMPLATE_LOADING = (
         `<div class="qor-body__loading"></div>`
-    )
+    );
 
     QorSlideout.plugin = function(options) {
         return this.each(function() {
