@@ -11,6 +11,10 @@ import (
 	"github.com/qor/qor/resource"
 )
 
+var (
+	PaginationPageCount = 20
+)
+
 type scopeFunc func(db *gorm.DB, context *qor.Context) *gorm.DB
 
 // Pagination is used to hold pagination related information when rendering tables
@@ -211,8 +215,10 @@ func (s *Searcher) parseContext() *qor.Context {
 	if s.Pagination.PerPage == 0 {
 		if perPage, err := strconv.Atoi(s.Context.Request.Form.Get("per_page")); err == nil {
 			s.Pagination.PerPage = perPage
-		} else {
+		} else if s.Resource.Config.PageCount > 0 {
 			s.Pagination.PerPage = s.Resource.Config.PageCount
+		} else {
+			s.Pagination.PerPage = PaginationPageCount
 		}
 	}
 

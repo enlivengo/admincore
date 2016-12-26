@@ -117,10 +117,6 @@ func (admin *Admin) newResource(value interface{}, config ...*Config) *Resource 
 
 	res.Permission = configuration.Permission
 
-	if configuration.PageCount == 0 {
-		configuration.PageCount = 20
-	}
-
 	if configuration.Name != "" {
 		res.Name = configuration.Name
 	} else if namer, ok := value.(ResourceNamer); ok {
