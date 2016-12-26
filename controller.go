@@ -1,11 +1,14 @@
 package admin
 
 import (
+	"crypto/md5"
+	"fmt"
 	"mime"
 	"net/http"
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/responder"
@@ -218,13 +221,33 @@ func (ac *Controller) Action(context *Context) {
 	}
 }
 
+var (
+	cacheSince = time.Now().Format(http.TimeFormat)
+)
+
 func (ac *Controller) Asset(context *Context) {
 	file := strings.TrimPrefix(context.Request.URL.Path, ac.GetRouter().Prefix)
 
+	if context.Request.Header.Get("If-Modified-Since") == cacheSince {
+		context.Writer.WriteHeader(http.StatusNotModified)
+		return
+	} else {
+		context.Writer.Header().Set("Last-Modified", cacheSince)
+	}
+
 	if content, err := context.Asset(file); err == nil {
+		etag := fmt.Sprintf("%x", md5.Sum(content))
+		if context.Request.Header.Get("If-None-Match") == etag {
+			context.Writer.WriteHeader(http.StatusNotModified)
+			return
+		}
+
 		if ctype := mime.TypeByExtension(filepath.Ext(file)); ctype != "" {
 			context.Writer.Header().Set("Content-Type", ctype)
 		}
+
+		context.Writer.Header().Set("Cache-control", "private, must-revalidate, max-age=300")
+		context.Writer.Header().Set("ETag", etag)
 		context.Writer.Write(content)
 	} else {
 		http.NotFound(context.Writer, context.Request)
