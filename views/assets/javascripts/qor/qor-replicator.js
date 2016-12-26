@@ -99,7 +99,7 @@
             on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).
             on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
-            $(document).on('beforeSend.qor.slideout', '.qor-slideout', this.removeData);
+            $(document).on('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData);
 
         },
 
@@ -107,6 +107,8 @@
             this.$element.
             off(EVENT_CLICK, this.add).
             off(EVENT_CLICK, this.del);
+
+            $(document).off('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData);
         },
 
         removeData: function() {

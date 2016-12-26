@@ -24,6 +24,7 @@
     var EVENT_SLIDEOUT_SUBMIT_COMPLEMENT = 'slideoutSubmitComplete.' + NAMESPACE;
     var EVENT_SLIDEOUT_CLOSED = 'slideoutClosed.' + NAMESPACE;
     var EVENT_SLIDEOUT_LOADED = 'slideoutLoaded.' + NAMESPACE;
+    var EVENT_SLIDEOUT_BEFORESEND = 'slideoutBeforeSend.' + NAMESPACE;
     var EVENT_SHOWN = 'shown.' + NAMESPACE;
     var EVENT_HIDE = 'hide.' + NAMESPACE;
     var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
@@ -186,7 +187,7 @@
             var _this = this;
             var $submit = $form.find(':submit');
 
-            $slideout.trigger('beforeSend.qor.slideout');
+            $slideout.trigger(EVENT_SLIDEOUT_BEFORESEND);
 
             if (FormData) {
                 e.preventDefault();
