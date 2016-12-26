@@ -24,7 +24,21 @@ func (res *Resource) Filter(filter *Filter) {
 		filter.Handler = func(db *gorm.DB, filterArgument *FilterArgument) *gorm.DB {
 			if metaValue := filterArgument.Value.Get("Value"); metaValue != nil {
 				if keyword := utils.ToString(metaValue.Value); keyword != "" {
-					return defaultFieldFilter(res, []string{filter.Name}, keyword, db, filterArgument.Context)
+					field := filterField{FieldName: filter.Name}
+					if operationMeta := filterArgument.Value.Get("Operation"); operationMeta != nil {
+						if operation := utils.ToString(operationMeta.Value); operation != "" {
+							field.Operation = operation
+						}
+					}
+					if field.Operation == "" {
+						if len(filter.Operations) > 0 {
+							field.Operation = filter.Operations[0]
+						} else {
+							field.Operation = "contains"
+						}
+					}
+
+					return filterResourceByFields(res, []filterField{field}, keyword, db, filterArgument.Context)
 				}
 			}
 			return db
@@ -44,12 +58,13 @@ func (res *Resource) GetFilters() []*Filter {
 
 // Filter filter definiation
 type Filter struct {
-	Name     string
-	Label    string
-	Type     string
-	Resource *Resource
-	Handler  func(*gorm.DB, *FilterArgument) *gorm.DB
-	Config   FilterConfigInterface
+	Name       string
+	Label      string
+	Type       string
+	Operations []string // eq, cont, gt, gteq, lt, lteq
+	Resource   *Resource
+	Handler    func(*gorm.DB, *FilterArgument) *gorm.DB
+	Config     FilterConfigInterface
 }
 
 // FilterConfigInterface filter config interface
