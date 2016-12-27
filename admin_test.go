@@ -56,10 +56,6 @@ func TestNewResource(t *testing.T) {
 	if user.Name != "User" {
 		t.Error("default resource name didn't set")
 	}
-
-	if user.Config.PageCount != 20 {
-		t.Error("default page count didn't set")
-	}
 }
 
 type UserWithCustomizedName struct{}
