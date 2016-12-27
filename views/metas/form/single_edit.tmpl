@@ -1,14 +1,14 @@
 {{$value := (raw_value_of .ResourceValue .Meta)}}
-<div class="signle-edit qor-field">
-  <label class="qor-field__label" for="{{.InputId}}">
-    {{meta_label .Meta}}
-  </label>
+{{if (or (not (is_new_record $value)) (has_create_permission .Meta))}}
+  <div class="signle-edit qor-field">
+    <label class="qor-field__label" for="{{.InputId}}">
+      {{meta_label .Meta}}
+    </label>
 
-  <div class="qor-field__block">
-    {{if (or (and (is_new_record $value) (has_create_permission .Meta)) (has_update_permission .Meta))}}
+    <div class="qor-field__block">
       <fieldset id="{{.InputId}}" class="qor-fieldset">
         {{render_nested_form $value (edit_sections .Meta.Resource) -1}}
       </fieldset>
-    {{end}}
+    </div>
   </div>
-</div>
+{{end}}
