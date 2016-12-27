@@ -126,7 +126,7 @@
 
             if (this.isMultipleTemplate) {
                 this.template = this.$multipleTemplates[templateName].prop('outerHTML');
-                this.parse();
+                this.parse(true);
                 this.parseNestTemplate();
 
                 $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
