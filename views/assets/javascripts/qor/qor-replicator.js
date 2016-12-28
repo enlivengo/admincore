@@ -13,11 +13,11 @@
 
     'use strict';
 
-    var NAMESPACE = 'qor.replicator';
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_REPLICATOR_ADDED = 'added.' + NAMESPACE;
+    let NAMESPACE = 'qor.replicator',
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_REPLICATOR_ADDED = 'added.' + NAMESPACE;
 
     function QorReplicator(element, options) {
         this.$element = $(element);
@@ -30,19 +30,13 @@
         constructor: QorReplicator,
 
         init: function() {
-            var $this = this.$element;
-            var options = this.options;
-            var $all = $this.children(options.childrenClass).children(options.itemClass);
-            var $template;
-            var $multipleTemplates = {};
-
-            this.isMultipleTemplate = $this.data().isMultiple;
-
-            if (!$all.length) {
-                return;
-            }
-
-            $template = $all.filter(options.newClass);
+            let $this = this.$element,
+                options = this.options,
+                $template = $this.children(options.childrenClass).children(options.newClass),
+                fieldsetName;
+                
+            this.isInSlideout = $this.closest('.qor-slideout').length;
+            
             if (!$template.length) {
                 return;
             }
@@ -50,33 +44,51 @@
             // Should destroy all components here
             $template.trigger('disable');
 
+            // if have isMultiple data value or template length large than 1
+            this.isMultipleTemplate = $this.data('isMultiple');
+
             if (this.isMultipleTemplate) {
-                $template.each(function() {
-                    $multipleTemplates[$(this).data().fieldsetName] = $(this);
+                this.fieldsetName = [];
+                this.template = {};
+                this.index = {};
+
+                $template.each((i,ele) => {
+                    fieldsetName = $(ele).data('fieldsetName');
+                    if (fieldsetName) {
+                        this.template[fieldsetName] = $(ele).prop('outerHTML');
+                        this.fieldsetName.push(fieldsetName);
+                    }
                 });
-                this.$multipleTemplates = $multipleTemplates;
+                this.parseMultiple();
 
             } else {
                 this.template = $template.prop('outerHTML');
                 this.parse();
             }
 
-            $template.hide();
+            $template.not('button').hide();
             this.bind();
 
         },
 
-        parse: function(hasIndex) {
-            var i = 0;
+        parse: function() {
+            let template;
 
             if (!this.template) {
                 return;
             }
+            template = this.initTemplate(this.template);
+            this.template = template.template;
+            this.index = template.index;
+        },
 
-            this.template = this.template.replace(/(\w+)\="(\S*\[\d+\]\S*)"/g, function(attribute, name, value) {
+        initTemplate: function (template) {
+            let i;
+
+            template = template.replace(/(\w+)\="(\S*\[\d+\]\S*)"/g, function(attribute, name, value) {
                 value = value.replace(/^(\S*)\[(\d+)\]([^\[\]]*)$/, function(input, prefix, index, suffix) {
                     if (input === value) {
-                        if (name === 'name') {
+                        if (name === 'name' && !i) {
                             i = index;
                         }
 
@@ -86,33 +98,45 @@
 
                 return (name + '="' + value + '"');
             });
-            if (hasIndex) {
-                return;
-            }
-            this.index = parseFloat(i);
+
+            return {
+                'template': template,
+                'index': parseFloat(i)
+            };
+        },
+
+        parseMultiple: function() {
+            let template;
+
+            this.fieldsetName.forEach((ele) => {
+                template = this.initTemplate(this.template[ele]);
+                this.template[ele] = template.template;
+                this.index[ele] = template.index;
+            });
         },
 
         bind: function() {
-            var options = this.options;
+            let options = this.options;
 
             this.$element.
-            on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).
-            on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
-
-            $(document).on('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData);
-
+                on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).
+                on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
+            
+            !this.isInSlideout && $(document).on('submit', 'form', this.removeData.bind(this));
+            $(document).on('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this));
         },
 
         unbind: function() {
             this.$element.
-            off(EVENT_CLICK, this.add).
-            off(EVENT_CLICK, this.del);
-
-            $(document).off('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData);
+                off(EVENT_CLICK, this.add).
+                off(EVENT_CLICK, this.del);
+            
+            !this.isInSlideout && $(document).off('submit', 'form', this.removeData.bind(this));
+            $(document).off('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this));
         },
 
         removeData: function() {
-            $('.qor-slideout form').find('.qor-fieldset--new').remove();
+            this.$element.find('.qor-fieldset--new').remove();
         },
 
         add: function(e) {
@@ -122,14 +146,13 @@
                 parents = $target.closest(this.$element),
                 parentsChildren = parents.children(options.childrenClass),
                 $item,
+                template,
                 $fieldset = $target.closest(options.childrenClass).children('fieldset');
 
             if (this.isMultipleTemplate) {
-                this.template = this.$multipleTemplates[templateName].prop('outerHTML');
-                this.parse(true);
-                this.parseNestTemplate();
-
-                $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
+                this.parseNestTemplate(templateName);
+                template = this.template[templateName];
+                $item = $(template.replace(/\{\{index\}\}/g, this.index[templateName]));
 
                 for (var dataKey in $target.data()) {
                     if (dataKey.match(/^sync/)) {
@@ -143,53 +166,59 @@
                 } else {
                     parentsChildren.prepend($item.show());
                 }
+                $item.data('itemIndex', this.index[templateName]);
+                this.index[templateName]++;
 
             } else {
                 this.parseNestTemplate();
                 $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
                 $target.before($item.show());
+                $item.data('itemIndex', this.index);
+                this.index++;
             }
 
 
-            $item && $item.trigger('enable').data('index', this.index).removeClass('qor-fieldset--new');
-            this.index++;
-
+            $item.trigger('enable').removeClass('qor-fieldset--new');
             $(document).trigger(EVENT_REPLICATOR_ADDED, [$item]);
             e.stopPropagation();
         },
 
         del: function(e) {
-            var options = this.options;
-            var $item = $(e.target).closest(options.itemClass);
-            var $alert;
+            let options = this.options,
+                $item = $(e.target).closest(options.itemClass),
+                $alert;
 
             $item.children(':visible').addClass('hidden').hide();
             $alert = $(options.alertTemplate.replace('{{name}}', this.parseName($item)));
             $alert.find(options.undoClass).one(EVENT_CLICK, function() {
                 $item.find('> .qor-fieldset__alert').remove();
                 $item.children('.hidden').removeClass('hidden').show();
-
             });
 
             $item.append($alert);
         },
 
-        parseNestTemplate: function() {
-            var $element = this.$element,
+        parseNestTemplate: function(templateType) {
+            let $element = this.$element,
                 parentForm = $element.parents('.qor-fieldset-container'),
                 index;
 
             if (parentForm.size()) {
-                index = $element.closest('.qor-fieldset').data().index;
+                index = $element.closest('.qor-fieldset').data('itemIndex');
                 if (index) {
-                    this.template = this.template.replace(/\[\d+\]/g, '[' + index + ']');
+                    if (templateType) {
+                        this.template[templateType] = this.template[templateType].replace(/\[\d+\]/g, '[' + index + ']');
+                    } else {
+                        this.template = this.template.replace(/\[\d+\]/g, '[' + index + ']');
+                    }
+                    
                 }
 
             }
         },
 
         parseName: function($item) {
-            var name = $item.find('input[name]').attr('name');
+            let name = $item.find('input[name]').attr('name');
 
             if (name) {
                 return name.replace(/[^\[\]]+$/, '');
@@ -213,9 +242,9 @@
 
     QorReplicator.plugin = function(options) {
         return this.each(function() {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var fn;
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                fn;
 
             if (!data) {
                 $this.data(NAMESPACE, (data = new QorReplicator(this, options)));
@@ -228,8 +257,8 @@
     };
 
     $(function() {
-        var selector = '.qor-fieldset-container';
-        var options = {
+        let selector = '.qor-fieldset-container';
+        let options = {
             itemClass: '.qor-fieldset',
             newClass: '.qor-fieldset--new',
             addClass: '.qor-fieldset__add',
@@ -245,13 +274,13 @@
         };
 
         $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorReplicator.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorReplicator.plugin.call($(selector, e.target), options);
-        }).
-        triggerHandler(EVENT_ENABLE);
+            on(EVENT_DISABLE, function(e) {
+                QorReplicator.plugin.call($(selector, e.target), 'destroy');
+            }).
+            on(EVENT_ENABLE, function(e) {
+                QorReplicator.plugin.call($(selector, e.target), options);
+            }).
+            triggerHandler(EVENT_ENABLE);
     });
 
     return QorReplicator;
