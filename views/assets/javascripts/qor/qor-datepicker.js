@@ -75,7 +75,7 @@
 
       this.$modal = $modal = $(replaceText(QorDatepicker.TEMPLATE, this.options.text)).appendTo('body');
 
-      if ($targetInput.size()) {
+      if ($targetInput.length) {
         datepickerOptions.date = $targetInput.val();
       }
 

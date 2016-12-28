@@ -32,7 +32,7 @@
     this.pickerData = this.$element.data();
     this.targetInputClass = this.pickerData.targetInput;
     this.parent = this.$element.closest(CLASS_PARENT);
-    this.isDateTimePicker = this.targetInputClass && this.parent.size();
+    this.isDateTimePicker = this.targetInputClass && this.parent.length;
     this.$targetInput = this.parent.find(this.targetInputClass);
     this.init();
   }
