@@ -156,17 +156,23 @@ func (meta *Meta) SetPermission(permission *roles.Permission) {
 	meta.Meta.Permission = permission
 	if meta.Resource != nil {
 		meta.Resource.Permission = permission
-		for _, meta := range meta.Resource.Metas {
-			meta.SetPermission(permission.Concat(meta.Meta.Permission))
-		}
 	}
 }
 
-func (meta *Meta) updateMeta() {
-	newPermission := meta.Permission
-	if newPermission == nil {
-		newPermission = meta.baseResource.Permission
+//  HasPermission check has permission or not
+func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
+	if meta.Permission != nil && !meta.Permission.HasPermission(mode, context.Roles...) {
+		return false
 	}
+
+	if meta.baseResource != nil {
+		return meta.baseResource.HasPermission(mode, context)
+	}
+
+	return true
+}
+
+func (meta *Meta) updateMeta() {
 	meta.Meta = resource.Meta{
 		Name:            meta.Name,
 		FieldName:       meta.FieldName,
@@ -174,7 +180,7 @@ func (meta *Meta) updateMeta() {
 		Valuer:          meta.Valuer,
 		FormattedValuer: meta.FormattedValuer,
 		Resource:        meta.baseResource,
-		Permission:      newPermission,
+		Permission:      meta.Permission,
 		Config:          meta.Config,
 	}
 
