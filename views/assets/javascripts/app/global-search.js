@@ -17,7 +17,7 @@ $(function () {
 
   $(document).on('click', '.qor-dialog--global-search', function(e){
     e.stopPropagation();
-    if (!$(e.target).parents('.qor-dialog-content').size() && !$(e.target).is('.qor-dialog-content')){
+    if (!$(e.target).parents('.qor-dialog-content').length && !$(e.target).is('.qor-dialog-content')){
       $('.qor-dialog--global-search').remove();
     }
   });

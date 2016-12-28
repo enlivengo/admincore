@@ -149,14 +149,14 @@
 
       data.displayName = data.Text || data.Name || data.Title || data.Code || data[Object.keys(data)[0]];
 
-      if (!$select.size()) {
+      if (!$select.length) {
         return;
       }
 
       $select[0].value = data.primaryKey;
       template = this.renderSelectOne(data);
 
-      if ($selectFeild.size()) {
+      if ($selectFeild.length) {
         $selectFeild.remove();
       }
 

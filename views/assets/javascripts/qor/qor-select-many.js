@@ -183,7 +183,7 @@
         primaryKey = $(this).data().primaryKey;
         $option = $options.filter('[value="' + primaryKey + '"]');
 
-        if (!$option.size()) {
+        if (!$option.length) {
           data = {
             primaryKey: primaryKey,
             displayName: ''
@@ -214,7 +214,7 @@
           $option,
           $list = this.$selectFeild.find('[data-primary-key="' + data.primaryKey + '"]');
 
-      if ($list.size()) {
+      if ($list.length) {
         if ($list.hasClass(CLASS_DELETED_ITEM)) {
           $list.removeClass(CLASS_DELETED_ITEM);
           this.updateSelectInputData();

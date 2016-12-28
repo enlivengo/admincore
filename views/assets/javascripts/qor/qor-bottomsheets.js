@@ -81,7 +81,7 @@
         build: function() {
             var $bottomsheets = $(CLASS_BOTTOMSHEETS);
 
-            if ($bottomsheets.size()) {
+            if ($bottomsheets.length) {
                 $bottomsheets.remove();
             }
 
@@ -457,7 +457,7 @@
                     error: $.proxy(function(response) {
                         this.hide();
                         var errors;
-                        if ($('.qor-error span').size() > 0) {
+                        if ($('.qor-error span').length > 0) {
                             errors = $('.qor-error span').map(function() {
                                 return $(this).text();
                             }).get().join(', ');
@@ -490,7 +490,7 @@
             var hideEvent;
             var $datePicker = $('.qor-datepicker').not('.hidden');
 
-            if ($datePicker.size()) {
+            if ($datePicker.length) {
                 $datePicker.addClass('hidden');
             }
 

@@ -68,7 +68,7 @@
     },
 
     initActions: function () {
-      this.tables = $(QOR_TABLE).find('table').size();
+      this.tables = $(QOR_TABLE).find('table').length;
 
       if (!this.tables) {
         $(BUTTON_BULKS).find('button').attr('disabled', true);
@@ -80,7 +80,7 @@
       var checkedInputs = $(QOR_TABLE_BULK).find('.mdl-checkbox__input:checked');
       var formData = [];
 
-      if (checkedInputs.size()){
+      if (checkedInputs.length){
         checkedInputs.each(function () {
           var id = $(this).closest('tr').data('primary-key');
           if (id){
@@ -97,7 +97,7 @@
 
     actionLink: function () {
       // if not in index page
-      if (!$(QOR_TABLE).find('table').size()) {
+      if (!$(QOR_TABLE).find('table').length) {
         return false;
       }
     },
@@ -160,13 +160,13 @@
 
           $firstTd.find('input').prop('checked', isChecked);
 
-          if (slideroutActionForm.size() && hasPopoverForm){
+          if (slideroutActionForm.length && hasPopoverForm){
 
-            if (isChecked && !$alreadyHaveValue.size()){
+            if (isChecked && !$alreadyHaveValue.length){
               slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
             }
 
-            if (!isChecked && $alreadyHaveValue.size()){
+            if (!isChecked && $alreadyHaveValue.length){
               $alreadyHaveValue.remove();
             }
 
@@ -301,7 +301,7 @@
       $('thead.is-hidden tr th:not(".mdl-data-table__cell--non-numeric")').clone().prependTo($('thead:not(".is-hidden") tr'));
 
       var $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input');
-      var isMediaLibrary = $('.qor-table--medialibrary').size();
+      var isMediaLibrary = $('.qor-table--medialibrary').length;
       var hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open');
 
       isMediaLibrary && ($fixedHeadCheckBox = $('thead .mdl-checkbox__input'));
@@ -316,7 +316,7 @@
         var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
         var slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
 
-        if (slideroutActionForm.size() && hasPopoverForm){
+        if (slideroutActionForm.length && hasPopoverForm){
 
           if ($(this).is(':checked')) {
             var allPrimaryValues = $('.qor-table--bulking tbody tr');
@@ -356,11 +356,11 @@
   };
 
   $.fn.qorSliderAfterShow.qorActionInit = function (url, html) {
-    var hasAction = $(html).find('[data-toggle="qor-action-slideout"]').size();
+    var hasAction = $(html).find('[data-toggle="qor-action-slideout"]').length;
     var $actionForm = $('[data-toggle="qor-action-slideout"]').find('form');
     var $checkedItem = $('.qor-page__body .mdl-checkbox__input:checked');
 
-    if (hasAction && $checkedItem.size()){
+    if (hasAction && $checkedItem.length){
       // insert checked value into sliderout form
       $checkedItem.each(function (i, e) {
         var id = $(e).parents('tbody tr').data('primary-key');

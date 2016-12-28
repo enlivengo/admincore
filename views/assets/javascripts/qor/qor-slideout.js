@@ -308,7 +308,7 @@
                             $content = $response.find(CLASS_MAIN_CONTENT);
                             $qorFormContainer = $content.find('.qor-form-container');
 
-                            this.slideoutType = $qorFormContainer.size() && $qorFormContainer.data().slideoutType;
+                            this.slideoutType = $qorFormContainer.length && $qorFormContainer.data().slideoutType;
 
                             if (!$content.length) {
                                 return;
@@ -375,7 +375,7 @@
                     error: $.proxy(function(response) {
                         var errors;
                         $(CLASS_BODY_LOADING).remove();
-                        if ($('.qor-error span').size() > 0) {
+                        if ($('.qor-error span').length > 0) {
                             errors = $('.qor-error span').map(function() {
                                 return $(this).text();
                             }).get().join(', ');
@@ -458,7 +458,7 @@
 
             $.fn.qorSlideoutBeforeHide = null;
 
-            if ($datePicker.size()) {
+            if ($datePicker.length) {
                 $datePicker.addClass('hidden');
             }
 

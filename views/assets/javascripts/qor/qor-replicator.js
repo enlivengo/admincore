@@ -161,7 +161,7 @@
                     }
                 }
 
-                if ($fieldset.size()) {
+                if ($fieldset.length) {
                     $fieldset.last().after($item.show());
                 } else {
                     parentsChildren.prepend($item.show());
@@ -203,7 +203,7 @@
                 parentForm = $element.parents('.qor-fieldset-container'),
                 index;
 
-            if (parentForm.size()) {
+            if (parentForm.length) {
                 index = $element.closest('.qor-fieldset').data('itemIndex');
                 if (index) {
                     if (templateType) {

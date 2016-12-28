@@ -372,7 +372,7 @@
                             var $linkHtml = this.link.$linkHtml,
                                 description = this.link.description;
 
-                            if (name == 'link' && !this.link.insertedTriggered && $linkHtml.size() && this.link.valueChanged && !this.link.clickCancel) {
+                            if (name == 'link' && !this.link.insertedTriggered && $linkHtml.length && this.link.valueChanged && !this.link.clickCancel) {
                                 if (description) {
                                     $linkHtml.prop('title', description);
                                 } else {

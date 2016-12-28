@@ -103,7 +103,7 @@
         buildCheck: function() {
             var $this = this.$element;
             // disable fixer if have multiple tables or in search page or in media library list page
-            if ($('.qor-page__body .qor-js-table').size() > 1 || $('.qor-global-search--container').size() > 0 || $this.hasClass('qor-table--medialibrary') || $this.is(':hidden') || $this.find('tbody > tr:visible').length <= 1) {
+            if ($('.qor-page__body .qor-js-table').length > 1 || $('.qor-global-search--container').length > 0 || $this.hasClass('qor-table--medialibrary') || $this.is(':hidden') || $this.find('tbody > tr:visible').length <= 1) {
                 return true;
             }
             return false;

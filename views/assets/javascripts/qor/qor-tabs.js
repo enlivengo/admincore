@@ -113,7 +113,7 @@
 
         });
 
-        !$(CLASS_TAB_BAR_LEFT).size() && this.$element.find(CLASS_TAB_BAR).prepend(QorTab.ARROW_LEFT);
+        !$(CLASS_TAB_BAR_LEFT).length && this.$element.find(CLASS_TAB_BAR).prepend(QorTab.ARROW_LEFT);
       }
     },
 

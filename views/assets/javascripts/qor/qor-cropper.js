@@ -222,7 +222,7 @@
 
       $target = $(target);
 
-      if ($target.closest(CLASS_DELETE).size()){
+      if ($target.closest(CLASS_DELETE).length){
         data.Delete = true;
 
         this.$output.val(JSON.stringify(data));
@@ -238,7 +238,7 @@
         this.$parent.find('.qor-fieldset').append($alert);
       }
 
-      if ($target.closest(CLASS_CROP).size()) {
+      if ($target.closest(CLASS_CROP).length) {
         $target = $target.closest('li').find('img');
         this.$target = $target;
         this.$modal.qorModal('show');
@@ -250,7 +250,7 @@
           file,
           $alert = this.$parent.find('.qor-fieldset__alert');
 
-      if ($alert.size()) {
+      if ($alert.length) {
         $alert.remove();
         this.data = clearObject(this.data);
       }
@@ -285,7 +285,7 @@
       $ul.show(); // show ul when it is hidden
 
       $image = $list.find('img');
-      imageLength = $image.size();
+      imageLength = $image.length;
       $image.one('load', function () {
         var $this = $(this);
         var naturalWidth = this.naturalWidth;

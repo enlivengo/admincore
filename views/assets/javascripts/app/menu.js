@@ -35,7 +35,7 @@ $(function () {
     $ul.addClass('collapse in').height($ul.prop('scrollHeight'));
   });
 
-  if ($('.qor-page').find('.qor-page__header').size()){
+  if ($('.qor-page').find('.qor-page__header').length){
     $('.qor-page').addClass("has-header");
     $('header.mdl-layout__header').addClass('has-action');
   }
