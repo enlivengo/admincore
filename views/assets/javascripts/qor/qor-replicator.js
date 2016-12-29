@@ -31,10 +31,9 @@
 
         init: function() {
             let $this = this.$element,
-                options = this.options,
-                $template = $this.children(options.childrenClass).children(options.newClass),
+                $template = $this.find('> .qor-field__block > .qor-fieldset--new'),
                 fieldsetName;
-                
+                        
             this.isInSlideout = $this.closest('.qor-slideout').length;
             
             if (!$template.length) {
@@ -65,8 +64,8 @@
                 this.template = $template.prop('outerHTML');
                 this.parse();
             }
-
-            $template.not('button').hide();
+            
+            $template.hide();
             this.bind();
 
         },
@@ -141,8 +140,8 @@
 
         add: function(e) {
             var options = this.options,
-                $target = $(e.target).closest(this.options.addClass),
-                templateName = $target.data().template,
+                $target = $(e.target).closest(options.addClass),
+                templateName = $target.data('template'),
                 parents = $target.closest(this.$element),
                 parentsChildren = parents.children(options.childrenClass),
                 $item,
@@ -232,12 +231,18 @@
     };
 
     QorReplicator.DEFAULTS = {
-        itemClass: false,
-        newClass: false,
-        addClass: false,
-        delClass: false,
-        childrenClass: false,
-        alertTemplate: ''
+        itemClass: '.qor-fieldset',
+        newClass: '.qor-fieldset--new',
+        addClass: '.qor-fieldset__add',
+        delClass: '.qor-fieldset__delete',
+        childrenClass: '.qor-field__block',
+        undoClass: '.qor-fieldset__undo',
+        alertTemplate: (
+            '<div class="qor-fieldset__alert">' +
+            '<input type="hidden" name="{{name}}._destroy" value="1">' +
+            '<button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>' +
+            '</div>'
+        )
     };
 
     QorReplicator.plugin = function(options) {
@@ -258,20 +263,7 @@
 
     $(function() {
         let selector = '.qor-fieldset-container';
-        let options = {
-            itemClass: '.qor-fieldset',
-            newClass: '.qor-fieldset--new',
-            addClass: '.qor-fieldset__add',
-            delClass: '.qor-fieldset__delete',
-            childrenClass: '.qor-field__block',
-            undoClass: '.qor-fieldset__undo',
-            alertTemplate: (
-                '<div class="qor-fieldset__alert">' +
-                '<input type="hidden" name="{{name}}._destroy" value="1">' +
-                '<button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>' +
-                '</div>'
-            )
-        };
+        let options = {};
 
         $(document).
             on(EVENT_DISABLE, function(e) {
