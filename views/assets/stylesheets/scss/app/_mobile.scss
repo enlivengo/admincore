@@ -1,7 +1,17 @@
 /* mobile */
 @media only screen
-and (min-device-width : 320px)
-and (max-device-width : 736px) {
+and (min-width : 320px)
+and (max-width : 736px) {
+
+  .qor-action--select + .qor-selector{
+    margin-bottom: 0 !important;
+  }
+
+  .qor-section-columns-2 .qor-field{
+    width: 100%;
+    float: none;
+    padding-right: 0;
+  }
 
   .qor-layout .mdl-layout__content{
     padding-top: 0 !important;
@@ -118,6 +128,7 @@ and (max-device-width : 736px) {
 
   .qor-table--medialibrary{
     margin-left: 12px;
+    width: 100%;
     .mdl-card{
       width: 163px;
     }
@@ -146,10 +157,11 @@ and (max-device-width : 736px) {
 
 /* mobile: iphone 6p */
 @media only screen
-and (min-device-width : 414px)
-and (max-device-width : 736px) {
+and (min-width : 414px)
+and (max-width : 736px) {
   .qor-table--medialibrary{
     margin-left: 12px;
+    width: 100%;
     .mdl-card{
       width: 180px;
     }
@@ -159,8 +171,8 @@ and (max-device-width : 736px) {
 /* iPad */
 
 @media only screen
-and (min-device-width : 768px)
-and (max-device-width : 1024px){
+and (min-width : 768px)
+and (max-width : 1024px){
   .mdl-layout__header{
     .qor-mobile--show-actions{
       display: none;
