@@ -581,9 +581,17 @@ const visiblePageCount = 8
 // [prev, 5, 6, 7, 8, 9, current, 11, 12]
 // If total page count less than VISIBLE_PAGE_COUNT, always show all pages
 func (context *Context) Pagination() *PaginationResult {
-	var pages []Page
-	pagination := context.Searcher.Pagination
-	if pagination.Total <= context.Searcher.Resource.Config.PageCount && pagination.CurrentPage <= 1 {
+	var (
+		pages      []Page
+		pagination = context.Searcher.Pagination
+		pageCount  = PaginationPageCount
+	)
+
+	if context.Searcher.Resource.Config.PageCount > 0 {
+		pageCount = context.Searcher.Resource.Config.PageCount
+	}
+
+	if pagination.Total <= pageCount && pagination.CurrentPage <= 1 {
 		return nil
 	}
 
