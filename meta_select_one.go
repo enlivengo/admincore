@@ -91,7 +91,6 @@ func (selectOneConfig *SelectOneConfig) FilterValue(filter *Filter, context *Con
 		if selectOneConfig.RemoteDataResource.CallFindOne(result, nil, clone) == nil {
 			return result
 		}
-		return ""
 	}
 
 	return keyword
