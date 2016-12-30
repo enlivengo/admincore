@@ -414,7 +414,7 @@ func filterResourceByFields(res *Resource, filterFields []filterField, keyword s
 					}
 				}
 			} else {
-				context.AddError(fmt.Errorf("filter `%v` is not supported", column))
+				// context.AddError(fmt.Errorf("filter `%v` is not supported", column))
 			}
 		}
 

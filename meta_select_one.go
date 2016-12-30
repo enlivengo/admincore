@@ -88,8 +88,10 @@ func (selectOneConfig *SelectOneConfig) FilterValue(filter *Filter, context *Con
 		result := selectOneConfig.RemoteDataResource.NewStruct()
 		clone := context.Clone()
 		clone.ResourceID = keyword
-		selectOneConfig.RemoteDataResource.CallFindOne(result, nil, clone)
-		return result
+		if selectOneConfig.RemoteDataResource.CallFindOne(result, nil, clone) == nil {
+			return result
+		}
+		return ""
 	}
 
 	return keyword
