@@ -454,7 +454,7 @@
                     }, this),
 
 
-                    error: $.proxy(function(response) {
+                    error: $.proxy(function() {
                         this.hide();
                         var errors;
                         if ($('.qor-error span').length > 0) {
@@ -462,7 +462,7 @@
                                 return $(this).text();
                             }).get().join(', ');
                         } else {
-                            errors = response.responseText;
+                            errors = 'Server error, please try again later!';
                         }
                         window.alert(errors);
                     }, this)

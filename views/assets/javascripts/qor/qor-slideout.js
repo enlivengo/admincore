@@ -372,7 +372,7 @@
                     }, this),
 
 
-                    error: $.proxy(function(response) {
+                    error: $.proxy(function() {
                         var errors;
                         $(CLASS_BODY_LOADING).remove();
                         if ($('.qor-error span').length > 0) {
@@ -380,8 +380,8 @@
                                 return $(this).text();
                             }).get().join(', ');
                         } else {
-                            errors = response.responseText;
-                        }
+                            errors = 'Server error, please try again later!';
+                        }                        
                         window.alert(errors);
                     }, this)
 
