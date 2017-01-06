@@ -22,30 +22,33 @@
     </script>
   {{end}}
 
-  <script name="select-many-selected-icon" type="x-tmpl-mustache">
-    <span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>
-  </script>
 
-  <script name="select-many-unselected-icon" type="x-tmpl-mustache">
-    <span class="qor-select__select-icon"><i class="material-icons">panorama_fish_eye</i></span>
-  </script>
+  {{if (eq .Meta.Config.SelectMode "bottom_sheet")}}
+    <script name="select-many-selected-icon" type="x-tmpl-mustache">
+      <span class="qor-select__select-icon"><i class="material-icons">check_circle</i></span>
+    </script>
 
-  <script name="select-many-hint" type="x-tmpl-mustache">
-    <div class="qor-selectmany__hint clearfix">
-      <span>[[ selectedNum ]] {{marshal (t "qor_admin.form.select_many_hint" "item(s) selected")}}</span>
-      <a href="#" data-dismiss="bottomsheets">{{t "qor_admin.form.select_many_hint_button" "DONE"}}</a>
-    </div>
-  </script>
-
-  <script name="select-many-template" type="x-tmpl-mustache">
-    <li data-primary-key="[[ primaryKey ]]">
-      <span>[[ &displayName ]]</span>
-      <a href="javascripr://" class="qor-selected-many__undo">
-        {{marshal (t "qor_admin.form.undo" "UNDO")}}
-      </a>
-      <a href="#" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
-    </li>
-  </script>
+    <script name="select-many-unselected-icon" type="x-tmpl-mustache">
+      <span class="qor-select__select-icon"><i class="material-icons">panorama_fish_eye</i></span>
+    </script>
+  
+    <script name="select-many-hint" type="x-tmpl-mustache">
+      <div class="qor-selectmany__hint clearfix">
+        <span>[[ selectedNum ]] {{marshal (t "qor_admin.form.select_many_hint" "item(s) selected")}}</span>
+        <a href="#" data-dismiss="bottomsheets">{{t "qor_admin.form.select_many_hint_button" "DONE"}}</a>
+      </div>
+    </script>
+  
+    <script name="select-many-template" type="x-tmpl-mustache">
+      <li data-primary-key="[[ primaryKey ]]">
+        <span>[[ &displayName ]]</span>
+        <a href="javascripr://" class="qor-selected-many__undo">
+          {{marshal (t "qor_admin.form.undo" "UNDO")}}
+        </a>
+        <a href="#" class="qor-selected-many__remove"><i class="material-icons">clear</i></a>
+      </li>
+    </script>
+  {{end}}
 
   <div class="qor-field__edit qor-field__block qor-field__selectmany" {{if (eq .Meta.Config.SelectMode "bottom_sheet")}}data-toggle="qor.selectmany"{{end}} {{if not (has_update_permission .Meta)}}data-disabled="disabled"{{end}}>
     {{if (eq .Meta.Config.SelectMode "bottom_sheet")}}
