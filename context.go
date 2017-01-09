@@ -35,7 +35,13 @@ func (admin *Admin) NewContext(w http.ResponseWriter, r *http.Request) *Context 
 
 // Funcs set FuncMap for templates
 func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
-	context.funcMaps = funcMaps
+	if context.funcMaps == nil {
+		context.funcMaps = template.FuncMap{}
+	}
+
+	for key, value := range funcMaps {
+		context.funcMaps[key] = value
+	}
 	return context
 }
 
