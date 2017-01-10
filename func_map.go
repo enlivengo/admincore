@@ -55,7 +55,7 @@ func (context *Context) uniqueKeyOf(value interface{}) interface{} {
 			primaryValues = append(primaryValues, fmt.Sprint(primaryField.Field.Interface()))
 		}
 		primaryValues = append(primaryValues, fmt.Sprint(rand.Intn(1000)))
-		return url.QueryEscape(strings.Join(primaryValues, "_ "))
+		return utils.ToParamString(url.QueryEscape(strings.Join(primaryValues, "_")))
 	}
 	return fmt.Sprint(value)
 }
@@ -344,7 +344,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		}
 
 		if !scope.PrimaryKeyZero() {
-			data["InputId"] = fmt.Sprintf("%v_%v_%v", scope.GetModelStruct().ModelType.Name(), scope.PrimaryKeyValue(), meta.Name)
+			data["InputId"] = utils.ToParamString(fmt.Sprintf("%v_%v_%v", scope.GetModelStruct().ModelType.Name(), scope.PrimaryKeyValue(), meta.Name))
 		}
 
 		data["CollectionValue"] = func() [][]string {
