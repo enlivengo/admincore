@@ -315,19 +315,25 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		}
 	}()
 
-	tmpl := template.New(meta.Type + ".tmpl").Funcs(funcsMap)
+	var (
+		tmpl    = template.New(meta.Type + ".tmpl").Funcs(funcsMap)
+		content []byte
+	)
+
 	switch {
 	case meta.Config != nil:
-		if content, err := meta.Config.GetTemplate(context, metaType); err == nil {
+		if content, err = meta.Config.GetTemplate(context, metaType); err == nil {
 			tmpl, err = tmpl.Parse(string(content))
 			break
 		}
 		fallthrough
 	default:
-		if content, err := context.Asset(fmt.Sprintf("%v/metas/%v/%v.tmpl", meta.baseResource.ToParam(), metaType, meta.Name), fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Type)); err == nil {
+		if content, err = context.Asset(fmt.Sprintf("%v/metas/%v/%v.tmpl", meta.baseResource.ToParam(), metaType, meta.Name), fmt.Sprintf("metas/%v/%v.tmpl", metaType, meta.Type)); err == nil {
 			tmpl, err = tmpl.Parse(string(content))
-		} else {
+		} else if metaType == "index" {
 			tmpl, err = tmpl.Parse("{{.Value}}")
+		} else {
+			err = fmt.Errorf("haven't found %v template for meta %v", metaType, meta.Name)
 		}
 	}
 
@@ -358,7 +364,9 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	}
 
 	if err != nil {
-		utils.ExitWithMsg(fmt.Sprintf("got error when render %v template for %v(%v):%v", metaType, meta.Name, meta.Type, err))
+		msg := fmt.Sprintf("got error when render %v template for %v(%v): %v", metaType, meta.Name, meta.Type, err)
+		fmt.Fprint(writer, msg)
+		utils.ExitWithMsg(msg)
 	}
 }
 
