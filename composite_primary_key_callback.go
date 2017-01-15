@@ -29,7 +29,7 @@ func (admin Admin) registerCompositePrimaryKeyCallback() {
 		})
 
 		db.Callback().Query().Before("gorm:query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
-		db.Callback().RowQuery().Before("gorm:query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
+		db.Callback().RowQuery().Before("gorm:row_query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
 	}
 }
 
