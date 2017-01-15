@@ -138,7 +138,7 @@
             this.$element.find('.qor-fieldset--new').remove();
         },
 
-        add: function (e, $button) {
+        add: function (e, $button, data) {
             let options = this.options,
                 $target = $button ? $button : $(e.target).closest(options.addClass),
                 templateName = $target.data('template'),
@@ -177,7 +177,8 @@
             }
 
             $item.trigger('enable').removeClass('qor-fieldset--new');
-            $(document).trigger(EVENT_REPLICATOR_ADDED, [$item]);
+
+            $(document).trigger(EVENT_REPLICATOR_ADDED, [$item, data]);
             e && e.stopPropagation();
         },
 
