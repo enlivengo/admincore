@@ -1035,7 +1035,7 @@ func (context *Context) FuncMap() template.FuncMap {
 			key := fmt.Sprintf("%v.attributes.%v", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, meta.Label)
 		},
-		"meta_placeholder": func(meta *Meta, placeholder string) template.HTML {
+		"meta_placeholder": func(meta *Meta, context *Context, placeholder string) template.HTML {
 			key := fmt.Sprintf("%v.attributes.%v.placeholder", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, placeholder)
 		},
