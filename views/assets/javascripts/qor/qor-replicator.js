@@ -138,6 +138,12 @@
             this.$element.find('.qor-fieldset--new').remove();
         },
 
+        addReplicators: function (data, $button) {
+            for (let i = 0, len = data.length; i < len; i++) {
+                this.add(null, $button, data[i]);
+            }
+        },
+
         add: function (e, $button, data) {
             let options = this.options,
                 $target = $button ? $button : $(e.target).closest(options.addClass),
