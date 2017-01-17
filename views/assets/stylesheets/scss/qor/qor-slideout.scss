@@ -12,11 +12,17 @@
     bottom: 0;
     z-index: $zindex-slideout;
     display: none;
-    background-color: #fff;
+    background-color: #f5f5f5;
     overflow: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     @include shadow-16dp();
+    .qor-form-container {
+        background-color: transparent;
+    }
+    .qor-fieldset {
+        background-color: #fff;
+    }
     figure {
         margin: 0;
     }
