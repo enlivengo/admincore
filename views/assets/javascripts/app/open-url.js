@@ -8,7 +8,6 @@ $(function() {
 
         CLASS_IS_SELECTED = 'is-selected',
 
-        hasSlideoutTheme = $body.hasClass('qor-theme-slideout'),
         isSlideoutOpened = function() {
             return $body.hasClass('qor-slideout-open');
         },
@@ -56,6 +55,7 @@ $(function() {
             openData = $this.data(),
             actionData,
             openType = openData.openType,
+            hasSlideoutTheme = $this.parents('.qor-theme-slideout').length,
             isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
 
 
