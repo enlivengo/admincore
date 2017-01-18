@@ -47,7 +47,6 @@ func (metaConfig) GetTemplate(context *Context, metaType string) ([]byte, error)
 // MetaConfigInterface meta config interface
 type MetaConfigInterface interface {
 	resource.MetaConfigInterface
-	GetTemplate(context *Context, metaType string) ([]byte, error)
 }
 
 // GetMetas get sub metas

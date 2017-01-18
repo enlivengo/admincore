@@ -322,9 +322,13 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 
 	switch {
 	case meta.Config != nil:
-		if content, err = meta.Config.GetTemplate(context, metaType); err == nil {
-			tmpl, err = tmpl.Parse(string(content))
-			break
+		if templater, ok := meta.Config.(interface {
+			GetTemplate(context *Context, metaType string) ([]byte, error)
+		}); ok {
+			if content, err = templater.GetTemplate(context, metaType); err == nil {
+				tmpl, err = tmpl.Parse(string(content))
+				break
+			}
 		}
 		fallthrough
 	default:
