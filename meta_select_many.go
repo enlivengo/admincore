@@ -13,6 +13,7 @@ import (
 // SelectManyConfig meta configuration used for select many
 type SelectManyConfig struct {
 	Collection               interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
+	Placeholder              string
 	SelectionTemplate        string
 	SelectMode               string // select, select_async, bottom_sheet
 	Select2ResultTemplate    template.JS
@@ -34,6 +35,7 @@ func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metao
 	if meta, ok := metaor.(*Meta); ok {
 		selectManyConfig.SelectOneConfig.Collection = selectManyConfig.Collection
 		selectManyConfig.SelectOneConfig.SelectMode = selectManyConfig.SelectMode
+		selectManyConfig.SelectOneConfig.Placeholder = selectManyConfig.Placeholder
 		selectManyConfig.SelectOneConfig.RemoteDataResource = selectManyConfig.RemoteDataResource
 
 		selectManyConfig.SelectOneConfig.ConfigureQorMeta(meta)

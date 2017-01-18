@@ -1036,6 +1036,14 @@ func (context *Context) FuncMap() template.FuncMap {
 			return context.Admin.T(context.Context, key, meta.Label)
 		},
 		"meta_placeholder": func(meta *Meta, context *Context, placeholder string) template.HTML {
+			if getPlaceholder, ok := meta.Config.(interface {
+				GetPlaceholder(*Context) (template.HTML, bool)
+			}); ok {
+				if str, ok := getPlaceholder.GetPlaceholder(context); ok {
+					return str
+				}
+			}
+
 			key := fmt.Sprintf("%v.attributes.%v.placeholder", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, placeholder)
 		},
