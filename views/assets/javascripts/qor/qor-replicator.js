@@ -17,7 +17,8 @@
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
-        EVENT_REPLICATOR_ADDED = 'added.' + NAMESPACE;
+        EVENT_REPLICATOR_ADDED = 'added.' + NAMESPACE,
+        EVENT_REPLICATORS_ADDED = 'addedMultiple.' + NAMESPACE;
 
     function QorReplicator(element, options) {
         this.$element = $(element);
@@ -142,6 +143,7 @@
             for (let i = 0, len = data.length; i < len; i++) {
                 this.add(null, $button, data[i]);
             }
+            $(document).trigger(EVENT_REPLICATORS_ADDED, [data]);
         },
 
         add: function (e, $button, data) {
