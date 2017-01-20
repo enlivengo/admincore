@@ -5,6 +5,10 @@
       {{meta_label .Meta}}
     </label>
 
+    <div class="qor-field__annotation">
+      {{meta_annotation .Meta .Context}}
+    </div>
+
     <div class="qor-field__block">
       <fieldset id="{{.InputId}}" class="qor-fieldset">
         {{render_nested_form $value (edit_sections .Meta.Resource) -1}}

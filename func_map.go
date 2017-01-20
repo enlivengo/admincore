@@ -1051,6 +1051,9 @@ func (context *Context) FuncMap() template.FuncMap {
 			key := fmt.Sprintf("%v.attributes.%v.placeholder", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, placeholder)
 		},
+		"meta_annotation": func(meta *Meta, context *Context) template.HTML {
+			return "annotation"
+		},
 
 		"url_for":            context.URLFor,
 		"link_to":            context.linkTo,

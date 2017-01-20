@@ -6,6 +6,10 @@
     {{meta_label .Meta}}
   </label>
 
+  <div class="qor-field__annotation">
+    {{meta_annotation .Meta .Context}}
+  </div>
+
   <div class="qor-field__show">
     {{if $is_existing_record}}{{.Value}}{{end}}
   </div>

@@ -1,8 +1,12 @@
-<div class="qor-field">
+<div class="qor-field" meta-type="string">
   <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
     <label class="qor-field__label mdl-textfield__label" for="{{.InputId}}">
       {{meta_label .Meta}}
     </label>
+
+    <div class="qor-field__annotation">
+      {{meta_annotation .Meta .Context}}
+    </div>
 
     <div class="qor-field__show">
       {{.Value}}

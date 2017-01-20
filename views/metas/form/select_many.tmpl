@@ -3,6 +3,10 @@
     {{meta_label .Meta}}
   </label>
 
+  <div class="qor-field__annotation">
+    {{meta_annotation .Meta .Context}}
+  </div>
+
   {{$current_values := (raw_value_of .ResourceValue .Meta)}}
   <div class="qor-field__show">
     {{range $value := $current_values}}
