@@ -4,10 +4,11 @@
 <div class="qor-field">
   <label class="qor-field__label" for="{{.InputId}}">
     {{meta_label .Meta}}
+
   </label>
 
   <div class="qor-field__show">
-    {{if $is_existing_record}}{{.Value}}{{end}}
+	{{.Value}}
   </div>
 
   {{if .Meta.Config.Select2ResultTemplate}}
