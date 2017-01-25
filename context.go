@@ -217,13 +217,22 @@ func (context *Context) JSON(action string, result interface{}) {
 	}
 
 	js, err := json.MarshalIndent(context.Resource.convertObjectToJSONMap(context, result, action), "", "\t")
-	context.Writer.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		result := make(map[string]string)
 		result["error"] = err.Error()
 		js, _ = json.Marshal(result)
 	}
+
+	context.Writer.Header().Set("Content-Type", "application/json")
 	context.Writer.Write(js)
+}
+
+type XMLResult struct {
+	Result interface{}
+}
+
+func (XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return nil
 }
 
 // XML generate xml outputs for action
@@ -232,12 +241,16 @@ func (context *Context) XML(action string, result interface{}) {
 		action = "edit"
 	}
 
-	xmlResult, err := xml.MarshalIndent(context.Resource.convertObjectToJSONMap(context, result, action), "", "    ")
-	context.Writer.Header().Set("Content-Type", "application/xml")
+	xmlResult := XMLResult{}
+	xmlResult.Result = context.Resource.convertObjectToJSONMap(context, result, action)
+
+	xmlMarshalResult, err := xml.MarshalIndent(result, "", "\t")
+
 	if err != nil {
-		result := make(map[string]string)
-		result["error"] = err.Error()
-		xmlResult, _ = xml.MarshalIndent(result, "", "    ")
+		xmlResult.Result = map[string]string{"error": err.Error()}
+		xmlMarshalResult, _ = xml.MarshalIndent(xmlResult, "", "\t")
 	}
-	context.Writer.Write(xmlResult)
+
+	context.Writer.Header().Set("Content-Type", "application/xml")
+	context.Writer.Write(xmlMarshalResult)
 }
