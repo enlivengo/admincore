@@ -3,6 +3,7 @@ package admin
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"html/template"
@@ -223,4 +224,20 @@ func (context *Context) JSON(action string, result interface{}) {
 		js, _ = json.Marshal(result)
 	}
 	context.Writer.Write(js)
+}
+
+// XML generate xml outputs for action
+func (context *Context) XML(action string, result interface{}) {
+	if action == "show" && !context.Resource.isSetShowAttrs {
+		action = "edit"
+	}
+
+	xmlResult, err := xml.MarshalIndent(context.Resource.convertObjectToJSONMap(context, result, action), "", "    ")
+	context.Writer.Header().Set("Content-Type", "application/xml")
+	if err != nil {
+		result := make(map[string]string)
+		result["error"] = err.Error()
+		xmlResult, _ = xml.MarshalIndent(result, "", "    ")
+	}
+	context.Writer.Write(xmlResult)
 }
