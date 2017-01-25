@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"reflect"
 
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
@@ -231,7 +232,57 @@ type XMLResult struct {
 	Result interface{}
 }
 
-func (XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	reflectValue := reflect.Indirect(reflect.ValueOf(xmlResult.Result))
+
+	switch reflectValue.Kind() {
+	case reflect.Map:
+		// encode map[string]interface{}
+		start.Name = xml.Name{
+			Space: "",
+			Local: "map",
+		}
+
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+
+		mapKeys := reflectValue.MapKeys()
+		for _, mapKey := range mapKeys {
+			elem := xml.StartElement{
+				Name: xml.Name{Space: "", Local: fmt.Sprint(mapKey.Interface())},
+				Attr: []xml.Attr{},
+			}
+			if err := e.EncodeElement(reflectValue.MapIndex(mapKey).Interface(), elem); err != nil {
+				return err
+			}
+		}
+
+		if err := e.EncodeToken(xml.EndElement{Name: start.Name}); err != nil {
+			return err
+		}
+	case reflect.Slice:
+		for i := 0; i < reflectValue.Len(); i++ {
+			if err := e.EncodeElement(reflect.Indirect(reflectValue.Index(i)).Interface(), start); err != nil {
+				return err
+			}
+		}
+	case reflect.Struct:
+		reflectType := reflectValue.Type()
+		for i := 0; i < reflectType.NumField(); i++ {
+			field := reflectType.Field(i)
+			fieldStart := xml.StartElement{
+				Name: xml.Name{
+					Space: "",
+					Local: field.Name,
+				},
+			}
+
+			// FIXME edit/show attrs
+			e.EncodeElement(fmt.Sprint(reflectValue.Field(i).Interface()), fieldStart)
+		}
+	}
+
 	return nil
 }
 
