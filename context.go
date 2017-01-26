@@ -242,18 +242,17 @@ func (xmlResult XMLResult) Initialize(value interface{}) XMLResult {
 func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	reflectValue := reflect.Indirect(reflect.ValueOf(xmlResult.Result))
 
+	// Write Start Element
+	if start.Name.Local == "XMLResult" {
+		start.Name.Local = "response"
+	}
+
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
 	switch reflectValue.Kind() {
 	case reflect.Map:
-		// encode map[string]interface{}
-		start.Name = xml.Name{
-			Space: "",
-			Local: "response",
-		}
-
-		if err := e.EncodeToken(start); err != nil {
-			return err
-		}
-
 		mapKeys := reflectValue.MapKeys()
 		for _, mapKey := range mapKeys {
 			var (
@@ -265,8 +264,9 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 				}
 			)
 
+			mapValue = reflect.Indirect(reflect.ValueOf(mapValue.Interface()))
 			if mapValue.Kind() == reflect.Map {
-				err = e.EncodeElement(xmlResult.Initialize(reflectValue.MapIndex(mapKey).Interface()), startElem)
+				err = e.EncodeElement(xmlResult.Initialize(mapValue.Interface()), startElem)
 			} else {
 				err = e.EncodeElement(fmt.Sprint(reflectValue.MapIndex(mapKey).Interface()), startElem)
 			}
@@ -274,10 +274,6 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 			if err != nil {
 				return err
 			}
-		}
-
-		if err := e.EncodeToken(xml.EndElement{Name: start.Name}); err != nil {
-			return err
 		}
 	case reflect.Slice:
 		for i := 0; i < reflectValue.Len(); i++ {
@@ -304,6 +300,10 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 		return e.EncodeElement(reflectValue.Interface(), start)
 	}
 
+	// Write End Element
+	if err := e.EncodeToken(xml.EndElement{Name: start.Name}); err != nil {
+		return err
+	}
 	return nil
 }
 

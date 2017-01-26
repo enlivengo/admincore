@@ -3,30 +3,20 @@ package admin_test
 import (
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/qor/admin"
 )
 
-func TestMarshalXML(t *testing.T) {
+func TestMarshalMapToXML(t *testing.T) {
 	xmlResult := admin.XMLResult{
-		Result: map[string]interface{}{"error": errors.New("error message")},
+		Result: map[string]interface{}{"error": errors.New("error message"), "status": map[string]int{"code": 200}},
 	}
+	result := "<response>\n\t<error>error message</error>\n\t<status>\n\t\t<code>200</code>\n\t</status>\n</response>"
 
 	if xmlMarshalResult, err := xml.MarshalIndent(xmlResult, "", "\t"); err != nil {
 		t.Errorf("no error should happen, but got %v", err)
-	} else {
-		fmt.Println(string(xmlMarshalResult))
-	}
-
-	xmlResult = admin.XMLResult{
-		Result: User{Name: "jinzhu", Age: 18},
-	}
-
-	if xmlMarshalResult, err := xml.MarshalIndent(xmlResult, "", "\t"); err != nil {
-		t.Errorf("no error should happen, but got %v", err)
-	} else {
-		fmt.Println(string(xmlMarshalResult))
+	} else if string(xmlMarshalResult) != result {
+		t.Errorf("Generated XML got %v, but should be %v", string(xmlMarshalResult), result)
 	}
 }
