@@ -335,7 +335,7 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 				metaStart := xml.StartElement{
 					Name: xml.Name{
 						Space: "",
-						Local: meta.Name,
+						Local: strings.Replace(meta.Label, " ", "", -1),
 					},
 				}
 
