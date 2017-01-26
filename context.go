@@ -246,28 +246,14 @@ func (xmlMarshaler XMLMarshaler) Initialize(value interface{}, res *Resource) XM
 	}
 }
 
-func (xmlMarshaler XMLMarshaler) XMLStartElement() xml.StartElement {
-	reflectValue := reflect.Indirect(reflect.ValueOf(xmlMarshaler.Result))
-
-	switch reflectValue.Kind() {
-	case reflect.Map:
-		return xml.StartElement{
-			Name: xml.Name{
-				Local: "response",
-			},
-		}
-	}
-
-	return xml.StartElement{}
-}
-
 var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, start xml.StartElement) error {
+	defaultStartElement := xml.StartElement{Name: xml.Name{Local: "XMLMarshaler"}}
 	reflectValue := reflect.Indirect(reflect.ValueOf(xmlMarshaler.Result))
 
 	switch reflectValue.Kind() {
 	case reflect.Map:
 		// Write Start Element
-		if start.Name.Local == "XMLMarshaler" {
+		if start.Name.Local == defaultStartElement.Name.Local {
 			start.Name.Local = "response"
 		}
 
@@ -299,8 +285,9 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 		}
 	case reflect.Slice:
 		// Write Start Element
-		if start.Name.Local == "XMLMarshaler" {
-			if xmlMarshaler.Resource != nil {
+		if start.Name.Local == defaultStartElement.Name.Local {
+			modelType := utils.ModelType(xmlMarshaler.Result)
+			if xmlMarshaler.Resource != nil && modelType == utils.ModelType(xmlMarshaler.Resource.Value) {
 				start.Name.Local = inflection.Plural(xmlMarshaler.Resource.Name)
 			} else {
 				start.Name.Local = "responses"
@@ -312,11 +299,26 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 		}
 
 		for i := 0; i < reflectValue.Len(); i++ {
-			if err := e.EncodeElement(xmlMarshaler.Initialize(reflect.Indirect(reflectValue.Index(i)).Interface(), nil), start); err != nil {
+			if err := e.EncodeElement(xmlMarshaler.Initialize(reflect.Indirect(reflectValue.Index(i)).Interface(), xmlMarshaler.Resource), defaultStartElement); err != nil {
 				return err
 			}
 		}
 	case reflect.Struct:
+		// Write Start Element
+		if xmlMarshaler.Resource != nil && utils.ModelType(xmlMarshaler.Result) == utils.ModelType(xmlMarshaler.Resource.Value) {
+			start.Name.Local = xmlMarshaler.Resource.Name
+		} else {
+			return e.EncodeElement(fmt.Sprint(xmlMarshaler.Result), start)
+		}
+
+		if start.Name.Local == defaultStartElement.Name.Local {
+			start.Name.Local = "response"
+		}
+
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+
 		reflectType := reflectValue.Type()
 		for i := 0; i < reflectType.NumField(); i++ {
 			if fieldStruct := reflectType.Field(i); ast.IsExported(fieldStruct.Name) {
