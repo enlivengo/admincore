@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"reflect"
+	"strings"
 
 	"github.com/jinzhu/inflection"
 	"github.com/qor/qor"
@@ -290,7 +291,7 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 		if start.Name.Local == defaultStartElement.Name.Local {
 			modelType := utils.ModelType(xmlMarshaler.Result)
 			if xmlMarshaler.Resource != nil && modelType == utils.ModelType(xmlMarshaler.Resource.Value) {
-				start.Name.Local = inflection.Plural(xmlMarshaler.Resource.Name)
+				start.Name.Local = inflection.Plural(strings.Replace(xmlMarshaler.Resource.Name, " ", "", -1))
 			} else {
 				start.Name.Local = "responses"
 			}
@@ -308,50 +309,57 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 	case reflect.Struct:
 		// Write Start Element
 		if xmlMarshaler.Resource == nil || utils.ModelType(xmlMarshaler.Result) != utils.ModelType(xmlMarshaler.Resource.Value) {
-			return e.EncodeElement(fmt.Sprint(xmlMarshaler.Result), start)
-		}
-
-		start.Name.Local = xmlMarshaler.Resource.Name
-		if start.Name.Local == defaultStartElement.Name.Local {
-			start.Name.Local = "response"
-		}
-
-		if err := e.EncodeToken(start); err != nil {
-			return err
-		}
-
-		metas := []*Meta{}
-		switch xmlMarshaler.Action {
-		case "index":
-			metas = res.ConvertSectionToMetas(res.allowedSections(res.IndexAttrs(), context, roles.Update))
-		case "edit":
-			metas = res.ConvertSectionToMetas(res.allowedSections(res.EditAttrs(), context, roles.Update))
-		case "show":
-			metas = res.ConvertSectionToMetas(res.allowedSections(res.ShowAttrs(), context, roles.Read))
-		}
-
-		for _, meta := range metas {
-			metaStart := xml.StartElement{
-				Name: xml.Name{
-					Space: "",
-					Local: meta.Name,
-				},
+			if err := e.EncodeElement(fmt.Sprint(xmlMarshaler.Result), start); err != nil {
+				return err
+			}
+		} else {
+			if start.Name.Local == defaultStartElement.Name.Local {
+				start.Name.Local = strings.Replace(xmlMarshaler.Resource.Name, " ", "", -1)
 			}
 
-			if meta.Resource != nil {
-				metaValue := meta.GetValuer()(xmlMarshaler.Result, context.Context)
-				if err := e.EncodeElement(xmlMarshaler.Initialize(metaValue, meta.Resource), metaStart); err != nil {
-					return err
+			if err := e.EncodeToken(start); err != nil {
+				return err
+			}
+
+			metas := []*Meta{}
+			switch xmlMarshaler.Action {
+			case "index":
+				metas = res.ConvertSectionToMetas(res.allowedSections(res.IndexAttrs(), context, roles.Update))
+			case "edit":
+				metas = res.ConvertSectionToMetas(res.allowedSections(res.EditAttrs(), context, roles.Update))
+			case "show":
+				metas = res.ConvertSectionToMetas(res.allowedSections(res.ShowAttrs(), context, roles.Read))
+			}
+
+			for _, meta := range metas {
+				metaStart := xml.StartElement{
+					Name: xml.Name{
+						Space: "",
+						Local: meta.Name,
+					},
 				}
-			} else {
-				formattedValue := meta.GetFormattedValuer()(xmlMarshaler.Result, context.Context)
-				if err := e.EncodeElement(fmt.Sprint(formattedValue), metaStart); err != nil {
-					return err
+
+				if meta.Resource != nil {
+					metaValue := meta.GetValuer()(xmlMarshaler.Result, context.Context)
+					if err := e.EncodeElement(xmlMarshaler.Initialize(metaValue, meta.Resource), metaStart); err != nil {
+						return err
+					}
+				} else {
+					formattedValue := meta.GetFormattedValuer()(xmlMarshaler.Result, context.Context)
+					if err := e.EncodeElement(fmt.Sprint(formattedValue), metaStart); err != nil {
+						return err
+					}
 				}
 			}
 		}
 	default:
-		return e.EncodeElement(reflectValue.Interface(), start)
+		if reflectValue.IsValid() {
+			if err := e.EncodeElement(fmt.Sprint(reflectValue.Interface()), start); err != nil {
+				return err
+			}
+		} else {
+			return nil
+		}
 	}
 
 	// Write End Element
