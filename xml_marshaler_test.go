@@ -2,6 +2,7 @@ package admin_test
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -10,7 +11,7 @@ import (
 
 func TestMarshalXML(t *testing.T) {
 	xmlResult := admin.XMLResult{
-		Result: map[string]string{"hello": "Hello"},
+		Result: map[string]interface{}{"error": errors.New("error message")},
 	}
 
 	if xmlMarshalResult, err := xml.MarshalIndent(xmlResult, "", "\t"); err != nil {

@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"go/ast"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -232,6 +233,12 @@ type XMLResult struct {
 	Result interface{}
 }
 
+func (xmlResult XMLResult) Initialize(value interface{}) XMLResult {
+	return XMLResult{
+		Result: value,
+	}
+}
+
 func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	reflectValue := reflect.Indirect(reflect.ValueOf(xmlResult.Result))
 
@@ -240,7 +247,7 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 		// encode map[string]interface{}
 		start.Name = xml.Name{
 			Space: "",
-			Local: "map",
+			Local: "response",
 		}
 
 		if err := e.EncodeToken(start); err != nil {
@@ -249,11 +256,22 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 
 		mapKeys := reflectValue.MapKeys()
 		for _, mapKey := range mapKeys {
-			elem := xml.StartElement{
-				Name: xml.Name{Space: "", Local: fmt.Sprint(mapKey.Interface())},
-				Attr: []xml.Attr{},
+			var (
+				err       error
+				mapValue  = reflectValue.MapIndex(mapKey)
+				startElem = xml.StartElement{
+					Name: xml.Name{Space: "", Local: fmt.Sprint(mapKey.Interface())},
+					Attr: []xml.Attr{},
+				}
+			)
+
+			if mapValue.Kind() == reflect.Map {
+				err = e.EncodeElement(xmlResult.Initialize(reflectValue.MapIndex(mapKey).Interface()), startElem)
+			} else {
+				err = e.EncodeElement(fmt.Sprint(reflectValue.MapIndex(mapKey).Interface()), startElem)
 			}
-			if err := e.EncodeElement(reflectValue.MapIndex(mapKey).Interface(), elem); err != nil {
+
+			if err != nil {
 				return err
 			}
 		}
@@ -270,17 +288,20 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	case reflect.Struct:
 		reflectType := reflectValue.Type()
 		for i := 0; i < reflectType.NumField(); i++ {
-			field := reflectType.Field(i)
-			fieldStart := xml.StartElement{
-				Name: xml.Name{
-					Space: "",
-					Local: field.Name,
-				},
-			}
+			if fieldStruct := reflectType.Field(i); ast.IsExported(fieldStruct.Name) {
+				fieldStart := xml.StartElement{
+					Name: xml.Name{
+						Space: "",
+						Local: fieldStruct.Name,
+					},
+				}
 
-			// FIXME edit/show attrs
-			e.EncodeElement(fmt.Sprint(reflectValue.Field(i).Interface()), fieldStart)
+				// FIXME edit/show attrs
+				e.EncodeElement(fmt.Sprint(reflectValue.Field(i).Interface()), fieldStart)
+			}
 		}
+	default:
+		return e.EncodeElement(reflectValue.Interface(), start)
 	}
 
 	return nil
@@ -303,5 +324,5 @@ func (context *Context) XML(action string, result interface{}) {
 	}
 
 	context.Writer.Header().Set("Content-Type", "application/xml")
-	context.Writer.Write(xmlMarshalResult)
+	context.Writer.Write([]byte(xml.Header + string(xmlMarshalResult)))
 }
