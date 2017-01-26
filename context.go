@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"go/ast"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -15,6 +14,7 @@ import (
 	"github.com/jinzhu/inflection"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
+	"github.com/qor/roles"
 )
 
 // Context admin context, which is used for admin controller
@@ -249,6 +249,8 @@ func (xmlMarshaler XMLMarshaler) Initialize(value interface{}, res *Resource) XM
 var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, start xml.StartElement) error {
 	defaultStartElement := xml.StartElement{Name: xml.Name{Local: "XMLMarshaler"}}
 	reflectValue := reflect.Indirect(reflect.ValueOf(xmlMarshaler.Result))
+	res := xmlMarshaler.Resource
+	context := xmlMarshaler.Context
 
 	switch reflectValue.Kind() {
 	case reflect.Map:
@@ -305,12 +307,11 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 		}
 	case reflect.Struct:
 		// Write Start Element
-		if xmlMarshaler.Resource != nil && utils.ModelType(xmlMarshaler.Result) == utils.ModelType(xmlMarshaler.Resource.Value) {
-			start.Name.Local = xmlMarshaler.Resource.Name
-		} else {
+		if xmlMarshaler.Resource == nil || utils.ModelType(xmlMarshaler.Result) != utils.ModelType(xmlMarshaler.Resource.Value) {
 			return e.EncodeElement(fmt.Sprint(xmlMarshaler.Result), start)
 		}
 
+		start.Name.Local = xmlMarshaler.Resource.Name
 		if start.Name.Local == defaultStartElement.Name.Local {
 			start.Name.Local = "response"
 		}
@@ -319,18 +320,34 @@ var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, s
 			return err
 		}
 
-		reflectType := reflectValue.Type()
-		for i := 0; i < reflectType.NumField(); i++ {
-			if fieldStruct := reflectType.Field(i); ast.IsExported(fieldStruct.Name) {
-				fieldStart := xml.StartElement{
-					Name: xml.Name{
-						Space: "",
-						Local: fieldStruct.Name,
-					},
-				}
+		metas := []*Meta{}
+		switch xmlMarshaler.Action {
+		case "index":
+			metas = res.ConvertSectionToMetas(res.allowedSections(res.IndexAttrs(), context, roles.Update))
+		case "edit":
+			metas = res.ConvertSectionToMetas(res.allowedSections(res.EditAttrs(), context, roles.Update))
+		case "show":
+			metas = res.ConvertSectionToMetas(res.allowedSections(res.ShowAttrs(), context, roles.Read))
+		}
 
-				// FIXME edit/show attrs
-				e.EncodeElement(fmt.Sprint(reflectValue.Field(i).Interface()), fieldStart)
+		for _, meta := range metas {
+			metaStart := xml.StartElement{
+				Name: xml.Name{
+					Space: "",
+					Local: meta.Name,
+				},
+			}
+
+			if meta.Resource != nil {
+				metaValue := meta.GetValuer()(xmlMarshaler.Result, context.Context)
+				if err := e.EncodeElement(xmlMarshaler.Initialize(metaValue, meta.Resource), metaStart); err != nil {
+					return err
+				}
+			} else {
+				formattedValue := meta.GetFormattedValuer()(xmlMarshaler.Result, context.Context)
+				if err := e.EncodeElement(fmt.Sprint(formattedValue), metaStart); err != nil {
+					return err
+				}
 			}
 		}
 	default:
