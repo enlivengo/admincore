@@ -9,7 +9,7 @@ import (
 )
 
 func TestMarshalMapToXML(t *testing.T) {
-	xmlResult := admin.XMLResult{
+	xmlResult := admin.XMLMarshaler{
 		Result: map[string]interface{}{"error": errors.New("error message"), "status": map[string]int{"code": 200}},
 	}
 	result := "<response>\n\t<error>error message</error>\n\t<status>\n\t\t<code>200</code>\n\t</status>\n</response>"

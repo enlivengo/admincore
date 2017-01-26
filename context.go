@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"reflect"
 
+	"github.com/jinzhu/inflection"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 )
@@ -229,30 +230,51 @@ func (context *Context) JSON(action string, result interface{}) {
 	context.Writer.Write(js)
 }
 
-type XMLResult struct {
-	Result interface{}
+type XMLMarshaler struct {
+	Action   string
+	Resource *Resource
+	Context  *Context
+	Result   interface{}
 }
 
-func (xmlResult XMLResult) Initialize(value interface{}) XMLResult {
-	return XMLResult{
-		Result: value,
+func (xmlMarshaler XMLMarshaler) Initialize(value interface{}, res *Resource) XMLMarshaler {
+	return XMLMarshaler{
+		Resource: res,
+		Action:   xmlMarshaler.Action,
+		Context:  xmlMarshaler.Context,
+		Result:   value,
 	}
 }
 
-func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	reflectValue := reflect.Indirect(reflect.ValueOf(xmlResult.Result))
-
-	// Write Start Element
-	if start.Name.Local == "XMLResult" {
-		start.Name.Local = "response"
-	}
-
-	if err := e.EncodeToken(start); err != nil {
-		return err
-	}
+func (xmlMarshaler XMLMarshaler) XMLStartElement() xml.StartElement {
+	reflectValue := reflect.Indirect(reflect.ValueOf(xmlMarshaler.Result))
 
 	switch reflectValue.Kind() {
 	case reflect.Map:
+		return xml.StartElement{
+			Name: xml.Name{
+				Local: "response",
+			},
+		}
+	}
+
+	return xml.StartElement{}
+}
+
+var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, start xml.StartElement) error {
+	reflectValue := reflect.Indirect(reflect.ValueOf(xmlMarshaler.Result))
+
+	switch reflectValue.Kind() {
+	case reflect.Map:
+		// Write Start Element
+		if start.Name.Local == "XMLMarshaler" {
+			start.Name.Local = "response"
+		}
+
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+
 		mapKeys := reflectValue.MapKeys()
 		for _, mapKey := range mapKeys {
 			var (
@@ -266,7 +288,7 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 
 			mapValue = reflect.Indirect(reflect.ValueOf(mapValue.Interface()))
 			if mapValue.Kind() == reflect.Map {
-				err = e.EncodeElement(xmlResult.Initialize(mapValue.Interface()), startElem)
+				err = e.EncodeElement(xmlMarshaler.Initialize(mapValue.Interface(), xmlMarshaler.Resource), startElem)
 			} else {
 				err = e.EncodeElement(fmt.Sprint(reflectValue.MapIndex(mapKey).Interface()), startElem)
 			}
@@ -276,8 +298,21 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 			}
 		}
 	case reflect.Slice:
+		// Write Start Element
+		if start.Name.Local == "XMLMarshaler" {
+			if xmlMarshaler.Resource != nil {
+				start.Name.Local = inflection.Plural(xmlMarshaler.Resource.Name)
+			} else {
+				start.Name.Local = "responses"
+			}
+		}
+
+		if err := e.EncodeToken(start); err != nil {
+			return err
+		}
+
 		for i := 0; i < reflectValue.Len(); i++ {
-			if err := e.EncodeElement(reflect.Indirect(reflectValue.Index(i)).Interface(), start); err != nil {
+			if err := e.EncodeElement(xmlMarshaler.Initialize(reflect.Indirect(reflectValue.Index(i)).Interface(), nil), start); err != nil {
 				return err
 			}
 		}
@@ -307,20 +342,28 @@ func (xmlResult XMLResult) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return nil
 }
 
+func (xmlMarshaler XMLMarshaler) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return DefaultXMLMarshalHandler(xmlMarshaler, e, start)
+}
+
 // XML generate xml outputs for action
 func (context *Context) XML(action string, result interface{}) {
 	if action == "show" && !context.Resource.isSetShowAttrs {
 		action = "edit"
 	}
 
-	xmlResult := XMLResult{}
-	xmlResult.Result = context.Resource.convertObjectToJSONMap(context, result, action)
+	xmlMarshaler := XMLMarshaler{
+		Action:   action,
+		Resource: context.Resource,
+		Context:  context,
+		Result:   result,
+	}
 
-	xmlMarshalResult, err := xml.MarshalIndent(result, "", "\t")
+	xmlMarshalResult, err := xml.MarshalIndent(xmlMarshaler, "", "\t")
 
 	if err != nil {
-		xmlResult.Result = map[string]string{"error": err.Error()}
-		xmlMarshalResult, _ = xml.MarshalIndent(xmlResult, "", "\t")
+		xmlMarshaler.Result = map[string]string{"error": err.Error()}
+		xmlMarshalResult, _ = xml.MarshalIndent(xmlMarshaler, "", "\t")
 	}
 
 	context.Writer.Header().Set("Content-Type", "application/xml")
