@@ -16,18 +16,19 @@ import (
 
 // Admin is a struct that used to generate admin/api interface
 type Admin struct {
-	SiteName         string
-	Config           *qor.Config
-	I18n             I18n
-	AssetFS          AssetFSInterface
+	SiteName string
+	Config   *qor.Config
+	I18n     I18n
+	AssetFS  AssetFSInterface
+	Auth     Auth
+	Encoding
+
 	menus            []*Menu
 	resources        []*Resource
 	searchResources  []*Resource
-	Auth             Auth
 	router           *Router
 	funcMaps         template.FuncMap
 	metaConfigorMaps map[string]func(*Meta)
-	encodings        []EncodingInterface
 }
 
 // ResourceNamer is an interface for models that defined method `ResourceName`

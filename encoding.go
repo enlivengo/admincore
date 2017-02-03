@@ -1,6 +1,9 @@
 package admin
 
-import "errors"
+import (
+	"errors"
+	"io"
+)
 
 type Decoder struct {
 	Action   string
@@ -9,7 +12,7 @@ type Decoder struct {
 	Result   interface{}
 }
 
-type Responder struct {
+type Encoder struct {
 	Action   string
 	Resource *Resource
 	Context  *Context
@@ -18,10 +21,9 @@ type Responder struct {
 
 type EncodingInterface interface {
 	CouldDecode(Decoder) bool
-	Decode(Decoder) error
-
-	CouldRespond(Responder) bool
-	Respond(Responder) error
+	Decode(dst interface{}, decoder Decoder) error
+	CouldEncode(Encoder) bool
+	Encode(writer io.Writer, encoder Encoder) error
 }
 
 type Encoding struct {
@@ -32,7 +34,7 @@ func (encoding *Encoding) RegisterEncoding(e EncodingInterface) {
 	encoding.Encodings = append(encoding.Encodings, e)
 }
 
-func (encoding *Encoding) Decode(decoder Decoder) error {
+func (encoding *Encoding) Decode(dst interface{}, decoder Decoder) error {
 	for _, d := range encoding.Encodings {
 		if d.CouldDecode(decoder) {
 			return d.Decode(decoder)
@@ -41,11 +43,11 @@ func (encoding *Encoding) Decode(decoder Decoder) error {
 	return errors.New("decoder not found")
 }
 
-func (encoding *Encoding) Respond(responder Responder) error {
+func (encoding *Encoding) Encode(writer io.Writer, encoder Encoder) error {
 	for _, f := range encoding.Encodings {
-		if f.CouldRespond(responder) {
-			return f.Respond(responder)
+		if f.CouldEncode(encoder) {
+			return f.Encode(encoder)
 		}
 	}
-	return errors.New("responder not found")
+	return errors.New("encoder not found")
 }
