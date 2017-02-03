@@ -27,6 +27,7 @@ type Admin struct {
 	router           *Router
 	funcMaps         template.FuncMap
 	metaConfigorMaps map[string]func(*Meta)
+	encodings        []EncodingInterface
 }
 
 // ResourceNamer is an interface for models that defined method `ResourceName`
