@@ -18,6 +18,14 @@ type Encoding struct {
 	Decoders []DecoderInterface
 }
 
+func (encoding *Encoding) RegisterEncoder(encoder EncoderInterface) {
+	encoding.Encoders = append(encoding.Encoders, encoder)
+}
+
+func (encoding *Encoding) RegisterDecoder(encoder DecoderInterface) {
+	encoding.Decoders = append(encoding.Decoders, encoder)
+}
+
 type EncoderInterface interface {
 	CouldEncode(Encoder) bool
 	Encode(writer io.Writer, encoder Encoder) error
