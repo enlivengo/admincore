@@ -3,9 +3,6 @@ package admin
 import (
 	"errors"
 	"io"
-
-	"github.com/qor/qor"
-	"github.com/qor/qor/resource"
 )
 
 var (
@@ -33,8 +30,8 @@ type EncoderInterface interface {
 
 type Encoder struct {
 	Action   string
-	Resource *resource.Resource
-	Context  *qor.Context
+	Resource *Resource
+	Context  *Context
 	Result   interface{}
 }
 
@@ -56,8 +53,8 @@ type DecoderInterface interface {
 
 type Decoder struct {
 	Action   string
-	Resource *resource.Resource
-	Context  *qor.Context
+	Resource *Resource
+	Context  *Context
 	Result   interface{}
 }
 
