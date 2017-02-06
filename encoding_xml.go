@@ -3,6 +3,8 @@ package admin
 import (
 	"encoding/xml"
 	"fmt"
+	"mime"
+	"path"
 	"reflect"
 	"strings"
 
@@ -165,6 +167,20 @@ func (XMLEncoding) Decode(dst interface{}, decoder Decoder) error {
 }
 
 func (XMLEncoding) CouldEncode(encoder Encoder) bool {
+	if encoder.Context != nil && encoder.Context.Request != nil {
+		if path.Ext(encoder.Context.Request.RequestURI) == ".xml" {
+			return true
+		}
+
+		if types, err := mime.ExtensionsByType(encoder.Context.Request.Header.Get("accept")); err == nil {
+			for _, typ := range types {
+				if typ == ".xml" {
+					return true
+				}
+			}
+		}
+	}
+
 	return false
 }
 
