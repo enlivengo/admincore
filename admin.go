@@ -21,7 +21,6 @@ type Admin struct {
 	I18n     I18n
 	AssetFS  AssetFSInterface
 	Auth     Auth
-	Encoding
 
 	menus            []*Menu
 	resources        []*Resource
