@@ -82,7 +82,7 @@ func (xmlStruct XMLStruct) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 }
 
 var XMLMarshalDefaultHandler = func(xmlStruct XMLStruct, e *xml.Encoder, start xml.StartElement) error {
-	defaultStartElement := xml.StartElement{Name: xml.Name{Local: "xmlStruct"}}
+	defaultStartElement := xml.StartElement{Name: xml.Name{Local: "XMLStruct"}}
 	reflectValue := reflect.Indirect(reflect.ValueOf(xmlStruct.Result))
 	res := xmlStruct.Resource
 	context := xmlStruct.Context
