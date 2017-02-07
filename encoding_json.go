@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"io"
 	"mime"
 	"path"
 )
@@ -26,7 +27,7 @@ func (JSONEncoding) CouldEncode(encoder Encoder) bool {
 	return false
 }
 
-func (JSONEncoding) Encode(dst interface{}, encoder Encoder) error {
+func (JSONEncoding) Encode(writer io.Writer, encoder Encoder) error {
 	context := encoder.Context
 
 	js, err := json.MarshalIndent(context.Resource.convertObjectToJSONMap(context, encoder.Result, encoder.Action), "", "\t")

@@ -10,13 +10,42 @@ var (
 	ErrUnsupportedDecoder = errors.New("unsupported decoder")
 )
 
+var DefaultEncoding = &Encoding{}
+
+func init() {
+	DefaultEncoding.RegisterEncoding(&XMLEncoding{}, &JSONEncoding{})
+}
+
 type Encoding struct {
 	Encoders []EncoderInterface
 	Decoders []DecoderInterface
 }
 
-func (encoding *Encoding) RegisterEncoder(encoder EncoderInterface) {
-	encoding.Encoders = append(encoding.Encoders, encoder)
+type EncodingInterface interface {
+	EncoderInterface
+	DecoderInterface
+}
+
+func (encoding *Encoding) RegisterEncoding(encodings ...interface{}) error {
+	for _, e := range encodings {
+		valid := false
+
+		if encoder, ok := e.(EncoderInterface); ok {
+			valid = true
+			encoding.Encoders = append(encoding.Encoders, encoder)
+		}
+
+		if decoder, ok := e.(DecoderInterface); ok {
+			valid = true
+			encoding.Decoders = append(encoding.Decoders, decoder)
+		}
+
+		if !valid {
+			return errors.New("invalid encoder/decoder")
+		}
+	}
+
+	return nil
 }
 
 func (encoding *Encoding) RegisterDecoder(encoder DecoderInterface) {
@@ -48,7 +77,7 @@ func (encoding *Encoding) Encode(writer io.Writer, encoder Encoder) error {
 
 type DecoderInterface interface {
 	CouldDecode(Decoder) bool
-	Decode(dst interface{}, decoder Decoder) error
+	Decode(writer io.Writer, decoder Decoder) error
 }
 
 type Decoder struct {
@@ -58,10 +87,10 @@ type Decoder struct {
 	Result   interface{}
 }
 
-func (encoding *Encoding) Decode(dst interface{}, decoder Decoder) error {
+func (encoding *Encoding) Decode(writer io.Writer, decoder Decoder) error {
 	for _, d := range encoding.Decoders {
 		if d.CouldDecode(decoder) {
-			if err := d.Decode(dst, decoder); err != ErrUnsupportedDecoder {
+			if err := d.Decode(writer, decoder); err != ErrUnsupportedDecoder {
 				return err
 			}
 		}

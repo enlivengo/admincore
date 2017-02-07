@@ -3,6 +3,7 @@ package admin
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"mime"
 	"path"
 	"reflect"
@@ -12,6 +13,73 @@ import (
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
 )
+
+type XMLEncoding struct{}
+
+func (XMLEncoding) CouldDecode(decoder Decoder) bool {
+	return false
+}
+
+func (XMLEncoding) Decode(dst interface{}, decoder Decoder) error {
+	return nil
+}
+
+func (XMLEncoding) CouldEncode(encoder Encoder) bool {
+	if encoder.Context != nil && encoder.Context.Request != nil {
+		if path.Ext(encoder.Context.Request.RequestURI) == ".xml" {
+			return true
+		}
+
+		if types, err := mime.ExtensionsByType(encoder.Context.Request.Header.Get("accept")); err == nil {
+			for _, typ := range types {
+				if typ == ".xml" {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func (XMLEncoding) Encode(writer io.Writer, encoder Encoder) error {
+	xmlMarshaler := XMLStruct{
+		Action:   encoder.Action,
+		Resource: encoder.Resource,
+		Context:  encoder.Context,
+		Result:   encoder.Result,
+	}
+
+	xmlMarshalResult, err := xml.MarshalIndent(xmlMarshaler, "", "\t")
+
+	if err != nil {
+		xmlMarshaler.Result = map[string]string{"error": err.Error()}
+		xmlMarshalResult, _ = xml.MarshalIndent(xmlMarshaler, "", "\t")
+	}
+
+	_, err = writer.Write([]byte(xml.Header + string(xmlMarshalResult)))
+	return err
+}
+
+type XMLStruct struct {
+	Action   string
+	Resource *Resource
+	Context  *Context
+	Result   interface{}
+}
+
+func (xmlStruct XMLStruct) Initialize(value interface{}, res *Resource) XMLStruct {
+	return XMLStruct{
+		Resource: res,
+		Action:   xmlStruct.Action,
+		Context:  xmlStruct.Context,
+		Result:   value,
+	}
+}
+
+func (xmlStruct XMLStruct) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return XMLMarshalDefaultHandler(xmlStruct, e, start)
+}
 
 var XMLMarshalDefaultHandler = func(xmlStruct XMLStruct, e *xml.Encoder, start xml.StartElement) error {
 	defaultStartElement := xml.StartElement{Name: xml.Name{Local: "xmlStruct"}}
@@ -133,75 +201,5 @@ var XMLMarshalDefaultHandler = func(xmlStruct XMLStruct, e *xml.Encoder, start x
 	if err := e.EncodeToken(xml.EndElement{Name: start.Name}); err != nil {
 		return err
 	}
-	return nil
-}
-
-type XMLStruct struct {
-	Action   string
-	Resource *Resource
-	Context  *Context
-	Result   interface{}
-}
-
-func (xmlStruct XMLStruct) Initialize(value interface{}, res *Resource) XMLStruct {
-	return XMLStruct{
-		Resource: res,
-		Action:   xmlStruct.Action,
-		Context:  xmlStruct.Context,
-		Result:   value,
-	}
-}
-
-func (xmlStruct XMLStruct) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return XMLMarshalDefaultHandler(xmlStruct, e, start)
-}
-
-type XMLEncoding struct{}
-
-func (XMLEncoding) CouldDecode(decoder Decoder) bool {
-	return false
-}
-
-func (XMLEncoding) Decode(dst interface{}, decoder Decoder) error {
-	return nil
-}
-
-func (XMLEncoding) CouldEncode(encoder Encoder) bool {
-	if encoder.Context != nil && encoder.Context.Request != nil {
-		if path.Ext(encoder.Context.Request.RequestURI) == ".xml" {
-			return true
-		}
-
-		if types, err := mime.ExtensionsByType(encoder.Context.Request.Header.Get("accept")); err == nil {
-			for _, typ := range types {
-				if typ == ".xml" {
-					return true
-				}
-			}
-		}
-	}
-
-	return false
-}
-
-func (XMLEncoding) Encode(dst interface{}, encoder Encoder) error {
-	context := encoder.Context
-
-	xmlMarshaler := XMLStruct{
-		Action:   encoder.Action,
-		Resource: encoder.Resource,
-		Context:  encoder.Context,
-		Result:   encoder.Result,
-	}
-
-	xmlMarshalResult, err := xml.MarshalIndent(xmlMarshaler, "", "\t")
-
-	if err != nil {
-		xmlMarshaler.Result = map[string]string{"error": err.Error()}
-		xmlMarshalResult, _ = xml.MarshalIndent(xmlMarshaler, "", "\t")
-	}
-
-	context.Writer.Header().Set("Content-Type", "application/xml")
-	context.Writer.Write([]byte(xml.Header + string(xmlMarshalResult)))
 	return nil
 }
