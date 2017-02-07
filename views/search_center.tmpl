@@ -29,26 +29,23 @@
         </button>
       </div>
     </form>
-
   </div>
 
-
-  <main class="qor-page__body qor-global-search--results">
-    <section class="qor-section">
-      {{range .Result}}
-        {{if .Results}}
-          {{if (len .Results)}}
-            <h2 class="qor-section-title">
-              <span>{{t (printf "qor_admin.search_center.%v" .Resource.ToParam) .Resource.Name}}</span>
-              <a href="{{patch_url (url_for .Resource) "keyword" $keyword}}" class="qor-view-all">{{t "qor_admin.search_center.view_all" "View All"}}</a>
-            </h2>
-            <div class="qor-section__body qor-table-container">
-              {{.Context.Render "index/table" .Results}}
-            </div>
-          {{end}}
+  <main class="qor-page__body qor-global-search--results qor-theme-slideout">
+  <section class="qor-section">
+    {{range .Result}}
+      {{if .Results}}
+        {{if (len .Results)}}
+          <h2 class="qor-section-title">
+            <span>{{t (printf "qor_admin.search_center.%v" .Resource.ToParam) .Resource.Name}}</span>
+            <a href="{{patch_url (url_for .Resource) "keyword" $keyword}}" class="qor-view-all">{{t "qor_admin.search_center.view_all" "View All"}}</a>
+          </h2>
+          <div class="qor-section__body qor-table-container">
+            {{.Context.Render "index/table" .Results}}
+          </div>
         {{end}}
       {{end}}
-    </section>
+    {{end}}
+  </section>
   </main>
-
 </div>
