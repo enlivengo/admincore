@@ -2,20 +2,14 @@ package admin
 
 import (
 	"bytes"
-	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
 	"path/filepath"
-	"reflect"
-	"strings"
 
-	"github.com/jinzhu/inflection"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
-	"github.com/qor/roles"
 )
 
 // Context admin context, which is used for admin controller
@@ -216,184 +210,28 @@ func (context *Context) Execute(name string, result interface{}) {
 
 // JSON generate json outputs for action
 func (context *Context) JSON(action string, result interface{}) {
-	if action == "show" && !context.Resource.isSetShowAttrs {
-		action = "edit"
+	if context.Encode(action, result) == nil {
+		context.Writer.Header().Set("Content-Type", "application/json")
 	}
-
-	js, err := json.MarshalIndent(context.Resource.convertObjectToJSONMap(context, result, action), "", "\t")
-	if err != nil {
-		result := make(map[string]string)
-		result["error"] = err.Error()
-		js, _ = json.Marshal(result)
-	}
-
-	context.Writer.Header().Set("Content-Type", "application/json")
-	context.Writer.Write(js)
-}
-
-type XMLMarshaler struct {
-	Action   string
-	Resource *Resource
-	Context  *Context
-	Result   interface{}
-}
-
-func (xmlMarshaler XMLMarshaler) Initialize(value interface{}, res *Resource) XMLMarshaler {
-	return XMLMarshaler{
-		Resource: res,
-		Action:   xmlMarshaler.Action,
-		Context:  xmlMarshaler.Context,
-		Result:   value,
-	}
-}
-
-var DefaultXMLMarshalHandler = func(xmlMarshaler XMLMarshaler, e *xml.Encoder, start xml.StartElement) error {
-	defaultStartElement := xml.StartElement{Name: xml.Name{Local: "XMLMarshaler"}}
-	reflectValue := reflect.Indirect(reflect.ValueOf(xmlMarshaler.Result))
-	res := xmlMarshaler.Resource
-	context := xmlMarshaler.Context
-
-	switch reflectValue.Kind() {
-	case reflect.Map:
-		// Write Start Element
-		if start.Name.Local == defaultStartElement.Name.Local {
-			start.Name.Local = "response"
-		}
-
-		if err := e.EncodeToken(start); err != nil {
-			return err
-		}
-
-		mapKeys := reflectValue.MapKeys()
-		for _, mapKey := range mapKeys {
-			var (
-				err       error
-				mapValue  = reflectValue.MapIndex(mapKey)
-				startElem = xml.StartElement{
-					Name: xml.Name{Space: "", Local: fmt.Sprint(mapKey.Interface())},
-					Attr: []xml.Attr{},
-				}
-			)
-
-			mapValue = reflect.Indirect(reflect.ValueOf(mapValue.Interface()))
-			if mapValue.Kind() == reflect.Map {
-				err = e.EncodeElement(xmlMarshaler.Initialize(mapValue.Interface(), xmlMarshaler.Resource), startElem)
-			} else {
-				err = e.EncodeElement(fmt.Sprint(reflectValue.MapIndex(mapKey).Interface()), startElem)
-			}
-
-			if err != nil {
-				return err
-			}
-		}
-	case reflect.Slice:
-		// Write Start Element
-		if start.Name.Local == defaultStartElement.Name.Local {
-			modelType := utils.ModelType(xmlMarshaler.Result)
-			if xmlMarshaler.Resource != nil && modelType == utils.ModelType(xmlMarshaler.Resource.Value) {
-				start.Name.Local = inflection.Plural(strings.Replace(xmlMarshaler.Resource.Name, " ", "", -1))
-			} else {
-				start.Name.Local = "responses"
-			}
-		}
-
-		if err := e.EncodeToken(start); err != nil {
-			return err
-		}
-
-		for i := 0; i < reflectValue.Len(); i++ {
-			if err := e.EncodeElement(xmlMarshaler.Initialize(reflect.Indirect(reflectValue.Index(i)).Interface(), xmlMarshaler.Resource), defaultStartElement); err != nil {
-				return err
-			}
-		}
-	case reflect.Struct:
-		// Write Start Element
-		if xmlMarshaler.Resource == nil || utils.ModelType(xmlMarshaler.Result) != utils.ModelType(xmlMarshaler.Resource.Value) {
-			if err := e.EncodeElement(fmt.Sprint(xmlMarshaler.Result), start); err != nil {
-				return err
-			}
-		} else {
-			if start.Name.Local == defaultStartElement.Name.Local {
-				start.Name.Local = strings.Replace(xmlMarshaler.Resource.Name, " ", "", -1)
-			}
-
-			if err := e.EncodeToken(start); err != nil {
-				return err
-			}
-
-			metas := []*Meta{}
-			switch xmlMarshaler.Action {
-			case "index":
-				metas = res.ConvertSectionToMetas(res.allowedSections(res.IndexAttrs(), context, roles.Update))
-			case "edit":
-				metas = res.ConvertSectionToMetas(res.allowedSections(res.EditAttrs(), context, roles.Update))
-			case "show":
-				metas = res.ConvertSectionToMetas(res.allowedSections(res.ShowAttrs(), context, roles.Read))
-			}
-
-			for _, meta := range metas {
-				if meta.HasPermission(roles.Read, context.Context) {
-					metaStart := xml.StartElement{
-						Name: xml.Name{
-							Space: "",
-							Local: strings.Replace(meta.Label, " ", "", -1),
-						},
-					}
-
-					// has_one, has_many checker to avoid dead loop
-					if meta.Resource != nil && (meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && (meta.FieldStruct.Relationship.Kind == "has_one" || meta.FieldStruct.Relationship.Kind == "has_many")) {
-						if err := e.EncodeElement(xmlMarshaler.Initialize(context.RawValueOf(xmlMarshaler.Result, meta), meta.Resource), metaStart); err != nil {
-							return err
-						}
-					} else {
-						if err := e.EncodeElement(context.FormattedValueOf(xmlMarshaler.Result, meta), metaStart); err != nil {
-							return err
-						}
-					}
-				}
-			}
-		}
-	default:
-		if reflectValue.IsValid() {
-			if err := e.EncodeElement(fmt.Sprint(reflectValue.Interface()), start); err != nil {
-				return err
-			}
-		} else {
-			return nil
-		}
-	}
-
-	// Write End Element
-	if err := e.EncodeToken(xml.EndElement{Name: start.Name}); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (xmlMarshaler XMLMarshaler) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return DefaultXMLMarshalHandler(xmlMarshaler, e, start)
 }
 
 // XML generate xml outputs for action
 func (context *Context) XML(action string, result interface{}) {
+	if context.Encode(action, result) == nil {
+		context.Writer.Header().Set("Content-Type", "application/xml")
+	}
+}
+
+func (context *Context) Encode(action string, result interface{}) error {
 	if action == "show" && !context.Resource.isSetShowAttrs {
 		action = "edit"
 	}
 
-	xmlMarshaler := XMLMarshaler{
+	encoder := Encoder{
 		Action:   action,
 		Resource: context.Resource,
 		Context:  context,
 		Result:   result,
 	}
-
-	xmlMarshalResult, err := xml.MarshalIndent(xmlMarshaler, "", "\t")
-
-	if err != nil {
-		xmlMarshaler.Result = map[string]string{"error": err.Error()}
-		xmlMarshalResult, _ = xml.MarshalIndent(xmlMarshaler, "", "\t")
-	}
-
-	context.Writer.Header().Set("Content-Type", "application/xml")
-	context.Writer.Write([]byte(xml.Header + string(xmlMarshalResult)))
+	return context.Admin.Encode(context.Writer, encoder)
 }
