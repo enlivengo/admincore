@@ -26,7 +26,7 @@ func (XMLEncoding) Decode(dst interface{}, decoder Decoder) error {
 
 func (XMLEncoding) CouldEncode(encoder Encoder) bool {
 	if encoder.Context != nil && encoder.Context.Request != nil {
-		if path.Ext(encoder.Context.Request.RequestURI) == ".xml" {
+		if path.Ext(encoder.Context.Request.URL.Path) == ".xml" {
 			return true
 		}
 

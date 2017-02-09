@@ -14,7 +14,7 @@ type JSONEncoding struct{}
 
 func (JSONEncoding) CouldEncode(encoder Encoder) bool {
 	if encoder.Context != nil && encoder.Context.Request != nil {
-		if path.Ext(encoder.Context.Request.RequestURI) == ".json" {
+		if path.Ext(encoder.Context.Request.URL.Path) == ".json" {
 			return true
 		}
 
