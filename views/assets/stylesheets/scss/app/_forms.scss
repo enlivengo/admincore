@@ -338,7 +338,7 @@ button.qor-fieldset__add,
     margin-top: 16px;
     margin-bottom: 16px;
     padding: 16px 24px;
-    border: 1px solid unquote("rgba(#{$color-black}, 0.12)");
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: unquote("rgb(#{$palette-grey-50})");
     .mdl-textfield__input {
         margin-top: 10px;
