@@ -3,6 +3,9 @@ package admin
 import (
 	"errors"
 	"io"
+	"mime"
+	"net/http"
+	"strings"
 )
 
 var (
@@ -97,4 +100,17 @@ func (encoding *Encoding) Decode(writer io.Writer, decoder Decoder) error {
 	}
 
 	return ErrUnsupportedDecoder
+}
+
+func getAcceptMimeTypes(request *http.Request) (results []string) {
+	if types, err := mime.ExtensionsByType(request.Header.Get("Accept")); err == nil {
+		return types
+	} else {
+		for _, accept := range strings.FieldsFunc(request.Header.Get("Accept"), func(s rune) bool { return string(s) == "," || string(s) == ";" }) {
+			if types, err := mime.ExtensionsByType(accept); err == nil {
+				results = append(results, types...)
+			}
+		}
+	}
+	return
 }

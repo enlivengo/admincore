@@ -3,7 +3,6 @@ package admin
 import (
 	"encoding/json"
 	"io"
-	"mime"
 	"path"
 	"reflect"
 
@@ -18,11 +17,9 @@ func (JSONEncoding) CouldEncode(encoder Encoder) bool {
 			return true
 		}
 
-		if types, err := mime.ExtensionsByType(encoder.Context.Request.Header.Get("accept")); err == nil {
-			for _, typ := range types {
-				if typ == ".json" {
-					return true
-				}
+		for _, typ := range getAcceptMimeTypes(encoder.Context.Request) {
+			if typ == ".json" {
+				return true
 			}
 		}
 	}

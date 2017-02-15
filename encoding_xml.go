@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"mime"
 	"path"
 	"reflect"
 	"strings"
@@ -30,11 +29,9 @@ func (XMLEncoding) CouldEncode(encoder Encoder) bool {
 			return true
 		}
 
-		if types, err := mime.ExtensionsByType(encoder.Context.Request.Header.Get("accept")); err == nil {
-			for _, typ := range types {
-				if typ == ".xml" {
-					return true
-				}
+		for _, typ := range getAcceptMimeTypes(encoder.Context.Request) {
+			if typ == ".xml" {
+				return true
 			}
 		}
 	}
