@@ -2,7 +2,7 @@
 $.fn.qorSliderAfterShow = $.fn.qorSliderAfterShow || {};
 
 // change Mustache tags from {{}} to [[]]
-window.Mustache.tags = ['[[', ']]'];
+window.Mustache && (window.Mustache.tags = ['[[', ']]']);
 
 // clear close alert after ajax complete
 $(document).ajaxComplete(function (event, xhr, settings) {
