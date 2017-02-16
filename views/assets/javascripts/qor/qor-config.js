@@ -65,6 +65,3 @@ $.fn.select2.ajaxFormatResult = function (data, tmpl) {
     }
     return result;
 };
-
-$.fn.qorTimepicker = $.fn.timepicker;
-delete $.fn.timepicker;
