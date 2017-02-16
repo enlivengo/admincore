@@ -63,7 +63,7 @@
 
             if (this.isDateTimePicker) {
                 this.$targetInput
-                    .timepicker(pickerOptions)
+                    .qorTimepicker(pickerOptions)
                     .on(EVENT_CHANGE_TIME, $.proxy(this.changeTime, this))
                     .on(EVENT_BLUR, $.proxy(this.blur, this))
                     .on(EVENT_FOCUS, $.proxy(this.focus, this))
@@ -207,14 +207,13 @@
                 return;
             }
 
-            this.$targetInput.timepicker('show');
+            this.$targetInput.qorTimepicker('show');
             this.oldValue = this.$targetInput.val();
-
         },
 
         destroy: function () {
             this.unbind();
-            this.$targetInput.timepicker('remove');
+            this.$targetInput.qorTimepicker('remove');
             this.$element.removeData(NAMESPACE);
         }
     };

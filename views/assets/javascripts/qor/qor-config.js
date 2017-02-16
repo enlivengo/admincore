@@ -5,7 +5,7 @@ $.fn.qorSliderAfterShow = $.fn.qorSliderAfterShow || {};
 window.Mustache.tags = ['[[', ']]'];
 
 // clear close alert after ajax complete
-$(document).ajaxComplete(function(event, xhr, settings) {
+$(document).ajaxComplete(function (event, xhr, settings) {
     if (settings.type == "POST" || settings.type == "PUT") {
         if ($.fn.qorSlideoutBeforeHide) {
             $.fn.qorSlideoutBeforeHide = null;
@@ -21,21 +21,21 @@ $.fn.select2.ajaxCommonOptions = {
     dataType: 'json',
     cache: true,
     delay: 250,
-    data: function(params) {
+    data: function (params) {
         return {
             keyword: params.term, // search term
             page: params.page,
             per_page: 20
         };
     },
-    processResults: function(data, params) {
+    processResults: function (data, params) {
         // parse the results into the format expected by Select2
         // since we are using custom formatting functions we do not need to
         // alter the remote JSON data, except to indicate that infinite
         // scrolling can be used
         params.page = params.page || 1;
 
-        var processedData = $.map(data, function(obj) {
+        var processedData = $.map(data, function (obj) {
             obj.id = obj.Id || obj.ID;
             return obj;
         });
@@ -51,7 +51,7 @@ $.fn.select2.ajaxCommonOptions = {
 
 // select2 ajax common options
 // format ajax template data
-$.fn.select2.ajaxFormatResult = function(data, tmpl) {
+$.fn.select2.ajaxFormatResult = function (data, tmpl) {
     var result = "";
     if (tmpl.length > 0) {
         result = window.Mustache.render(tmpl.html().replace(/{{(.*?)}}/g, '[[$1]]'), data);
@@ -65,3 +65,6 @@ $.fn.select2.ajaxFormatResult = function(data, tmpl) {
     }
     return result;
 };
+
+$.fn.qorTimepicker = $.fn.timepicker;
+delete $.fn.timepicker;
