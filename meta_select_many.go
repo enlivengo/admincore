@@ -48,8 +48,10 @@ func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metao
 			meta.SetFormattedValuer(func(record interface{}, context *qor.Context) interface{} {
 				reflectValues := reflect.Indirect(reflect.ValueOf(meta.GetValuer()(record, context)))
 				var results []string
-				for i := 0; i < reflectValues.Len(); i++ {
-					results = append(results, utils.Stringify(reflectValues.Index(i).Interface()))
+				if reflectValues.IsValid() {
+					for i := 0; i < reflectValues.Len(); i++ {
+						results = append(results, utils.Stringify(reflectValues.Index(i).Interface()))
+					}
 				}
 				return results
 			})
