@@ -13,12 +13,13 @@
 
     'use strict';
 
-    let NAMESPACE = 'qor.replicator',
+    const NAMESPACE = 'qor.replicator',
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_REPLICATOR_ADDED = 'added.' + NAMESPACE,
-        EVENT_REPLICATORS_ADDED = 'addedMultiple.' + NAMESPACE;
+        EVENT_REPLICATORS_ADDED = 'addedMultiple.' + NAMESPACE,
+        EVENT_REPLICATORS_ADDED_DONE = 'addedMultipleDone.' + NAMESPACE;
 
     function QorReplicator(element, options) {
         this.$element = $(element);
@@ -139,22 +140,17 @@
             this.$element.find('.qor-fieldset--new').remove();
         },
 
-        addReplicators: function (data, $button) {
-            for (let i = 0, len = data.length; i < len; i++) {
-                this.add(null, $button, data[i]);
-            }
-            $(document).trigger(EVENT_REPLICATORS_ADDED, [data]);
-        },
+        add: function (e, data, isAutomatically) {
+            var options = this.options,
+                $item, template;
 
-        add: function (e, $button, data) {
-            let options = this.options,
-                $target = $button ? $button : $(e.target).closest(options.addClass),
-                templateName = $target.data('template'),
-                parents = $target.closest(this.$element),
-                parentsChildren = parents.children(options.childrenClass),
-                $item,
-                template,
-                $fieldset = $target.closest(options.childrenClass).children('fieldset');
+            if (!isAutomatically) {
+                var $target = $(e.target).closest(options.addClass),
+                    templateName = $target.data('template'),
+                    parents = $target.closest(this.$element),
+                    parentsChildren = parents.children(options.childrenClass),
+                    $fieldset = $target.closest(options.childrenClass).children('fieldset');
+            }
 
             if (this.isMultipleTemplate) {
                 this.parseNestTemplate(templateName);
@@ -177,17 +173,47 @@
                 this.index[templateName]++;
 
             } else {
-                this.parseNestTemplate();
-                $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
-                $target.before($item.show());
-                $item.data('itemIndex', this.index);
-                this.index++;
+                if (!isAutomatically) {
+
+                    $item = this.addSingle();
+                    $target.before($item.show());
+                    this.index++;
+
+                } else {
+                    if (data && data.length) {
+                        this.addMultiple(data);
+                        $(document).trigger(EVENT_REPLICATORS_ADDED_DONE);
+                    }
+                }
+
             }
 
-            $item.trigger('enable').removeClass('qor-fieldset--new');
+            if (!isAutomatically) {
+                $item.trigger('enable');
+                $(document).trigger(EVENT_REPLICATOR_ADDED, [$item]);
+                e.stopPropagation();
+            }
 
-            $(document).trigger(EVENT_REPLICATOR_ADDED, [$item, data]);
-            e && e.stopPropagation();
+        },
+
+        addMultiple: function (data) {
+            let $item;
+
+            for (let i = 0, len = data.length; i < len; i++) {
+                $item = this.addSingle();
+                this.index++;
+                $(document).trigger(EVENT_REPLICATORS_ADDED, [$item, data[i]]);
+            }
+        },
+
+        addSingle: function () {
+            let $item;
+
+            this.parseNestTemplate();
+            $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
+            $item.data('itemIndex', this.index).removeClass('qor-fieldset--new');
+
+            return $item;
         },
 
         del: function (e) {
