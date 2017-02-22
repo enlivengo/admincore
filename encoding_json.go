@@ -57,7 +57,7 @@ func convertObjectToJSONMap(res *Resource, context *Context, value interface{}, 
 	case reflect.Slice:
 		values := []interface{}{}
 		for i := 0; i < reflectValue.Len(); i++ {
-			if reflect.Indirect(reflectValue).Kind() == reflect.Struct {
+			if reflect.Indirect(reflectValue.Index(i)).Kind() == reflect.Struct {
 				if reflectValue.Index(i).Kind() == reflect.Ptr {
 					values = append(values, convertObjectToJSONMap(res, context, reflectValue.Index(i).Interface(), kind))
 				} else {
