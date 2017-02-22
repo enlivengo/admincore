@@ -176,7 +176,7 @@
                 } else {
                     parentsChildren.prepend($item.show());
                 }
-                $item.data('itemIndex', this.index[templateName]);
+                $item.data('itemIndex', this.index[templateName]).removeClass('qor-fieldset--new');
                 this.index[templateName]++;
 
             } else {
