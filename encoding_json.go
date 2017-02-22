@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"path"
 	"reflect"
@@ -28,20 +29,25 @@ func (JSONEncoding) CouldEncode(encoder Encoder) bool {
 }
 
 func (JSONEncoding) Encode(writer io.Writer, encoder Encoder) error {
-	context := encoder.Context
+	var res *Resource
+	var context = encoder.Context
 
-	js, err := json.MarshalIndent(context.Resource.convertObjectToJSONMap(context, encoder.Result, encoder.Action), "", "\t")
+	if context != nil {
+		res = context.Resource
+	}
+
+	js, err := json.MarshalIndent(convertObjectToJSONMap(res, context, encoder.Result, encoder.Action), "", "\t")
 	if err != nil {
 		result := make(map[string]string)
 		result["error"] = err.Error()
 		js, _ = json.Marshal(result)
 	}
 
-	_, err = context.Writer.Write(js)
+	_, err = writer.Write(js)
 	return err
 }
 
-func (res *Resource) convertObjectToJSONMap(context *Context, value interface{}, kind string) interface{} {
+func convertObjectToJSONMap(res *Resource, context *Context, value interface{}, kind string) interface{} {
 	reflectValue := reflect.ValueOf(value)
 	for reflectValue.Kind() == reflect.Ptr {
 		reflectValue = reflectValue.Elem()
@@ -51,10 +57,14 @@ func (res *Resource) convertObjectToJSONMap(context *Context, value interface{},
 	case reflect.Slice:
 		values := []interface{}{}
 		for i := 0; i < reflectValue.Len(); i++ {
-			if reflectValue.Index(i).Kind() == reflect.Ptr {
-				values = append(values, res.convertObjectToJSONMap(context, reflectValue.Index(i).Interface(), kind))
+			if reflect.Indirect(reflectValue).Kind() == reflect.Struct {
+				if reflectValue.Index(i).Kind() == reflect.Ptr {
+					values = append(values, convertObjectToJSONMap(res, context, reflectValue.Index(i).Interface(), kind))
+				} else {
+					values = append(values, convertObjectToJSONMap(res, context, reflectValue.Index(i).Addr().Interface(), kind))
+				}
 			} else {
-				values = append(values, res.convertObjectToJSONMap(context, reflectValue.Index(i).Addr().Interface(), kind))
+				values = append(values, fmt.Sprint(reflectValue.Index(i).Interface()))
 			}
 		}
 		return values
@@ -73,13 +83,18 @@ func (res *Resource) convertObjectToJSONMap(context *Context, value interface{},
 			if meta.HasPermission(roles.Read, context.Context) {
 				// has_one, has_many checker to avoid dead loop
 				if meta.Resource != nil && (meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && (meta.FieldStruct.Relationship.Kind == "has_one" || meta.FieldStruct.Relationship.Kind == "has_many")) {
-					values[meta.GetName()] = meta.Resource.convertObjectToJSONMap(context, context.RawValueOf(value, meta), kind)
+					values[meta.GetName()] = convertObjectToJSONMap(meta.Resource, context, context.RawValueOf(value, meta), kind)
 				} else {
 					values[meta.GetName()] = context.FormattedValueOf(value, meta)
 				}
 			}
 		}
 		return values
+	case reflect.Map:
+		for _, key := range reflectValue.MapKeys() {
+			reflectValue.SetMapIndex(key, reflect.ValueOf(convertObjectToJSONMap(res, context, reflectValue.MapIndex(key).Interface(), kind)))
+		}
+		return reflectValue.Interface()
 	default:
 		return value
 	}
