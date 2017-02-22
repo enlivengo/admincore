@@ -89,6 +89,7 @@
             template = template.replace(/(\w+)\="(\S*\[\d+\]\S*)"/g, function (attribute, name, value) {
                 value = value.replace(/^(\S*)\[(\d+)\]([^\[\]]*)$/, function (input, prefix, index, suffix) {
                     if (input === value) {
+
                         if (name === 'name' && !i) {
                             i = index;
                         }
@@ -107,13 +108,18 @@
         },
 
         parseMultiple: function () {
-            let template;
+            let template, name, fieldsetName = this.fieldsetName;
 
-            this.fieldsetName.forEach((ele) => {
-                template = this.initTemplate(this.template[ele]);
-                this.template[ele] = template.template;
-                this.index[ele] = template.index;
-            });
+            for (let i = 0, len = fieldsetName.length; i < len; i++) {
+                name = fieldsetName[i];
+                if (this.template[name].length) {
+                    continue;
+                }
+
+                template = this.initTemplate(this.template[name]);
+                this.template[name] = template.template;
+                this.index[name] = template.index;
+            }
         },
 
         bind: function () {
@@ -155,6 +161,7 @@
             if (this.isMultipleTemplate) {
                 this.parseNestTemplate(templateName);
                 template = this.template[templateName];
+
                 $item = $(template.replace(/\{\{index\}\}/g, this.index[templateName]));
 
                 for (var dataKey in $target.data()) {
