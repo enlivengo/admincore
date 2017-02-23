@@ -345,6 +345,8 @@ button.qor-fieldset__add,
     }
     .qor-fieldset {
         background-color: #fff;
+        box-shadow: none;
+        border: 1px solid unquote("rgba(#{$color-black}, 0.12)");
         .qor-fieldset {
             background-color: unquote("rgb(#{$palette-grey-50})");
         }
