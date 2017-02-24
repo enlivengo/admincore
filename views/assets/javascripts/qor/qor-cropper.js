@@ -402,16 +402,19 @@
 
                 built: function () {
                     $modal.find(CLASS_SAVE).one(EVENT_CLICK, function () {
-                        var cropData = $clone.cropper('getData', true);
-                        var syncData = [];
-                        var url;
+                        let cropData = $clone.cropper('getData', true),
+                            croppedCanvas = $clone.cropper('getCroppedCanvas'),
+                            syncData = [],
+                            url;
 
                         data.crop = true;
                         data[options.key][sizeName] = cropData;
                         _this.imageData = $clone.cropper('getImageData');
                         _this.cropData = cropData;
 
-                        url = $clone.cropper('getCroppedCanvas').toDataURL();
+                        if (croppedCanvas) {
+                            url = croppedCanvas.toDataURL();
+                        }
 
                         $modal.find(CLASS_OPTIONS + ' input').each(function () {
                             var $this = $(this);
