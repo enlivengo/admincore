@@ -8,7 +8,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
-	"github.com/qor/media_library"
+	"github.com/qor/media/oss"
 	"github.com/qor/qor"
 	"github.com/qor/qor/test/utils"
 
@@ -41,7 +41,7 @@ type User struct {
 	Role         string
 	Active       bool
 	RegisteredAt *time.Time
-	Avatar       media_library.FileSystem
+	Avatar       oss.OSS
 	CreditCard   CreditCard
 	Addresses    []Address
 	Languages    []Language `gorm:"many2many:user_languages;"`
