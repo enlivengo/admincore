@@ -80,7 +80,7 @@
         if (typeof str === 'string') {
             if (typeof data === 'object') {
                 $.each(data, function (key, val) {
-                    str = str.replace('${' + String(key).toLowerCase() + '}', val);
+                    str = str.replace('$[' + String(key).toLowerCase() + ']', val);
                 });
             }
         }
@@ -401,6 +401,10 @@
                 autoCropArea: 1,
 
                 built: function () {
+                    $modal.find('.qor-cropper__options-toggle').on(EVENT_CLICK, function () {
+                        $modal.find('.qor-cropper__options-input').prop('checked', $(this).prop('checked'));
+                    }).prop('checked', true);
+
                     $modal.find(CLASS_SAVE).one(EVENT_CLICK, function () {
                         let cropData = $clone.cropper('getData', true),
                             croppedCanvas = $clone.cropper('getCroppedCanvas'),
@@ -463,7 +467,7 @@
                     if (width / height === aspectRatio) {
                         list.push(
                             '<label>' +
-                            '<input type="checkbox" name="' + name + '" > ' +
+                            '<input class="qor-cropper__options-input" type="checkbox" name="' + name + '" checked> ' +
                             '<span>' + name +
                             '<small>(' + width + '&times;' + height + ' px)</small>' +
                             '</span>' +
@@ -592,44 +596,45 @@
         }
     };
 
-    QorCropper.TOGGLE = ('<div class="qor-cropper__toggle">' +
-        '<div class="qor-cropper__toggle--crop"><i class="material-icons">crop</i></div>' +
-        '<div class="qor-cropper__toggle--delete"><i class="material-icons">delete</i></div>' +
-        '</div>'
+    QorCropper.TOGGLE = (
+        `<div class="qor-cropper__toggle">
+            <div class="qor-cropper__toggle--crop"><i class="material-icons">crop</i></div>
+            <div class="qor-cropper__toggle--delete"><i class="material-icons">delete</i></div>
+        </div>`
     );
 
     QorCropper.ALERT = (
-        '<div class="qor-fieldset__alert">' +
-        '<button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>' +
-        '</div>'
+        `<div class="qor-fieldset__alert">
+            <button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>
+        </div>`
     );
 
     QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
     QorCropper.LIST = '<ul><li><img></li></ul>';
     QorCropper.FILE_LIST = '<div class="qor-file__list-item"><span><span>{{filename}}</span></span>';
     QorCropper.MODAL = (
-        '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="mdl-card mdl-shadow--2dp" role="document">' +
-        '<div class="mdl-card__title">' +
-        '<h2 class="mdl-card__title-text">${title}</h2>' +
-        '</div>' +
-        '<div class="mdl-card__supporting-text">' +
-        '<div class="qor-cropper__wrapper"></div>' +
-        '<div class="qor-cropper__options">' +
-        '<p>Sync cropping result to:</p>' +
-        '</div>' +
-        '</div>' +
-        '<div class="mdl-card__actions mdl-card--border">' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">${ok}</a>' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">${cancel}</a>' +
-        '</div>' +
-        '<div class="mdl-card__menu">' +
-        '<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">' +
-        '<i class="material-icons">close</i>' +
-        '</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+        `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="mdl-card mdl-shadow--2dp" role="document">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">$[title]</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    <div class="qor-cropper__wrapper"></div>
+                    <div class="qor-cropper__options">
+                        <p>Sync cropping result to: <label><input type="checkbox" class="qor-cropper__options-toggle" checked/> All</label></p>
+                    </div>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">$[ok]</a>
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">$[cancel]</a>
+                </div>
+                <div class="mdl-card__menu">
+                    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">
+                        <i class="material-icons">close</i>
+                    </button>
+                </div>
+            </div>
+        </div>`
     );
 
     QorCropper.plugin = function (option) {
