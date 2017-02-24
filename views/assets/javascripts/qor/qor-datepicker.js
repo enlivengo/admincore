@@ -27,7 +27,7 @@
         if (typeof str === 'string') {
             if (typeof data === 'object') {
                 $.each(data, function (key, val) {
-                    str = str.replace('${' + String(key).toLowerCase() + '}', val);
+                    str = str.replace('$[' + String(key).toLowerCase() + ']', val);
                 });
             }
         }
@@ -59,15 +59,17 @@
         },
 
         build: function () {
-            var $modal;
-            var $ele = this.$element;
-            var data = this.pickerData;
-            var datepickerOptions = {
-                date: $ele.val(),
-                inline: true
-            };
-            var parent = $ele.closest(CLASS_PARENT);
-            var $targetInput = parent.find(data.targetInput);
+            let $modal,
+                $ele = this.$element,
+                data = this.pickerData,
+                date = $ele.val() ? new Date($ele.val()) : new Date(),
+
+                datepickerOptions = {
+                    date: date,
+                    inline: true
+                },
+                parent = $ele.closest(CLASS_PARENT),
+                $targetInput = parent.find(data.targetInput);
 
             if (this.built) {
                 return;
@@ -76,10 +78,10 @@
             this.$modal = $modal = $(replaceText(QorDatepicker.TEMPLATE, this.options.text)).appendTo('body');
 
             if ($targetInput.length) {
-                datepickerOptions.date = $targetInput.val();
+                datepickerOptions.date = $targetInput.val() ? new Date($targetInput.val()) : new Date();
             }
 
-            if (data.targetInput && $targetInput.data().startDate) {
+            if (data.targetInput && $targetInput.data('start-date')) {
                 datepickerOptions.startDate = new Date();
             }
 
@@ -176,24 +178,24 @@
     };
 
     QorDatepicker.TEMPLATE = (
-        '<div class="qor-modal fade qor-datepicker" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="mdl-card mdl-shadow--2dp" role="document">' +
-        '<div class="mdl-card__title">' +
-        '<h2 class="mdl-card__title-text">${title}</h2>' +
-        '</div>' +
-        '<div class="mdl-card__supporting-text">' +
-        '<div class="qor-datepicker__picked">' +
-        '<div class="qor-datepicker__picked-year"></div>' +
-        '<div class="qor-datepicker__picked-date"></div>' +
-        '</div>' +
-        '<div class="qor-datepicker__embedded"></div>' +
-        '</div>' +
-        '<div class="mdl-card__actions">' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-datepicker__save">${ok}</a>' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">${cancel}</a>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+        `<div class="qor-modal fade qor-datepicker" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="mdl-card mdl-shadow--2dp" role="document">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">$[title]</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    <div class="qor-datepicker__picked">
+                        <div class="qor-datepicker__picked-year"></div>
+                        <div class="qor-datepicker__picked-date"></div>
+                    </div>
+                    <div class="qor-datepicker__embedded"></div>
+                </div>
+                <div class="mdl-card__actions">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-datepicker__save">$[ok]</a>
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">$[cancel]</a>
+                </div>
+            </div>
+        </div>`
     );
 
     QorDatepicker.plugin = function (option) {
