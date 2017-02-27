@@ -19,7 +19,7 @@
     {{stylesheet_tag "vendors" "qor" "app"}}
     {{load_admin_stylesheets}}
     {{load_theme_stylesheets}}
-    {{javascript_tag "vendors/jquery.min"}}
+    {{javascript_tag "vendors/jquery.min" "vendors"}}
   </head>
 
   <body class="{{if qor_theme_class}}{{qor_theme_class}}{{end}}">
@@ -48,7 +48,7 @@
     </div>
 
     <!-- JavaScripts -->
-    {{javascript_tag "vendors" "qor" "app"}}
+    {{javascript_tag "qor" "app"}}
     {{load_admin_javascripts}}
     {{load_theme_javascripts}}
   </body>
