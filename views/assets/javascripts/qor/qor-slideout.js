@@ -307,11 +307,12 @@
                     cache: true,
                     ifModified: true,
                     success: $.proxy(function (response) {
-                        var $response,
+                        let $response,
                             $content,
                             $qorFormContainer,
                             $scripts,
-                            src = [],
+                            srcs = [],
+                            loadedScripts = $('body').data('slideoutLoadedScripts'),
                             duplicates;
 
                         $(CLASS_BODY_LOADING).remove();
@@ -330,7 +331,7 @@
                             }
 
                             // Get response body tag: http://stackoverflow.com/questions/7001926/cannot-get-body-element-from-ajax-response
-                            var bodyHtml = response.match(/<\s*body.*>[\s\S]*<\s*\/body\s*>/ig);
+                            let bodyHtml = response.match(/<\s*body.*>[\s\S]*<\s*\/body\s*>/ig);
                             // if no body tag return
                             if (bodyHtml) {
                                 this.loadExtraResource(bodyHtml, $response, url, response);
@@ -339,13 +340,23 @@
                             $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
 
                             $scripts.each(function () {
-                                src.push($(this).attr('src'));
+                                let src = $(this).attr('src');
+
+                                if (loadedScripts) {
+                                    if (_.contains(loadedScripts, src)) {
+                                        $content.find(`script[src="${src}"]`).remove();
+                                    } else {
+                                        srcs.push(src);
+                                    }
+                                } else {
+                                    srcs.push(src);
+                                    $('body').data('slideoutLoadedScripts', srcs);
+                                }
                             });
 
-                            duplicates = getDuplicates(src);
+                            duplicates = getDuplicates(srcs);
                             duplicates.map((src) => {
-                                $content.find(`script[src="${src}"]`).remove();
-                                $content.append(`<script src="${src}"></script>`);
+                                $content.find(`script[src="${src}"]`).not(':first').remove();
                             });
 
                             // reset slideout header and body
