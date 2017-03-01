@@ -117,7 +117,7 @@
             this.$output = $parent.find(options.output);
             this.$list = $list = $parent.find(options.list);
 
-            fetchUrl = this.$output.data().fetchSizedata;
+            fetchUrl = this.$output.data('fetchSizedata');
 
             if (!$list.find('img').attr('src')) {
                 $list.find('ul').hide();
@@ -145,12 +145,18 @@
 
         build: function () {
             var textData = this.$output.data(),
+                text = {},
+                replaceTexts;
+
+            if (textData) {
                 text = {
                     title: textData.cropperTitle,
                     ok: textData.cropperOk,
                     cancel: textData.cropperCancel
-                },
+                };
                 replaceTexts = this.options.text;
+            }
+
 
             if (text.ok && text.title && text.cancel) {
                 replaceTexts = text;
