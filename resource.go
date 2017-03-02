@@ -63,7 +63,7 @@ func (res Resource) GetPrimaryValue(request *http.Request) string {
 
 // ParamIDName return param name for primary key like :product_id
 func (res Resource) ParamIDName() string {
-	return fmt.Sprintf(":%v_id", inflection.Singular(utils.ToParamString(res.ToParam())))
+	return fmt.Sprintf(":%v_id", inflection.Singular(res.ToParam()))
 }
 
 // ToParam used as urls to register routes for resource
