@@ -57,6 +57,75 @@
         return _.uniq(array);
     }
 
+    function execSlideoutEvents(url, response) {
+        // exec qorSliderAfterShow after script loaded
+        var qorSliderAfterShow = $.fn.qorSliderAfterShow;
+        for (var name in qorSliderAfterShow) {
+            if (qorSliderAfterShow.hasOwnProperty(name) && !qorSliderAfterShow[name]['isLoaded']) {
+                qorSliderAfterShow[name]['isLoaded'] = true;
+                qorSliderAfterShow[name].call(this, url, response);
+            }
+        }
+    }
+
+    function loadScripts(srcs, data, callback) {
+        let scriptsLoaded = 0;
+
+        for (let i = 0, len = srcs.length; i < len; i++) {
+            let script = document.createElement('script');
+
+            script.onload = function () {
+                scriptsLoaded++;
+
+                if (scriptsLoaded === srcs.length) {
+                    if ($.isFunction(callback)) {
+                        callback();
+                    }
+                }
+
+                if (data && data.url && data.response) {
+                    execSlideoutEvents(data.url, data.response);
+                }
+            };
+
+            script.src = srcs[i];
+            document.body.appendChild(script);
+        }
+
+    }
+
+    function loadStyles(srcs) {
+        let ss = document.createElement('link'),
+            src = srcs.shift();
+
+        ss.type = 'text/css';
+        ss.rel = 'stylesheet';
+        ss.onload = function () {
+            if (srcs.length) {
+                loadStyles(srcs);
+            }
+        };
+        ss.href = src;
+        document.getElementsByTagName('head')[0].appendChild(ss);
+    }
+
+    function compareScripts($scripts) {
+        let $currentPageScripts = $('script'),
+            slideoutScripts = pushArrary($scripts, true),
+            currentPageScripts = pushArrary($currentPageScripts, true),
+            scriptDiff = _.difference(slideoutScripts, currentPageScripts);
+        return scriptDiff;
+    }
+
+    function compareLinks($links) {
+        let $currentStyles = $('link'),
+            slideoutStyles = pushArrary($links),
+            currentStyles = pushArrary($currentStyles),
+            styleDiff = _.difference(slideoutStyles, currentStyles);
+
+        return styleDiff;
+    }
+
     function QorSlideout(element, options) {
         this.$element = $(element);
         this.options = $.extend({}, QorSlideout.DEFAULTS, $.isPlainObject(options) && options);
@@ -114,60 +183,16 @@
             }
         },
 
-        loadScript: function (src, url, response) {
-            var script = document.createElement('script');
-            script.src = src;
+        loadExtraResource: function (data) {
+            let styleDiff = compareLinks(data.$links),
+                scriptDiff = compareScripts(data.$scripts);
 
-            if (url && response) {
-                script.onload = function () {
-                    // exec qorSliderAfterShow after script loaded
-                    var qorSliderAfterShow = $.fn.qorSliderAfterShow;
-                    for (var name in qorSliderAfterShow) {
-                        if (qorSliderAfterShow.hasOwnProperty(name) && !qorSliderAfterShow[name]['isLoaded']) {
-                            qorSliderAfterShow[name].call(this, url, response);
-                        }
-                    }
-
-                };
+            if (styleDiff.length) {
+                loadStyles(styleDiff);
             }
 
-            document.body.appendChild(script);
-        },
-
-        loadStyle: function (src) {
-            var ss = document.createElement('link');
-            ss.type = 'text/css';
-            ss.rel = 'stylesheet';
-            ss.href = src;
-            document.getElementsByTagName('head')[0].appendChild(ss);
-        },
-
-        loadExtraResource: function ($scripts, $links, url, response) {
-            let $currentPageStyles = $('link'),
-                $currentPageScripts = $('script'),
-
-                slideoutStyles = pushArrary($links),
-                currentStyles = pushArrary($currentPageStyles),
-
-                slideoutScripts = pushArrary($scripts, true),
-                currentPageScripts = pushArrary($currentPageScripts, true),
-
-                styleDiff = _.difference(slideoutStyles, currentStyles),
-                scriptDiff = _.difference(slideoutScripts, currentPageScripts),
-
-                styleDiffLength = styleDiff.length,
-                scriptDiffLength = scriptDiff.length;
-
-            if (styleDiffLength) {
-                for (var i = styleDiffLength - 1; i >= 0; i--) {
-                    this.loadStyle(styleDiff[i]);
-                }
-            }
-
-            if (scriptDiffLength) {
-                for (var j = scriptDiffLength - 1; j >= 0; j--) {
-                    this.loadScript(scriptDiff[j], url, response);
-                }
+            if (scriptDiff.length) {
+                loadScripts(scriptDiff, data);
             }
 
         },
@@ -292,14 +317,12 @@
             dataType = data.datatype ? data.datatype : 'html';
 
             load = $.proxy(function () {
-                // console.time('slideoutAjaxSuccess');
                 $.ajax(url, {
                     method: method,
                     dataType: dataType,
                     cache: true,
                     ifModified: true,
                     success: $.proxy(function (response) {
-                        // console.timeEnd('slideoutAjaxSuccess');
                         let $response,
                             $content,
                             $qorFormContainer,
@@ -307,65 +330,66 @@
                             $links,
                             bodyClass;
 
-
                         $(CLASS_BODY_LOADING).remove();
 
                         if (method === 'GET') {
-                            // console.time('slideoutHandleHtml');
                             $response = $(response);
-
                             $content = $response.find(CLASS_MAIN_CONTENT);
                             $qorFormContainer = $content.find('.qor-form-container');
-                            $scripts = $content.find('script[src]');
-                            $links = $content.find('link[href]');
-
                             this.slideoutType = $qorFormContainer.length && $qorFormContainer.data().slideoutType;
 
                             if (!$content.length) {
                                 return;
                             }
 
-                            // Get response body tag: http://stackoverflow.com/questions/7001926/cannot-get-body-element-from-ajax-response
                             let bodyHtml = response.match(/<\s*body.*>[\s\S]*<\s*\/body\s*>/ig);
-                            // if no body tag return
                             if (bodyHtml) {
                                 bodyHtml = bodyHtml.join('').replace(/<\s*body/gi, '<div').replace(/<\s*\/body/gi, '</div');
                                 bodyClass = $(bodyHtml).prop('class');
                                 $('body').addClass(bodyClass);
 
-                                this.loadExtraResource($response.filter('script'), $response.filter('link'), url, response);
+                                let data = {
+                                    '$scripts': $response.filter('script'),
+                                    '$links': $response.filter('link'),
+                                    'url': url,
+                                    'response': response
+                                };
+
+                                this.loadExtraResource(data);
                             }
 
                             $content.find('.qor-button--cancel').attr('data-dismiss', 'slideout').removeAttr('href');
 
-                            if ($scripts.length || $links.length) {
-                                this.loadExtraResource($scripts, $links);
-                                $content.find('script[src],link[href]').remove();
+                            $scripts = compareScripts($content.find('script[src]'));
+                            $links = compareLinks($content.find('link[href]'));
+
+                            if ($scripts.length) {
+                                let data = {
+                                    'url': url,
+                                    'response': response
+                                };
+
+                                loadScripts($scripts, data, function () {});
+
                             }
 
-                            // console.timeEnd('slideoutHandleHtml');
+                            if ($links.length) {
+                                loadStyles($links);
+                            }
 
+                            $content.find('script[src],link[href]').remove();
 
-                            // console.time('slideoutInsertHtml');
                             // reset slideout header and body
                             $slideout.html(this.$slideoutTemplate);
-
                             $title = $slideout.find('.qor-slideout__title');
                             this.$body = $slideout.find('.qor-slideout__body');
 
                             $title.html($response.find(options.title).html());
                             replaceHtml($slideout.find('.qor-slideout__body')[0], $content.html());
-
-                            // this.$body.html($content.html())
-
-                            // console.timeEnd('slideoutInsertHtml');
-
                             this.$body.find(CLASS_HEADER_LOCALE).remove();
 
                             $slideout.one(EVENT_SHOWN, function () {
-                                // console.time('slideoutTriggerEnable');
                                 $(this).trigger('enable');
-                                // console.timeEnd('slideoutTriggerEnable');
                             }).one(EVENT_HIDDEN, function () {
                                 $(this).trigger('disable');
                             });
@@ -455,11 +479,9 @@
 
         shown: function () {
             this.slided = true;
-
             // Disable to scroll body element
             $('body').addClass(CLASS_OPEN);
-
-            this.$slideout.trigger(EVENT_SHOWN);
+            this.$slideout.trigger('beforeEnable.qor.slideout').trigger(EVENT_SHOWN).trigger('afterEnable.qor.slideout');
         },
 
         hide: function () {
