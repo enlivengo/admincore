@@ -317,15 +317,12 @@
             dataType = data.datatype ? data.datatype : 'html';
 
             load = $.proxy(function () {
-                console.time('slideoutAjaxSuccess');
                 $.ajax(url, {
                     method: method,
                     dataType: dataType,
                     cache: true,
                     ifModified: true,
                     success: $.proxy(function (response) {
-                        console.timeEnd('slideoutAjaxSuccess');
-                        console.log('------------------------------');
                         let $response,
                             $content,
                             $qorFormContainer,
@@ -372,9 +369,7 @@
                                     'response': response
                                 };
 
-                                loadScripts($scripts, data, function () {
-                                    console.log('all loaded');
-                                });
+                                loadScripts($scripts, data, function () {});
 
                             }
 
@@ -394,10 +389,7 @@
                             this.$body.find(CLASS_HEADER_LOCALE).remove();
 
                             $slideout.one(EVENT_SHOWN, function () {
-                                console.time('slideoutTriggerEnable');
                                 $(this).trigger('enable');
-                                console.timeEnd('slideoutTriggerEnable');
-                                console.log('------------------------------');
                             }).one(EVENT_HIDDEN, function () {
                                 $(this).trigger('disable');
                             });
@@ -487,13 +479,9 @@
 
         shown: function () {
             this.slided = true;
-
             // Disable to scroll body element
             $('body').addClass(CLASS_OPEN);
-
-            this.$slideout.trigger('beforeEnable.qor.slideout');
-            this.$slideout.trigger(EVENT_SHOWN);
-            this.$slideout.trigger('afterEnable.qor.slideout');
+            this.$slideout.trigger('beforeEnable.qor.slideout').trigger(EVENT_SHOWN).trigger('afterEnable.qor.slideout');
         },
 
         hide: function () {
