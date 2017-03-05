@@ -1,4 +1,4 @@
-(function(factory) {
+(function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as anonymous module.
         define(['jquery'], factory);
@@ -9,39 +9,32 @@
         // Browser globals.
         factory(jQuery);
     }
-})(function($) {
+})(function ($) {
 
     'use strict';
 
-    var FormData = window.FormData;
-    var NAMESPACE = 'qor.bottomsheets';
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_SUBMIT = 'submit.' + NAMESPACE;
-    var EVENT_RELOAD = 'reload.' + NAMESPACE;
-    var EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE;
-    var EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE;
-    var EVENT_HIDE = 'hide.' + NAMESPACE;
-    var EVENT_HIDDEN = 'hidden.' + NAMESPACE;
-    var EVENT_KEYUP = 'keyup.' + NAMESPACE;
-    var CLASS_OPEN = 'qor-bottomsheets-open';
-    var CLASS_IS_SHOWN = 'is-shown';
-    var CLASS_IS_SLIDED = 'is-slided';
-    var CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page';
-    var CLASS_BODY_CONTENT = '.qor-page__body';
-    var CLASS_BODY_HEAD = '.qor-page__header';
-    var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
-    var CLASS_BOTTOMSHEETS_FILTER = '.qor-bottomsheet__filter';
-    var CLASS_BOTTOMSHEETS_BUTTON = '.qor-bottomsheets__search-button';
-    var CLASS_BOTTOMSHEETS_INPUT = '.qor-bottomsheets__search-input';
-    var URL_GETQOR = 'http://www.getqor.com/';
-
-    function QorBottomSheets(element, options) {
-        this.$element = $(element);
-        this.options = $.extend({}, QorBottomSheets.DEFAULTS, $.isPlainObject(options) && options);
-        this.disabled = false;
-        this.resourseData = {};
-        this.init();
-    }
+    let _ = window._,
+        FormData = window.FormData,
+        NAMESPACE = 'qor.bottomsheets',
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_SUBMIT = 'submit.' + NAMESPACE,
+        EVENT_RELOAD = 'reload.' + NAMESPACE,
+        EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE,
+        EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE,
+        EVENT_HIDE = 'hide.' + NAMESPACE,
+        EVENT_HIDDEN = 'hidden.' + NAMESPACE,
+        EVENT_KEYUP = 'keyup.' + NAMESPACE,
+        CLASS_OPEN = 'qor-bottomsheets-open',
+        CLASS_IS_SHOWN = 'is-shown',
+        CLASS_IS_SLIDED = 'is-slided',
+        CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page',
+        CLASS_BODY_CONTENT = '.qor-page__body',
+        CLASS_BODY_HEAD = '.qor-page__header',
+        CLASS_BOTTOMSHEETS = '.qor-bottomsheets',
+        CLASS_BOTTOMSHEETS_FILTER = '.qor-bottomsheet__filter',
+        CLASS_BOTTOMSHEETS_BUTTON = '.qor-bottomsheets__search-button',
+        CLASS_BOTTOMSHEETS_INPUT = '.qor-bottomsheets__search-input',
+        URL_GETQOR = 'http://www.getqor.com/';
 
     function getUrlParameter(name, search) {
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -70,15 +63,103 @@
         }
     }
 
+    function pushArrary($ele, isScript) {
+        let array = [],
+            prop = 'href';
+
+        isScript && (prop = 'src');
+        $ele.each(function () {
+            array.push($(this).attr(prop));
+        });
+        return _.uniq(array);
+    }
+
+    function execSlideoutEvents(url, response) {
+        // exec qorSliderAfterShow after script loaded
+        var qorSliderAfterShow = $.fn.qorSliderAfterShow;
+        for (var name in qorSliderAfterShow) {
+            if (qorSliderAfterShow.hasOwnProperty(name) && !qorSliderAfterShow[name]['isLoaded']) {
+                qorSliderAfterShow[name]['isLoaded'] = true;
+                qorSliderAfterShow[name].call(this, url, response);
+            }
+        }
+    }
+
+    function loadScripts(srcs, data, callback) {
+        let scriptsLoaded = 0;
+
+        for (let i = 0, len = srcs.length; i < len; i++) {
+            let script = document.createElement('script');
+
+            script.onload = function () {
+                scriptsLoaded++;
+
+                if (scriptsLoaded === srcs.length) {
+                    if ($.isFunction(callback)) {
+                        callback();
+                    }
+                }
+
+                if (data && data.url && data.response) {
+                    execSlideoutEvents(data.url, data.response);
+                }
+            };
+
+            script.src = srcs[i];
+            document.body.appendChild(script);
+        }
+
+    }
+
+    function loadStyles(srcs) {
+        let ss = document.createElement('link'),
+            src = srcs.shift();
+
+        ss.type = 'text/css';
+        ss.rel = 'stylesheet';
+        ss.onload = function () {
+            if (srcs.length) {
+                loadStyles(srcs);
+            }
+        };
+        ss.href = src;
+        document.getElementsByTagName('head')[0].appendChild(ss);
+    }
+
+    function compareScripts($scripts) {
+        let $currentPageScripts = $('script'),
+            slideoutScripts = pushArrary($scripts, true),
+            currentPageScripts = pushArrary($currentPageScripts, true),
+            scriptDiff = _.difference(slideoutScripts, currentPageScripts);
+        return scriptDiff;
+    }
+
+    function compareLinks($links) {
+        let $currentStyles = $('link'),
+            slideoutStyles = pushArrary($links),
+            currentStyles = pushArrary($currentStyles),
+            styleDiff = _.difference(slideoutStyles, currentStyles);
+
+        return styleDiff;
+    }
+
+    function QorBottomSheets(element, options) {
+        this.$element = $(element);
+        this.options = $.extend({}, QorBottomSheets.DEFAULTS, $.isPlainObject(options) && options);
+        this.disabled = false;
+        this.resourseData = {};
+        this.init();
+    }
+
     QorBottomSheets.prototype = {
         constructor: QorBottomSheets,
 
-        init: function() {
+        init: function () {
             this.build();
             this.bind();
         },
 
-        build: function() {
+        build: function () {
             var $bottomsheets = $(CLASS_BOTTOMSHEETS);
 
             if ($bottomsheets.length) {
@@ -95,16 +176,16 @@
 
         },
 
-        initBottomsheet: function() {
+        initBottomsheet: function () {
 
         },
 
-        unbuild: function() {
+        unbuild: function () {
             this.$body = null;
             this.$bottomsheets.remove();
         },
 
-        bind: function() {
+        bind: function () {
             this.$bottomsheets
                 .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
                 .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
@@ -115,7 +196,7 @@
                 .on('filterChanged.qor.filter', this.filterChanged.bind(this));
         },
 
-        unbind: function() {
+        unbind: function () {
             this.$bottomsheets
                 .off(EVENT_SUBMIT, 'form', this.submit.bind(this))
                 .off(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
@@ -125,14 +206,14 @@
                 .off('filterChanged.qor.filter', this.filterChanged.bind(this));
         },
 
-        bindActionData: function(actiondData) {
+        bindActionData: function (actiondData) {
             var $form = this.$body.find('[data-toggle="qor-action-slideout"]').find('form');
             for (var i = actiondData.length - 1; i >= 0; i--) {
                 $form.prepend('<input type="hidden" name="primary_values[]" value="' + actiondData[i] + '" />');
             }
         },
 
-        filterChanged: function(e, search, key) {
+        filterChanged: function (e, search, key) {
             // if this event triggered:
             // search: ?locale_mode=locale, ?filters[Color].Value=2
             // key: search param name: locale_mode
@@ -144,7 +225,7 @@
             return false;
         },
 
-        selectorChanged: function(e, url, key) {
+        selectorChanged: function (e, url, key) {
             // if this event triggered:
             // url: /admin/!remote_data_searcher/products/Collections?locale=en-US
             // key: search param key: locale
@@ -156,7 +237,7 @@
             return false;
         },
 
-        keyup: function(e) {
+        keyup: function (e) {
             var searchInput = this.$bottomsheets.find(CLASS_BOTTOMSHEETS_INPUT);
 
             if (e.which === 13 && searchInput.length && searchInput.is(':focus')) {
@@ -164,7 +245,7 @@
             }
         },
 
-        search: function() {
+        search: function () {
             var $bottomsheets = this.$bottomsheets,
                 param = '?keyword=',
                 baseUrl = $bottomsheets.data().url,
@@ -174,7 +255,7 @@
             this.reload(url);
         },
 
-        pagination: function(e) {
+        pagination: function (e) {
             var $ele = $(e.target),
                 url = $ele.prop('href');
             if (url) {
@@ -183,18 +264,18 @@
             return false;
         },
 
-        reload: function(url) {
+        reload: function (url) {
             var $content = this.$bottomsheets.find(CLASS_BODY_CONTENT);
 
             this.addLoading($content);
             this.fetchPage(url);
         },
 
-        fetchPage: function(url) {
+        fetchPage: function (url) {
             var $bottomsheets = this.$bottomsheets,
                 _this = this;
 
-            $.get(url, function(response) {
+            $.get(url, function (response) {
                 var $response = $(response).find(CLASS_MAIN_CONTENT),
                     $responseHeader = $response.find(CLASS_BODY_HEAD),
                     $responseBody = $response.find(CLASS_BODY_CONTENT);
@@ -211,12 +292,12 @@
                 } else {
                     _this.reload(url);
                 }
-            }).fail(function() {
+            }).fail(function () {
                 window.alert("server error, please try again later!");
             });
         },
 
-        constructloadURL: function(url, key) {
+        constructloadURL: function (url, key) {
             var fakeURL,
                 value,
                 filterURL = this.filterURL,
@@ -237,41 +318,51 @@
             return filterURL;
         },
 
-        addHeaderClass: function() {
+        addHeaderClass: function () {
             this.$body.find(CLASS_BODY_HEAD).hide();
             if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(CLASS_BOTTOMSHEETS_FILTER).length) {
                 this.$body.addClass('has-header').find(CLASS_BODY_HEAD).show();
             }
         },
 
-        addLoading: function($element) {
+        addLoading: function ($element) {
             $element.html('');
             var $loading = $(QorBottomSheets.TEMPLATE_LOADING).appendTo($element);
             window.componentHandler.upgradeElement($loading.children()[0]);
         },
 
-        loadScript: function(src) {
-            var script = document.createElement('script');
-            script.src = src;
-            document.body.appendChild(script);
-            this.scriptAdded = true;
+        loadExtraResource: function (data) {
+            let styleDiff = compareLinks(data.$links),
+                scriptDiff = compareScripts(data.$scripts);
+
+            if (styleDiff.length) {
+                loadStyles(styleDiff);
+            }
+
+            if (scriptDiff.length) {
+                loadScripts(scriptDiff, data);
+            }
+
         },
 
-        loadMedialibraryJS: function($response) {
+        loadMedialibraryJS: function ($response) {
             var $script = $response.filter('script'),
                 theme = /theme=media_library/g,
                 src,
                 _this = this;
 
-            $script.each(function() {
+            $script.each(function () {
                 src = $(this).prop('src');
                 if (theme.test(src)) {
-                    _this.loadScript(src);
+                    var script = document.createElement('script');
+                    script.src = src;
+                    document.body.appendChild(script);
+                    _this.scriptAdded = true;
                 }
             });
         },
 
-        submit: function(e) {
+        submit: function (e) {
 
             // will ingore submit event if need handle with other submit event: like select one, many...
             if (this.resourseData.ingoreSubmit) {
@@ -303,10 +394,10 @@
                     dataType: 'html',
                     processData: false,
                     contentType: false,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         $submit.prop('disabled', true);
                     },
-                    success: function() {
+                    success: function () {
 
                         $('.qor-error').remove();
 
@@ -329,7 +420,7 @@
                             _this.refresh();
                         }
                     },
-                    error: function(xhr, textStatus, errorThrown) {
+                    error: function (xhr, textStatus, errorThrown) {
                         var $error;
 
                         if (xhr.status === 422) {
@@ -341,14 +432,14 @@
                             window.alert([textStatus, errorThrown].join(': '));
                         }
                     },
-                    complete: function() {
+                    complete: function () {
                         $submit.prop('disabled', false);
                     }
                 });
             }
         },
 
-        load: function(url, data, callback) {
+        load: function (url, data, callback) {
             var options = this.options,
                 method,
                 dataType,
@@ -376,14 +467,18 @@
             method = data.method ? data.method : 'GET';
             dataType = data.datatype ? data.datatype : 'html';
 
-            load = $.proxy(function() {
+            load = $.proxy(function () {
                 $.ajax(url, {
                     method: method,
                     dataType: dataType,
-                    success: $.proxy(function(response) {
+                    success: $.proxy(function (response) {
                         if (method === 'GET') {
-                            var $response = $(response),
+                            let $response = $(response),
                                 $content,
+                                data = {
+                                    '$scripts': $response.filter('script'),
+                                    '$links': $response.filter('link')
+                                },
                                 hasSearch = selectModal && $response.find('.qor-search-container').length;
 
                             $content = $response.find(CLASS_MAIN_CONTENT);
@@ -391,6 +486,8 @@
                             if (!$content.length) {
                                 return;
                             }
+
+                            this.loadExtraResource(data);
 
                             if (ingoreSubmit) {
                                 $content.find(CLASS_BODY_HEAD).remove();
@@ -426,7 +523,7 @@
 
                             $bottomsheets.trigger('enable');
 
-                            $bottomsheets.one(EVENT_HIDDEN, function() {
+                            $bottomsheets.one(EVENT_HIDDEN, function () {
                                 $(this).trigger('disable');
                             });
 
@@ -454,11 +551,11 @@
                     }, this),
 
 
-                    error: $.proxy(function() {
+                    error: $.proxy(function () {
                         this.hide();
                         var errors;
                         if ($('.qor-error span').length > 0) {
-                            errors = $('.qor-error span').map(function() {
+                            errors = $('.qor-error span').map(function () {
                                 return $(this).text();
                             }).get().join(', ');
                         } else {
@@ -474,18 +571,18 @@
 
         },
 
-        open: function(options, callback) {
+        open: function (options, callback) {
             this.resourseData = options;
             this.load(options.url, options, callback);
         },
 
-        show: function() {
+        show: function () {
             this.$bottomsheets.addClass(CLASS_IS_SHOWN).get(0).offsetHeight;
             this.$bottomsheets.addClass(CLASS_IS_SLIDED);
             $('body').addClass(CLASS_OPEN);
         },
 
-        hide: function() {
+        hide: function () {
             var $bottomsheets = this.$bottomsheets;
             var hideEvent;
             var $datePicker = $('.qor-datepicker').not('.hidden');
@@ -514,15 +611,15 @@
             return false;
         },
 
-        refresh: function() {
+        refresh: function () {
             this.hide();
 
-            setTimeout(function() {
+            setTimeout(function () {
                 window.location.reload();
             }, 350);
         },
 
-        destroy: function() {
+        destroy: function () {
             this.unbind();
             this.unbuild();
             this.$element.removeData(NAMESPACE);
@@ -555,8 +652,8 @@
         '</div>'
     );
 
-    QorBottomSheets.plugin = function(options) {
-        return this.each(function() {
+    QorBottomSheets.plugin = function (options) {
+        return this.each(function () {
             var $this = $(this);
             var data = $this.data(NAMESPACE);
             var fn;
