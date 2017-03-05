@@ -452,6 +452,11 @@
             this.load(options.url, options.data);
         },
 
+        reload: function (url) {
+            this.hide();
+            this.load(url);
+        },
+
         show: function () {
             var $slideout = this.$slideout;
             var showEvent;
