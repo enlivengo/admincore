@@ -78,9 +78,9 @@ func (context *Context) newResourcePath(res *Resource) string {
 func (context *Context) URLFor(value interface{}, resources ...*Resource) string {
 	getPrefix := func(res *Resource) string {
 		var params string
-		for res.base != nil {
-			params = path.Join(res.base.ToParam(), res.base.GetPrimaryValue(context.Request), params)
-			res = res.base
+		for res.ParentResource != nil {
+			params = path.Join(res.ParentResource.ToParam(), res.ParentResource.GetPrimaryValue(context.Request), params)
+			res = res.ParentResource
 		}
 		return path.Join(res.GetAdmin().router.Prefix, params)
 	}

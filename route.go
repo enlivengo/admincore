@@ -113,13 +113,13 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 	if prefix = func(r *Resource) string {
 		p := param
 
-		for r.base != nil {
-			bp := r.base.ToParam()
+		for r.ParentResource != nil {
+			bp := r.ParentResource.ToParam()
 			if bp == param {
 				return ""
 			}
-			p = path.Join(bp, r.base.ParamIDName(), p)
-			r = r.base
+			p = path.Join(bp, r.ParentResource.ParamIDName(), p)
+			r = r.ParentResource
 		}
 		return "/" + strings.Trim(p, "/")
 	}(res); prefix == "" {
@@ -242,7 +242,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 	scope := gorm.Scope{Value: res.Value}
 	if scope.PrimaryField() != nil {
 		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
 				if len(meta.Resource.newSections) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "create")
 				}
@@ -250,7 +250,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 		}
 
 		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
 				if len(meta.Resource.showSections) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "read")
 				}
@@ -258,7 +258,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 		}
 
 		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.base != nil {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
 				if len(meta.Resource.editSections) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "update", "delete")
 				}

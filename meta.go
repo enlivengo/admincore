@@ -84,7 +84,7 @@ func getField(fields []*gorm.StructField, name string) (*gorm.StructField, bool)
 
 func (meta *Meta) setBaseResource(base *Resource) {
 	res := meta.Resource
-	res.base = base
+	res.ParentResource = base
 
 	findOneHandle := res.FindOneHandler
 	res.FindOneHandler = func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) (err error) {

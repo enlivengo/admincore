@@ -17,14 +17,14 @@ import (
 // Resource is the most important thing for qor admin, every model is defined as a resource, qor admin will genetate management interface based on its definition
 type Resource struct {
 	resource.Resource
-	Config        *Config
-	Metas         []*Meta
-	Actions       []*Action
-	SearchHandler func(keyword string, context *qor.Context) *gorm.DB
+	Config         *Config
+	Metas          []*Meta
+	Actions        []*Action
+	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
+	ParentResource *Resource
 
 	admin          *Admin
 	params         string
-	base           *Resource
 	scopes         []*Scope
 	filters        []*Filter
 	searchAttrs    *[]string
