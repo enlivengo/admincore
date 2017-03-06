@@ -18,6 +18,7 @@
         NAMESPACE = 'qor.bottomsheets',
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_SUBMIT = 'submit.' + NAMESPACE,
+        EVENT_SUBMITED = 'ajaxSuccessed.' + NAMESPACE,
         EVENT_RELOAD = 'reload.' + NAMESPACE,
         EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE,
         EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE,
@@ -363,17 +364,18 @@
         },
 
         submit: function (e) {
-
+            let resourseData = this.resourseData;
             // will ingore submit event if need handle with other submit event: like select one, many...
-            if (this.resourseData.ingoreSubmit) {
+            if (resourseData.ingoreSubmit) {
                 return;
             }
 
-            var $body = this.$body;
-            var form = e.target;
-            var $form = $(form);
-            var _this = this;
-            var $submit = $form.find(':submit');
+            let $body = this.$body,
+                form = e.target,
+                $form = $(form),
+                _this = this,
+                ajaxType = resourseData.ajaxType,
+                $submit = $form.find(':submit');
 
             // will submit form as normal, 
             // if you need download file after submit form or other things, please add
@@ -391,13 +393,19 @@
                 $.ajax($form.prop('action'), {
                     method: $form.prop('method'),
                     data: new FormData(form),
-                    dataType: 'html',
+                    dataType: ajaxType ? ajaxType : 'html',
                     processData: false,
                     contentType: false,
                     beforeSend: function () {
                         $submit.prop('disabled', true);
                     },
-                    success: function () {
+                    success: function (data) {
+
+                        if (resourseData.ajaxTakeover) {
+                            resourseData.$target.parent().trigger(EVENT_SUBMITED, [data]);
+                            return;
+                        }
+
 
                         $('.qor-error').remove();
 

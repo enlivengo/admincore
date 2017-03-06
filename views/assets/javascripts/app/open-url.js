@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
 
     'use strict';
 
@@ -8,10 +8,10 @@ $(function() {
 
         CLASS_IS_SELECTED = 'is-selected',
 
-        isSlideoutOpened = function() {
+        isSlideoutOpened = function () {
             return $body.hasClass('qor-slideout-open');
         },
-        isBottomsheetsOpened = function() {
+        isBottomsheetsOpened = function () {
             return $body.hasClass('qor-bottomsheets-open');
         };
 
@@ -39,14 +39,14 @@ $(function() {
             return;
         }
 
-        $checked.each(function() {
+        $checked.each(function () {
             IDs.push($(this).closest('tr').data('primary-key'));
         });
 
         return IDs;
     }
 
-    $(document).on('click.qor.openUrl', '[data-url]', function(e) {
+    $(document).on('click.qor.openUrl', '[data-url]', function (e) {
         var $this = $(this),
             $target = $(e.target),
             isNewButton = $this.hasClass('qor-button--new'),
@@ -70,6 +70,8 @@ $(function() {
                 actionData: actionData
             });
         }
+
+        openData.$target = $target;
 
         if (!openData.method || openData.method.toUpperCase() == "GET") {
             // Open in BottmSheet: is action button, open type is bottom-sheet
