@@ -213,6 +213,8 @@
         margin-top: 0;
         .qor-fieldset {
             padding: 4px 8px;
+            box-shadow: none;
+            border: 1px solid rgba(0, 0, 0, .12);
         }
         iframe {
             height: 148px !important;
