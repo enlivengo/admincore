@@ -155,21 +155,22 @@
         },
 
         bind: function () {
-            this.$slideout.
-            on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
+            this.$slideout
+                .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
+                .on(EVENT_CLICK, '.qor-slideout__fullscreen', $.proxy(this.toggleSlideoutMode, this))
                 .on(EVENT_CLICK, '[data-dismiss="slideout"]', $.proxy(this.hide, this));
 
-            $document.
-            on(EVENT_KEYUP, $.proxy(this.keyup, this));
+            $document
+                .on(EVENT_KEYUP, $.proxy(this.keyup, this));
         },
 
         unbind: function () {
-            this.$slideout.
-            off(EVENT_SUBMIT, this.submit);
+            this.$slideout
+                .off(EVENT_SUBMIT, this.submit);
 
-            $document.
-            off(EVENT_KEYUP, this.keyup).
-            off(EVENT_CLICK, this.hide);
+            $document
+                .off(EVENT_KEYUP, this.keyup)
+                .off(EVENT_CLICK, this.hide);
         },
 
         keyup: function (e) {
@@ -205,6 +206,12 @@
             $(CLASS_BODY_LOADING).remove();
             var $loading = $(QorSlideout.TEMPLATE_LOADING);
             $loading.appendTo($('body')).trigger('enable');
+        },
+
+        toggleSlideoutMode: function () {
+
+            this.$slideout.toggleClass('qor-slideout__fullscreen').find('.qor-slideout__fullscreen i').toggle();
+
         },
 
         submit: function (e) {
@@ -394,6 +401,7 @@
                                 $(this).trigger('disable');
                             });
 
+                            $slideout.find('.qor-slideout__opennew').attr('href', url);
                             this.show();
 
                             // callback for after slider loaded HTML
@@ -566,9 +574,16 @@
     QorSlideout.TEMPLATE = (
         `<div class="qor-slideout">
             <div class="qor-slideout__header">
-            <button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">
-                <span class="material-icons">close</span>
-            </button>
+                <div class="qor-slideout__header-link">
+                    <a href="#" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__fullscreen">
+                        <i class="material-icons">fullscreen</i>
+                        <i class="material-icons" style="display: none;">fullscreen_exit</i>
+                    </a>
+                    <a href="#" target="_blank" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__opennew"><i class="material-icons">open_in_new</i></a>
+                </div>
+                <button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-slideout__close" data-dismiss="slideout">
+                    <span class="material-icons">close</span>
+                </button>
                 <h3 class="qor-slideout__title"></h3>
             </div>
             <div class="qor-slideout__body"></div>
