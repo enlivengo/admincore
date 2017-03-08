@@ -13,6 +13,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
+	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
 )
 
@@ -338,7 +339,7 @@ func (admin *Admin) compile() {
 
 			handlers := router.routers[strings.ToUpper(request.Method)]
 			for _, handler := range handlers {
-				if params, ok := handler.try(relativePath); ok && handler.HasPermission(context.Context) {
+				if params, _, ok := utils.ParamsMatch(handler.Path, relativePath); ok && handler.HasPermission(context.Context) {
 					if len(params) > 0 {
 						context.Request.URL.RawQuery = url.Values(params).Encode() + "&" + context.Request.URL.RawQuery
 					}
