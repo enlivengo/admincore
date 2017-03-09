@@ -96,15 +96,15 @@ func TestMenu(t *testing.T) {
 		{Name: res5.Name, rawPath: "res5", Link: "/admin/res5"},
 	}
 
-	if !reflect.DeepEqual(expect, menus) {
-		g, err := json.MarshalIndent(menus, "", "  ")
-		if err != nil {
-			t.Error(err)
-		}
-		w, err := json.MarshalIndent(expect, "", "  ")
-		if err != nil {
-			t.Error(err)
-		}
+	g, err := json.MarshalIndent(menus, "", "  ")
+	if err != nil {
+		t.Error(err)
+	}
+	w, err := json.MarshalIndent(expect, "", "  ")
+	if err != nil {
+		t.Error(err)
+	}
+	if string(g) != string(w) {
 		t.Errorf("add menu errors: got %s; expect %s", g, w)
 	}
 
