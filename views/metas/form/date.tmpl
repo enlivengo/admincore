@@ -8,7 +8,7 @@
       {{.Value}}
     </div>
 
-    <div class="qor-field__edit qor-field__picker-container" data-picker-type="date">
+    <div class="qor-field__edit qor-field__datepicker" data-picker-type="date">
       <input class="mdl-textfield__input qor-datepicker__input" placeholder="{{meta_placeholder .Meta .Context "YYYY-MM-DD"}}" type="text" id="{{.InputId}}" name="{{.InputName}}" value="{{.Value}}" {{if not (has_update_permission .Meta)}} disabled{{end}}>
 
       <div>

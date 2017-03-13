@@ -22,7 +22,7 @@
     var EVENT_BLUR = 'blur.' + NAMESPACE;
     var EVENT_CHANGE_TIME = 'selectTime.' + NAMESPACE;
 
-    var CLASS_PARENT = '.qor-field__datetimepicker';
+    var CLASS_PARENT = '[data-picker-type]';
     var CLASS_TIME_SELECTED = '.ui-timepicker-selected';
 
     function QorTimepicker(element, options) {

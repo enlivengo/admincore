@@ -21,7 +21,7 @@
 
     var CLASS_EMBEDDED = '.qor-datepicker__embedded';
     var CLASS_SAVE = '.qor-datepicker__save';
-    var CLASS_PARENT = '.qor-field__picker-container';
+    var CLASS_PARENT = '[data-picker-type]';
 
     function replaceText(str, data) {
         if (typeof str === 'string') {
