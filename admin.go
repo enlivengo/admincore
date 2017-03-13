@@ -112,7 +112,7 @@ func (admin *Admin) newResource(value interface{}, config ...*Config) *Resource 
 	}
 
 	res := &Resource{
-		Resource:    *resource.New(value),
+		Resource:    resource.New(value),
 		Config:      configuration,
 		cachedMetas: &map[string][]*Meta{},
 		admin:       admin,

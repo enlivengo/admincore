@@ -16,7 +16,7 @@ import (
 
 // Resource is the most important thing for qor admin, every model is defined as a resource, qor admin will genetate management interface based on its definition
 type Resource struct {
-	resource.Resource
+	*resource.Resource
 	Config         *Config
 	Metas          []*Meta
 	Actions        []*Action
@@ -359,8 +359,6 @@ func (res *Resource) GetMetas(attrs []string) []resource.Metaor {
 		}
 	}
 
-	primaryKey := res.PrimaryFieldName()
-
 	metas := []resource.Metaor{}
 
 Attrs:
@@ -381,8 +379,11 @@ Attrs:
 
 		if meta == nil {
 			meta = &Meta{Name: attr, baseResource: res}
-			if attr == primaryKey {
-				meta.Type = "hidden"
+			for _, primaryField := range res.PrimaryFields {
+				if attr == primaryField.Name {
+					meta.Type = "hidden"
+					break
+				}
 			}
 			meta.updateMeta()
 		}

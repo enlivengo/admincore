@@ -3,7 +3,6 @@ package admin
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -96,9 +95,8 @@ func (meta *Meta) setBaseResource(base *Resource) {
 			clone := context.Clone()
 			baseValue := base.NewStruct()
 			if err = base.FindOneHandler(baseValue, nil, clone); err == nil {
-				scope := clone.GetDB().NewScope(nil)
-				sql := fmt.Sprintf("%v = ?", scope.Quote(res.PrimaryDBName()))
-				err = context.GetDB().Model(baseValue).Where(sql, primaryKey).Related(value).Error
+				primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
+				err = context.GetDB().Model(baseValue).Where(primaryQuerySQL, primaryParams...).Related(value).Error
 			}
 		}
 		return
@@ -135,10 +133,9 @@ func (meta *Meta) setBaseResource(base *Resource) {
 	res.DeleteHandler = func(value interface{}, context *qor.Context) (err error) {
 		var clone = context.Clone()
 		var baseValue = base.NewStruct()
-		if primryKey := res.GetPrimaryValue(context.Request); primryKey != "" {
-			var scope = clone.GetDB().NewScope(nil)
-			var sql = fmt.Sprintf("%v = ?", scope.Quote(res.PrimaryDBName()))
-			if err = context.GetDB().First(value, sql, primryKey).Error; err == nil {
+		if primaryKey := res.GetPrimaryValue(context.Request); primaryKey != "" {
+			primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
+			if err = context.GetDB().Where(primaryQuerySQL, primaryParams...).First(value).Error; err == nil {
 				if err = base.FindOneHandler(baseValue, nil, clone); err == nil {
 					base.FindOneHandler(baseValue, nil, clone)
 					return context.GetDB().Model(baseValue).Association(meta.FieldName).Delete(value).Error

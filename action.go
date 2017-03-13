@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
@@ -102,13 +102,23 @@ func (action Action) HasPermission(mode roles.PermissionMode, context *qor.Conte
 // FindSelectedRecords find selected records when run bulk actions
 func (actionArgument *ActionArgument) FindSelectedRecords() []interface{} {
 	var (
-		context  = actionArgument.Context
-		resource = context.Resource
-		records  = []interface{}{}
+		context   = actionArgument.Context
+		resource  = context.Resource
+		records   = []interface{}{}
+		sqls      []string
+		sqlParams []interface{}
 	)
 
 	clone := context.clone()
-	clone.SetDB(clone.GetDB().Where(fmt.Sprintf("%v IN (?)", resource.PrimaryDBName()), actionArgument.PrimaryValues))
+	for _, primaryValue := range actionArgument.PrimaryValues {
+		primaryQuerySQL, primaryParams := resource.ToPrimaryQueryParams(primaryValue, context.Context)
+		sqls = append(sqls, primaryQuerySQL)
+		sqlParams = append(sqlParams, primaryParams...)
+	}
+
+	if len(sqls) > 0 {
+		clone.SetDB(clone.GetDB().Where(strings.Join(sqls, " OR "), sqlParams...))
+	}
 	results, _ := clone.FindMany()
 
 	resultValues := reflect.Indirect(reflect.ValueOf(results))
