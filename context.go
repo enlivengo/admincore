@@ -16,13 +16,14 @@ import (
 type Context struct {
 	*qor.Context
 	*Searcher
-	Flashes  []Flash
-	Resource *Resource
-	Admin    *Admin
-	Content  template.HTML
-	Action   string
-	Settings map[string]interface{}
-	Result   interface{}
+	Flashes      []Flash
+	Resource     *Resource
+	Admin        *Admin
+	Content      template.HTML
+	Action       string
+	Settings     map[string]interface{}
+	Result       interface{}
+	RouteHandler *routeHandler
 
 	funcMaps template.FuncMap
 }

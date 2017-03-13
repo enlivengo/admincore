@@ -43,12 +43,12 @@ func (middleware Middleware) Next(context *Context) {
 // Router contains registered routers
 type Router struct {
 	Prefix      string
-	routers     map[string][]routeHandler
+	routers     map[string][]*routeHandler
 	middlewares []*Middleware
 }
 
 func newRouter() *Router {
-	return &Router{routers: map[string][]routeHandler{
+	return &Router{routers: map[string][]*routeHandler{
 		"GET":    {},
 		"PUT":    {},
 		"POST":   {},
@@ -330,53 +330,29 @@ func (admin *Admin) compile() {
 	router.Use(&Middleware{
 		Name: "qor_handler",
 		Handler: func(context *Context, middleware *Middleware) {
-			request := context.Request
-
-			relativePath := "/" + strings.Trim(
-				strings.TrimSuffix(strings.TrimPrefix(request.URL.Path, router.Prefix), path.Ext(request.URL.Path)),
-				"/",
-			)
-
-			handlers := router.routers[strings.ToUpper(request.Method)]
-			for _, handler := range handlers {
-				if params, _, ok := utils.ParamsMatch(handler.Path, relativePath); ok && handler.HasPermission(context.Context) {
-					if len(params) > 0 {
-						context.Request.URL.RawQuery = url.Values(params).Encode() + "&" + context.Request.URL.RawQuery
-					}
-
-					context.setResource(handler.Config.Resource)
-					if context.Resource == nil {
-						if matches := regexp.MustCompile(path.Join(router.Prefix, `([^/]+)`)).FindStringSubmatch(request.URL.Path); len(matches) > 1 {
-							context.setResource(admin.GetResource(matches[1]))
-						}
-					}
-
-					context.Writer.Header().Set("Cache-control", "no-store")
-					context.Writer.Header().Set("Pragma", "no-cache")
-					handler.Handle(context)
-					return
-				}
-			}
-
-			http.NotFound(context.Writer, request)
+			context.Writer.Header().Set("Cache-control", "no-store")
+			context.Writer.Header().Set("Pragma", "no-cache")
+			context.RouteHandler.Handle(context)
 		},
 	})
 }
 
 // ServeHTTP dispatches the handler registered in the matched route
 func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var relativePath = strings.TrimPrefix(req.URL.Path, admin.router.Prefix)
-	var context = admin.NewContext(w, req)
+	var (
+		relativePath = "/" + strings.Trim(strings.TrimPrefix(req.URL.Path, admin.router.Prefix), "/")
+		context      = admin.NewContext(w, req)
+	)
 
 	// Parse Request Form
-	context.Request.ParseMultipartForm(2 * 1024 * 1024)
+	req.ParseMultipartForm(2 * 1024 * 1024)
 
 	// Set Request Method
-	if method := context.Request.Form.Get("_method"); method != "" {
-		context.Request.Method = strings.ToUpper(method)
+	if method := req.Form.Get("_method"); method != "" {
+		req.Method = strings.ToUpper(method)
 	}
 
-	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) && strings.ToUpper(context.Request.Method) == "GET" {
+	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) && strings.ToUpper(req.Method) == "GET" {
 		(&Controller{Admin: admin}).Asset(context)
 		return
 	}
@@ -399,6 +375,24 @@ func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		context.SetDB(context.GetDB().Set("qor:current_user", context.CurrentUser))
 	}
 	context.Roles = roles.MatchedRoles(req, currentUser)
+
+	handlers := admin.router.routers[strings.ToUpper(req.Method)]
+	for _, handler := range handlers {
+		if params, _, ok := utils.ParamsMatch(handler.Path, relativePath); ok && handler.HasPermission(context.Context) {
+			if len(params) > 0 {
+				req.URL.RawQuery = url.Values(params).Encode() + "&" + req.URL.RawQuery
+			}
+			context.RouteHandler = handler
+
+			context.setResource(handler.Config.Resource)
+			if context.Resource == nil {
+				if matches := regexp.MustCompile(path.Join(admin.router.Prefix, `([^/]+)`)).FindStringSubmatch(req.URL.Path); len(matches) > 1 {
+					context.setResource(admin.GetResource(matches[1]))
+				}
+			}
+			break
+		}
+	}
 
 	// Call first middleware
 	for _, middleware := range admin.router.middlewares {

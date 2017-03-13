@@ -23,7 +23,7 @@ type routeHandler struct {
 	Config RouteConfig
 }
 
-func newRouteHandler(path string, handle requestHandler, configs ...RouteConfig) routeHandler {
+func newRouteHandler(path string, handle requestHandler, configs ...RouteConfig) *routeHandler {
 	handler := routeHandler{
 		Path:   "/" + strings.TrimPrefix(path, "/"),
 		Handle: handle,
@@ -36,7 +36,7 @@ func newRouteHandler(path string, handle requestHandler, configs ...RouteConfig)
 	if handler.Config.Permissioner == nil && handler.Config.Resource != nil {
 		handler.Config.Permissioner = handler.Config.Resource
 	}
-	return handler
+	return &handler
 }
 
 var emptyPermissionMode roles.PermissionMode
