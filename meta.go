@@ -314,7 +314,7 @@ func (meta *Meta) updateMeta() {
 				}
 
 				if result != nil {
-					res := meta.baseResource.GetAdmin().NewResource(result)
+					res := meta.baseResource.NewResource(result)
 					meta.Resource = res
 					meta.Meta.Permission = meta.Meta.Permission.Concat(res.Config.Permission)
 				}
@@ -324,7 +324,6 @@ func (meta *Meta) updateMeta() {
 				permission := meta.Resource.Permission.Concat(meta.Meta.Permission)
 				meta.Resource.Permission = permission
 				meta.SetPermission(permission)
-				meta.setBaseResource(meta.baseResource)
 			}
 		}
 	}

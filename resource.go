@@ -114,6 +114,14 @@ func (res *Resource) GetTheme(name string) ThemeInterface {
 	return nil
 }
 
+// NewResource initialize a new qor resource, won't add it to admin, just initialize it
+func (res *Resource) NewResource(value interface{}, config ...*Config) *Resource {
+	subRes := res.GetAdmin().newResource(value, config...)
+	subRes.ParentResource = res
+	subRes.configure()
+	return subRes
+}
+
 // Decode decode context into a value
 func (res *Resource) Decode(context *qor.Context, value interface{}) error {
 	return resource.Decode(context, value, res)

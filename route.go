@@ -61,6 +61,16 @@ func (r *Router) Mounted() bool {
 }
 
 // Use reigster a middleware to the router
+func (r *Router) GetMiddleware(name string) *Middleware {
+	for _, middleware := range r.middlewares {
+		if middleware.Name == name {
+			return middleware
+		}
+	}
+	return nil
+}
+
+// Use reigster a middleware to the router
 func (r *Router) Use(middleware *Middleware) {
 	// compile middleware
 	for index, m := range r.middlewares {
