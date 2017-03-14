@@ -332,7 +332,11 @@ func (admin *Admin) compile() {
 		Handler: func(context *Context, middleware *Middleware) {
 			context.Writer.Header().Set("Cache-control", "no-store")
 			context.Writer.Header().Set("Pragma", "no-cache")
-			context.RouteHandler.Handle(context)
+			if context.RouteHandler != nil {
+				context.RouteHandler.Handle(context)
+				return
+			}
+			http.NotFound(context.Writer, context.Request)
 		},
 	})
 }
