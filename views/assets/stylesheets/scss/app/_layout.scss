@@ -185,10 +185,15 @@
     transition: left 0.35s ease;
 }
 
+.has-subnav{
+  .qor-page__header{
+    height: auto;
+  }
+}
 .qor-page__header {
     position: fixed;
     top: 64px;
-    height: 48px;
+    min-height: 48px;
     margin-bottom: 24px;
     padding: 0 24px;
     width: calc(100% - 240px);
