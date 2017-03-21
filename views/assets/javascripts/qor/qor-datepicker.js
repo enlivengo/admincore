@@ -21,7 +21,7 @@
 
     var CLASS_EMBEDDED = '.qor-datepicker__embedded';
     var CLASS_SAVE = '.qor-datepicker__save';
-    var CLASS_PARENT = '.qor-field__datetimepicker';
+    var CLASS_PARENT = '[data-picker-type]';
 
     function replaceText(str, data) {
         if (typeof str === 'string') {
@@ -85,15 +85,15 @@
                 datepickerOptions.startDate = new Date();
             }
 
-            $modal.
-            find(CLASS_EMBEDDED).
-            on(EVENT_CHANGE, $.proxy(this.change, this)).
-            qorDatepicker(datepickerOptions).
-            triggerHandler(EVENT_CHANGE);
+            $modal
+                .find(CLASS_EMBEDDED)
+                .on(EVENT_CHANGE, $.proxy(this.change, this))
+                .qorDatepicker(datepickerOptions)
+                .triggerHandler(EVENT_CHANGE);
 
-            $modal.
-            find(CLASS_SAVE).
-            on(EVENT_CLICK, $.proxy(this.pick, this));
+            $modal
+                .find(CLASS_SAVE)
+                .on(EVENT_CLICK, $.proxy(this.pick, this));
 
             this.built = true;
         },
@@ -103,15 +103,15 @@
                 return;
             }
 
-            this.$modal.
-            find(CLASS_EMBEDDED).
-            off(EVENT_CHANGE, this.change).
-            qorDatepicker('destroy').
-            end().
-            find(CLASS_SAVE).
-            off(EVENT_CLICK, this.pick).
-            end().
-            remove();
+            this.$modal
+                .find(CLASS_EMBEDDED)
+                .off(EVENT_CHANGE, this.change)
+                .qorDatepicker('destroy')
+                .end()
+                .find(CLASS_SAVE)
+                .off(EVENT_CLICK, this.pick)
+                .end()
+                .remove();
         },
 
         change: function (e) {
@@ -139,13 +139,14 @@
         },
 
         pick: function () {
-            var $targetInput = this.$element;
-            var targetInputClass = this.pickerData.targetInput;
-            var newValue = this.formatDate;
+            let targetInputClass = this.pickerData.targetInput,
+                $element = this.$element,
+                $parent = $element.closest(CLASS_PARENT),
+                $targetInput = targetInputClass ? $parent.find(targetInputClass) : $element,
+                pickerType = $parent.data('picker-type'),
+                newValue = this.formatDate;
 
-            if (targetInputClass) {
-                $targetInput = $targetInput.closest(CLASS_PARENT).find(targetInputClass);
-
+            if (pickerType === 'datetime') {
                 var regDate = /^\d{4}-\d{1,2}-\d{1,2}/;
                 var oldValue = $targetInput.val();
                 var hasDate = regDate.test(oldValue);
@@ -155,7 +156,6 @@
                 } else {
                     newValue = newValue + ' 00:00';
                 }
-
             }
 
             $targetInput.val(newValue).trigger('change');
