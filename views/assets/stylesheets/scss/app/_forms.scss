@@ -23,6 +23,13 @@
     }
 }
 
+.mdl-switch{
+  width: auto;
+  &.is-upgraded {
+      padding-right: 28px;
+  }
+}
+
 .mdl-textfield textarea.mdl-textfield__input {
     overflow: initial !important;
 }
