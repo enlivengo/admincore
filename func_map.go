@@ -117,41 +117,40 @@ func (context *Context) URLFor(value interface{}, resources ...*Resource) string
 
 			var (
 				scope         = context.GetDB().NewScope(value)
-				primaryField  = scope.PrimaryField()
-				primaryKey    string
+				primaryFields []string
 				primaryValues = map[string]string{}
 			)
 
-			if len(res.PrimaryFields) > 0 {
-				var primaryFieldValues []string
-				for _, primaryField := range res.PrimaryFields {
-					if field, ok := scope.FieldByName(primaryField.Name); ok {
-						primaryFieldValues = append(primaryFieldValues, fmt.Sprint(field.Field.Interface())) // TODO improve me
-					}
-				}
-				primaryKey = strings.Join(primaryFieldValues, ",")
-			} else {
-				if primaryField != nil {
-					primaryKey = fmt.Sprint(reflect.Indirect(primaryField.Field).Interface())
-				}
-
-				for _, field := range scope.PrimaryFields() {
-					if field.DBName != primaryField.DBName {
-						primaryValues[fmt.Sprintf("primary_key[%v_%v]", scope.TableName(), field.DBName)] = fmt.Sprint(reflect.Indirect(field.Field).Interface())
-					}
+			for _, primaryField := range res.PrimaryFields {
+				if field, ok := scope.FieldByName(primaryField.Name); ok {
+					primaryFields = append(primaryFields, fmt.Sprint(field.Field.Interface())) // TODO improve me
 				}
 			}
 
-			result := path.Join(getPrefix(res), res.ToParam(), primaryKey)
+			for _, field := range scope.PrimaryFields() {
+				useAsPrimaryField := false
+				for _, primaryField := range res.PrimaryFields {
+					if field.DBName == primaryField.DBName {
+						useAsPrimaryField = true
+						break
+					}
+				}
+
+				if !useAsPrimaryField {
+					primaryValues[fmt.Sprintf("primary_key[%v_%v]", scope.TableName(), field.DBName)] = fmt.Sprint(reflect.Indirect(field.Field).Interface())
+				}
+			}
+
+			urlPath := path.Join(getPrefix(res), res.ToParam(), strings.Join(primaryFields, ","))
 
 			if len(primaryValues) > 0 {
 				var primaryValueParams []string
 				for key, value := range primaryValues {
 					primaryValueParams = append(primaryValueParams, fmt.Sprintf("%v=%v", key, url.QueryEscape(value)))
 				}
-				result = result + "?" + strings.Join(primaryValueParams, "&")
+				urlPath = urlPath + "?" + strings.Join(primaryValueParams, "&")
 			}
-			return result
+			return urlPath
 		}
 	}
 	return ""
