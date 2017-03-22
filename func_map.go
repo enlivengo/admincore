@@ -619,6 +619,14 @@ func (context *Context) Pagination() *PaginationResult {
 		pageCount  = pagination.PerPage
 	)
 
+	if pageCount == 0 {
+		if context.Resource != nil && context.Resource.Config.PageCount != 0 {
+			pageCount = context.Resource.Config.PageCount
+		} else {
+			pageCount = PaginationPageCount
+		}
+	}
+
 	if pagination.Total <= pageCount && pagination.CurrentPage <= 1 {
 		return nil
 	}
