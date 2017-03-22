@@ -348,11 +348,14 @@ button.qor-fieldset__add,
         margin-top: 10px;
     }
     .qor-fieldset {
-        background-color: #fff;
+        background-color: unquote("rgb(#{$palette-grey-50})");
         box-shadow: none;
         border: 1px solid unquote("rgba(#{$color-black}, 0.12)");
         .qor-fieldset {
-            background-color: unquote("rgb(#{$palette-grey-50})");
+            background-color: #fff;
+            .qor-fieldset {
+                background-color: unquote("rgb(#{$palette-grey-50})");
+            }
         }
     }
 }
