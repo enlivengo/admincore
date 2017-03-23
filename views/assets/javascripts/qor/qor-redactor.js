@@ -322,7 +322,7 @@
                         click: function (e) {
                             var $currentTag = $(this.selection.parent());
 
-                            if ($currentTag.is('.redactor-editor')) {
+                            if ($currentTag.is('.redactor-layer')) {
                                 $currentTag = $(this.selection.current());
                             }
                             this.selection.$currentTag = $currentTag;

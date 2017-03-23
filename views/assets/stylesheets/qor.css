@@ -753,92 +753,55 @@ li.ui-timepicker-selected .ui-timepicker-duration,
     .qor-dialog .qor-dialog-content .mdl-textfield {
       width: 100%; }
 
-.redactor-editor iframe.qor-video-container {
-  height: 380px;
-  margin-bottom: 16px; }
+/*Reset for cropper*/
+.redactor-air, .redactor-toolbar {
+  font-family: Roboto, Helvetica, Arial, sans-serif !important; }
 
-.redactor-editor pre {
-  white-space: normal; }
+.redactor-box {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
 
-.redactor-editor > figure,
-.redactor-editor > h1,
-.redactor-editor > h2,
-.redactor-editor > h3,
-.redactor-editor > h4,
-.redactor-editor > h5,
-.redactor-editor > h6,
-.redactor-editor > p,
-.redactor-editor > code,
-.redactor-editor > pre {
-  position: relative; }
+.redactor-styles {
+  font-family: Roboto, Helvetica, Arial, sans-serif !important;
+  border: 0; }
+  .redactor-styles iframe.qor-video-container {
+    height: 380px;
+    margin-bottom: 16px; }
+  .redactor-styles pre {
+    white-space: normal; }
+  .redactor-styles figure, .redactor-styles h1, .redactor-styles h2, .redactor-styles h3, .redactor-styles h4, .redactor-styles h5, .redactor-styles h6, .redactor-styles p, .redactor-styles code, .redactor-styles pre {
+    font-family: Roboto, Helvetica, Arial, sans-serif !important;
+    position: relative; }
 
-.redactor-toolbar li a {
-  padding: 12px; }
-
-.redactor-toolbar i {
-  font-size: 18px; }
-  .redactor-toolbar i.html:after {
-    content: "code"; }
-  .redactor-toolbar i.link:after {
-    content: "insert_link"; }
-  .redactor-toolbar i.image:after {
-    content: "image"; }
-  .redactor-toolbar i.format:after {
-    content: "text_fields"; }
-  .redactor-toolbar i.bold:after {
-    content: "format_bold"; }
-  .redactor-toolbar i.file:after {
-    content: "attach_file"; }
-  .redactor-toolbar i.italic:after {
-    content: "format_italic"; }
-  .redactor-toolbar i.deleted:after {
-    content: "strikethrough_s"; }
-  .redactor-toolbar i.lists:after {
-    content: "format_line_spacing"; }
-  .redactor-toolbar i.table:after {
-    content: "grid_on"; }
+.redactor-toolbar {
+  border-bottom: 1px solid rgba(0,0,0, 0.1);
+  box-shadow: none; }
+  .redactor-toolbar li a {
+    padding: 12px; }
+  .redactor-toolbar i {
+    font-size: 18px; }
+    .redactor-toolbar i.html:after {
+      content: "code"; }
+    .redactor-toolbar i.link:after {
+      content: "insert_link"; }
+    .redactor-toolbar i.image:after {
+      content: "image"; }
+    .redactor-toolbar i.format:after {
+      content: "text_fields"; }
+    .redactor-toolbar i.bold:after {
+      content: "format_bold"; }
+    .redactor-toolbar i.file:after {
+      content: "attach_file"; }
+    .redactor-toolbar i.italic:after {
+      content: "format_italic"; }
+    .redactor-toolbar i.deleted:after {
+      content: "strikethrough_s"; }
+    .redactor-toolbar i.lists:after {
+      content: "format_line_spacing"; }
+    .redactor-toolbar i.table:after {
+      content: "grid_on"; }
 
 .redactor-link-tooltip {
   z-index: 1000; }
-
-/* Reset for radactor modal */
-#redactor-modal {
-  border-radius: 2px;
-  box-shadow: 0 9px 46px 8px rgba(0, 0, 0, 0.14), 0 11px 15px -7px rgba(0, 0, 0, 0.12), 0 24px 38px 3px rgba(0, 0, 0, 0.2);
-  padding: 24px;
-  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-  #redactor-modal #redactor-modal-header {
-    background: none;
-    padding: 0;
-    margin-bottom: 36px;
-    font-weight: 300;
-    border-radius: 0;
-    font-size: 30px;
-    border: 0; }
-  #redactor-modal input[type=text],
-  #redactor-modal input[type=password],
-  #redactor-modal input[type=email],
-  #redactor-modal input[type=url],
-  #redactor-modal select,
-  #redactor-modal textarea {
-    border-radius: 0;
-    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-  #redactor-modal #redactor-modal-body {
-    padding: 0; }
-  #redactor-modal button {
-    height: 36px;
-    line-height: 36px;
-    padding: 0 16px;
-    font-size: 14px;
-    border-radius: 2px;
-    border: 0;
-    background: none; }
-    #redactor-modal button:hover {
-      background-color: rgba(158, 158, 158, 0.2); }
-    #redactor-modal button#redactor-modal-button-action {
-      background-color: rgb(3,169,244); }
-      #redactor-modal button#redactor-modal-button-action:hover {
-        background-color: rgb(3,169,244); }
 
 .qor-selector {
   position: relative;
