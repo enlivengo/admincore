@@ -9,19 +9,27 @@ import (
 )
 
 var (
+	// ErrUnsupportedEncoder unsupported encoder error
 	ErrUnsupportedEncoder = errors.New("unsupported encoder")
+	// ErrUnsupportedDecoder unsupported decoder error
 	ErrUnsupportedDecoder = errors.New("unsupported decoder")
 )
 
-var DefaultEncoding = &Encoding{}
-
-func init() {
-	DefaultEncoding.RegisterEncoding(&XMLEncoding{}, &JSONEncoding{})
+// DefaultEncoding  admin default encoding
+var DefaultEncoding = &Encoding{
+	Encoders: map[string][]EncoderInterface{},
+	Decoders: map[string][]DecoderInterface{},
 }
 
+func init() {
+	DefaultEncoding.RegisterEncoding("xml", &XMLEncoding{})
+	DefaultEncoding.RegisterEncoding("json", &JSONEncoding{})
+}
+
+// Encoding encoder & decoder
 type Encoding struct {
-	Encoders []EncoderInterface
-	Decoders []DecoderInterface
+	Encoders map[string][]EncoderInterface
+	Decoders map[string][]DecoderInterface
 }
 
 type EncodingInterface interface {
@@ -29,18 +37,18 @@ type EncodingInterface interface {
 	DecoderInterface
 }
 
-func (encoding *Encoding) RegisterEncoding(encodings ...interface{}) error {
+func (encoding *Encoding) RegisterEncoding(format string, encodings ...interface{}) error {
 	for _, e := range encodings {
 		valid := false
 
 		if encoder, ok := e.(EncoderInterface); ok {
 			valid = true
-			encoding.Encoders = append(encoding.Encoders, encoder)
+			encoding.Encoders[format] = append(encoding.Encoders[format], encoder)
 		}
 
 		if decoder, ok := e.(DecoderInterface); ok {
 			valid = true
-			encoding.Decoders = append(encoding.Decoders, decoder)
+			encoding.Decoders[format] = append(encoding.Decoders[format], decoder)
 		}
 
 		if !valid {
