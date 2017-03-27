@@ -38,7 +38,7 @@
                 fieldsetName;
 
             this.isInSlideout = $this.closest('.qor-slideout').length;
-            this.hasInlineReplicator = $this.closest(CLASS_CONTAINER).length || $this.find(CLASS_CONTAINER).length;
+            this.hasInlineReplicator = $this.parents(CLASS_CONTAINER).length || $this.find(CLASS_CONTAINER).length;
 
             if (!$template.length || $this.closest('.qor-fieldset--new').length) {
                 return;
