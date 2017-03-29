@@ -281,6 +281,12 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 // MountTo mount the service into mux (HTTP request multiplexer) with given path
 func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 	prefix := "/" + strings.Trim(mountTo, "/")
+	serveMux := admin.NewServeMux(prefix)
+	mux.Handle(prefix, serveMux)     // /:prefix
+	mux.Handle(prefix+"/", serveMux) // /:prefix/:xxx
+}
+
+func (admin *Admin) NewServeMux(prefix string) http.Handler {
 	router := admin.router
 	router.Prefix = prefix
 
@@ -296,15 +302,6 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
 		}
 	}
-
-	mux.Handle(prefix, admin)     // /:prefix
-	mux.Handle(prefix+"/", admin) // /:prefix/:xxx
-
-	admin.compile()
-}
-
-func (admin *Admin) compile() {
-	router := admin.GetRouter()
 
 	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
@@ -349,11 +346,18 @@ func (admin *Admin) compile() {
 			http.NotFound(context.Writer, context.Request)
 		},
 	})
+
+	return &serveMux{admin: admin}
+}
+
+type serveMux struct {
+	admin *Admin
 }
 
 // ServeHTTP dispatches the handler registered in the matched route
-func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var (
+		admin        = serveMux.admin
 		relativePath = "/" + strings.Trim(strings.TrimPrefix(req.URL.Path, admin.router.Prefix), "/")
 		context      = admin.NewContext(w, req)
 	)
