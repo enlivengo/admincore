@@ -1,0 +1,16 @@
+.qor-page__show .qor-field__show {
+    min-height: 24px;
+}
+
+.qor-inlineedit__field {
+    .qor-field__edit {
+        .qor-inlineedit__save {
+            right: 48px;
+            position: absolute;
+        }
+        .qor-inlineedit__cancel {
+            position: absolute;
+            right: 0;
+        }
+    }
+}
