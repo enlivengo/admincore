@@ -541,7 +541,7 @@
 
             $slideout.
             one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
-            removeClass(`${CLASS_IS_SLIDED},qor-slideout__fullscreen`);
+            removeClass(`${CLASS_IS_SLIDED} qor-slideout__fullscreen`);
 
             $slideout.trigger(EVENT_SLIDEOUT_CLOSED);
         },
