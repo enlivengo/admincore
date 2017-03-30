@@ -51,34 +51,36 @@ func TestMenu(t *testing.T) {
 	}
 }
 
-// func TestMenuPriority(t *testing.T) {
-// 	admin := New(&qor.Config{})
-// 	admin.router.Prefix = "/admin"
+func TestMenuPriority(t *testing.T) {
+	admin := New(&qor.Config{})
+	admin.router.Prefix = "/admin"
 
-// 	admin.AddMenu(&Menu{Name: "Name1", Priority: 2})
-// 	admin.AddMenu(&Menu{Name: "Name2", Priority: -1})
-// 	admin.AddMenu(&Menu{Name: "Name3", Priority: 3})
-// 	admin.AddMenu(&Menu{Name: "Name4", Priority: 4})
-// 	admin.AddMenu(&Menu{Name: "Name5", Priority: 1})
-// 	admin.AddMenu(&Menu{Name: "SubName1", Ancestors: []string{"Name5"}, Priority: 1})
-// 	admin.AddMenu(&Menu{Name: "SubName2", Ancestors: []string{"Name5"}, Priority: 3})
-// 	admin.AddMenu(&Menu{Name: "SubName3", Ancestors: []string{"Name5"}, Priority: -1})
-// 	admin.AddMenu(&Menu{Name: "SubName4", Ancestors: []string{"Name5"}, Priority: 4})
+	admin.AddMenu(&Menu{Name: "Name1", Priority: 2})
+	admin.AddMenu(&Menu{Name: "Name2", Priority: -1})
+	admin.AddMenu(&Menu{Name: "Name3", Priority: 3})
+	admin.AddMenu(&Menu{Name: "Name4", Priority: 4})
+	admin.AddMenu(&Menu{Name: "Name5", Priority: 1})
+	admin.AddMenu(&Menu{Name: "Name6", Priority: 0})
+	admin.AddMenu(&Menu{Name: "Name7", Priority: -2})
+	admin.AddMenu(&Menu{Name: "SubName1", Ancestors: []string{"Name5"}, Priority: 1})
+	admin.AddMenu(&Menu{Name: "SubName2", Ancestors: []string{"Name5"}, Priority: 3})
+	admin.AddMenu(&Menu{Name: "SubName3", Ancestors: []string{"Name5"}, Priority: -1})
+	admin.AddMenu(&Menu{Name: "SubName4", Ancestors: []string{"Name5"}, Priority: 4})
+	admin.AddMenu(&Menu{Name: "SubName5", Ancestors: []string{"Name5"}, Priority: -1})
 
-// 	menuNames := []string{"Name5", "Name1", "Name3", "Name4", "Name2"}
-// 	submenuNames := []string{"SubName1", "SubName2", "SubName4", "SubName3"}
-// 	for idx, menu := range admin.GetMenus() {
-// 		fmt.Println(menu.Name)
-// 		if menuNames[idx] != menu.Name {
-// 			t.Errorf("#%v menu should be %v, but got %v", idx, menuNames[idx], menu.Name)
-// 		}
+	menuNames := []string{"Name5", "Name1", "Name3", "Name4", "Name6", "Name7", "Name2"}
+	submenuNames := []string{"SubName1", "SubName2", "SubName4", "SubName3", "SubName5"}
+	for idx, menu := range admin.GetMenus() {
+		if menuNames[idx] != menu.Name {
+			t.Errorf("#%v menu should be %v, but got %v", idx, menuNames[idx], menu.Name)
+		}
 
-// 		if subMenus := menu.GetSubMenus(); len(subMenus) > 0 {
-// 			for idx, menu := range subMenus {
-// 				if submenuNames[idx] != menu.Name {
-// 					t.Errorf("#%v menu should be %v, but got %v", idx, submenuNames[idx], menu.Name)
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+		if subMenus := menu.GetSubMenus(); len(subMenus) > 0 {
+			for idx, menu := range subMenus {
+				if submenuNames[idx] != menu.Name {
+					t.Errorf("#%v menu should be %v, but got %v", idx, submenuNames[idx], menu.Name)
+				}
+			}
+		}
+	}
+}
