@@ -10,7 +10,7 @@ import (
 )
 
 func generateResourceMenu(resource *Resource) *Menu {
-	return &Menu{rawPath: resource.ToParam(), Name: resource.Name}
+	return &Menu{relativePath: resource.ToParam(), Name: resource.Name}
 }
 
 func TestAddMenuAndGetMenus(t *testing.T) {
@@ -80,20 +80,20 @@ func TestMenu(t *testing.T) {
 		{Name: "menu1", subMenus: []*Menu{
 			{Name: "menu1-1", subMenus: []*Menu{
 				{Name: "menu1-1-1", subMenus: []*Menu{
-					{Name: res7.Name, rawPath: "res7", Link: "/admin/res7"},
+					{Name: res7.Name, relativePath: "res7", Link: "/admin/res7"},
 				}},
-				{Name: res3.Name, rawPath: "res3", Link: "/admin/res3"},
+				{Name: res3.Name, relativePath: "res3", Link: "/admin/res3"},
 			}},
-			{Name: res1.Name, rawPath: "res1", Link: "/admin/res1"},
-			{Name: res2.Name, rawPath: "res2", Link: "/admin/res2"},
+			{Name: res1.Name, relativePath: "res1", Link: "/admin/res1"},
+			{Name: res2.Name, relativePath: "res2", Link: "/admin/res2"},
 			{Name: "menu1-2", subMenus: []*Menu{
-				{Name: res6.Name, rawPath: "res6", Link: "/admin/res6"},
+				{Name: res6.Name, relativePath: "res6", Link: "/admin/res6"},
 			}},
 		}},
 		{Name: "menu2", subMenus: []*Menu{
-			{Name: res4.Name, rawPath: "res4", Link: "/admin/res4"},
+			{Name: res4.Name, relativePath: "res4", Link: "/admin/res4"},
 		}},
-		{Name: res5.Name, rawPath: "res5", Link: "/admin/res5"},
+		{Name: res5.Name, relativePath: "res5", Link: "/admin/res5"},
 	}
 
 	g, err := json.MarshalIndent(menus, "", "  ")

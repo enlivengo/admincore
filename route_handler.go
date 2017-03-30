@@ -7,6 +7,8 @@ import (
 	"github.com/qor/roles"
 )
 
+var blankPermissionMode roles.PermissionMode
+
 // RouteConfig config for admin routes
 type RouteConfig struct {
 	Resource       *Resource
@@ -39,10 +41,8 @@ func newRouteHandler(path string, handle requestHandler, configs ...RouteConfig)
 	return &handler
 }
 
-var emptyPermissionMode roles.PermissionMode
-
 func (handler routeHandler) HasPermission(context *qor.Context) bool {
-	if handler.Config.Permissioner == nil || handler.Config.PermissionMode == emptyPermissionMode {
+	if handler.Config.Permissioner == nil || handler.Config.PermissionMode == blankPermissionMode {
 		return true
 	}
 	return handler.Config.Permissioner.HasPermission(handler.Config.PermissionMode, context)

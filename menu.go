@@ -9,20 +9,28 @@ import (
 
 // Menu qor admin sidebar menus definiation
 type Menu struct {
-	Name       string
-	Link       string
-	Ancestors  []string
-	Priority   int
-	Permission *roles.Permission
-	subMenus   []*Menu
-	rawPath    string
+	Name         string
+	Link         string
+	Priority     int
+	Ancestors    []string
+	Permissioner HasPermissioner
+	Permission   *roles.Permission
+
+	subMenus     []*Menu
+	relativePath string
 }
 
+// HasPermission check menu has permission or not
 func (menu Menu) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
-	if menu.Permission == nil {
-		return true
+	if menu.Permission != nil {
+		return menu.Permission.HasPermission(mode, context.Roles...)
 	}
-	return menu.Permission.HasPermission(mode, context.Roles...)
+
+	if menu.Permissioner != nil {
+		return menu.Permissioner.HasPermission(mode, context)
+	}
+
+	return true
 }
 
 // GetMenus get menus for admin sidebar
@@ -68,8 +76,8 @@ func (admin *Admin) generateMenuLinks() {
 
 func prefixMenuLinks(menus []*Menu, prefix string) {
 	for _, m := range menus {
-		if m.rawPath != "" {
-			m.Link = path.Join(prefix, m.rawPath)
+		if m.relativePath != "" {
+			m.Link = path.Join(prefix, m.relativePath)
 		}
 		if len(m.subMenus) > 0 {
 			prefixMenuLinks(m.subMenus, prefix)
