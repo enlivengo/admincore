@@ -13,9 +13,10 @@ func (admin Admin) GetMenus() []*Menu {
 }
 
 // AddMenu add a menu to admin sidebar
-func (admin *Admin) AddMenu(menu *Menu) {
+func (admin *Admin) AddMenu(menu *Menu) *Menu {
 	menu.router = admin.router
 	admin.menus = appendMenu(admin.menus, menu.Ancestors, menu)
+	return menu
 }
 
 // GetMenu get sidebar menu with name

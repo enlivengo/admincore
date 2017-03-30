@@ -162,18 +162,9 @@ func (admin *Admin) NewResource(value interface{}, config ...*Config) *Resource 
 // AddResource make a model manageable from admin interface
 func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource {
 	res := admin.newResource(value, config...)
+	admin.resources = append(admin.resources, res)
 
 	if !res.Config.Invisible {
-		var menuName string
-		if res.Config.Singleton {
-			menuName = res.Name
-		} else {
-			menuName = inflection.Plural(res.Name)
-		}
-
-		menu := &Menu{RelativePath: res.ToParam(), Name: menuName, Permissioner: res, Priority: res.Config.Priority}
-		admin.menus = appendMenu(admin.menus, res.Config.Menu, menu)
-
 		res.Action(&Action{
 			Name:   "Delete",
 			Method: "DELETE",
@@ -183,9 +174,13 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 			Permission: res.Config.Permission,
 			Modes:      []string{"menu_item"},
 		})
-	}
 
-	admin.resources = append(admin.resources, res)
+		menuName := res.Name
+		if !res.Config.Singleton {
+			menuName = inflection.Plural(res.Name)
+		}
+		admin.AddMenu(&Menu{Name: menuName, Permissioner: res, Priority: res.Config.Priority, Ancestors: res.Config.Menu, RelativePath: res.ToParam()})
+	}
 
 	if admin.router.Mounted() {
 		res.configure()
@@ -193,6 +188,7 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
 		}
 	}
+
 	return res
 }
 
