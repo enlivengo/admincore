@@ -21,15 +21,30 @@
         EVENT_MOUSELEAVE = 'mouseleave.' + NAMESPACE,
         CLASS_FIELD = '.qor-field',
         CLASS_FIELD_SHOW = '.qor-field__show',
-        CLASS_FIELD_EDIT = '.qor-field__edit',
         CLASS_EDIT = '.qor-inlineedit__edit',
         CLASS_SAVE = '.qor-inlineedit__save',
-        CLASS_CANCEL = '.qor-inlineedit__cancel';
+        CLASS_BUTTONS = '.qor-inlineedit__buttons',
+        CLASS_CANCEL = '.qor-inlineedit__cancel',
+        CLASS_CONTAINER = 'qor-inlineedit__field';
 
     function QorInlineEdit(element, options) {
         this.$element = $(element);
         this.options = $.extend({}, QorInlineEdit.DEFAULTS, $.isPlainObject(options) && options);
         this.init();
+    }
+
+    function getJsonData(names, data) {
+        let key = '',
+            value = data[names[0].slice(1)];
+
+        if (names.length > 1) {
+            for (let i = 1; i < names.length; i++) {
+                key = names[i].slice(1);
+                value = value[key];
+            }
+        }
+
+        return value;
     }
 
     QorInlineEdit.prototype = {
@@ -49,7 +64,12 @@
         },
 
         unbind: function() {
-
+            this.$element
+                .off(EVENT_MOUSEENTER, CLASS_FIELD_SHOW, this.showEditButton)
+                .off(EVENT_MOUSELEAVE, CLASS_FIELD_SHOW, this.hideEditButton)
+                .off(EVENT_CLICK, CLASS_CANCEL, this.hideEdit)
+                .off(EVENT_CLICK, CLASS_SAVE, this.saveEdit)
+                .off(EVENT_CLICK, CLASS_EDIT, this.showEdit);
         },
 
         showEditButton: function() {
@@ -62,22 +82,48 @@
         },
 
         showEdit: function() {
-            let $parent = $(this).hide().closest('.qor-field').addClass('qor-inlineedit__field'),
+            let $parent = $(this).hide().closest(CLASS_FIELD).addClass(CLASS_CONTAINER),
                 $save = $(QorInlineEdit.TEMPLATE_SAVE);
 
-            $save.appendTo($parent.find(CLASS_FIELD_EDIT).show())
-            $parent.find(CLASS_FIELD_SHOW).hide();
+            $save.appendTo($parent);
         },
 
         hideEdit: function() {
-            let $parent = $(this).closest('.qor-field');
-            $(`${CLASS_EDIT},${CLASS_SAVE}`).remove();
-            $parent.find(CLASS_FIELD_EDIT).hide();
-            $parent.find(CLASS_FIELD_SHOW).show();
+            let $parent = $(this).closest(CLASS_FIELD).removeClass(CLASS_CONTAINER);
+            $parent.find(CLASS_BUTTONS).remove();
         },
 
         saveEdit: function() {
-            let $parent = $(this).closest('.qor-field');
+            let $btn = $(this),
+                $parent = $btn.closest(CLASS_FIELD),
+                $form = $btn.closest('form'),
+                $input = $parent.find('input[name*="QorResource"],textarea[name*="QorResource"],select[name*="QorResource"]'),
+                names = $input.length && $input.prop('name').match(/\.\w+/g),
+                inputData = $input.serialize();
+
+            if (names.length)
+
+                $.ajax($form.prop('action'), {
+                    method: $form.prop('method'),
+                    data: inputData,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $btn.prop('disabled', true);
+                    },
+                    success: function(data) {
+                        let newValue = getJsonData(names, data);
+
+                        $parent.removeClass(CLASS_CONTAINER).find(CLASS_FIELD_SHOW).html(newValue);
+                        $parent.find(CLASS_BUTTONS).remove();
+                        $btn.prop('disabled', false);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        window.alert([textStatus, errorThrown].join(': '));
+                        $btn.prop('disabled', false);
+                    }
+                });
         },
 
         destroy: function() {
@@ -89,8 +135,10 @@
     QorInlineEdit.DEFAULTS = {};
 
     QorInlineEdit.TEMPLATE_EDIT = `<button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored qor-inlineedit__edit" type="button"><i class="material-icons">mode_edit</i></button>`;
-    QorInlineEdit.TEMPLATE_SAVE = `<button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored qor-inlineedit__save" type="button"><i class="material-icons">done</i></button>
-                                    <button class="mdl-button mdl-js-button mdl-button--icon qor-inlineedit__cancel" type="button"><i class="material-icons">close</i></button>`;
+    QorInlineEdit.TEMPLATE_SAVE = `<div class="qor-inlineedit__buttons">
+                                    <button class="mdl-button mdl-button--colored mdl-js-button qor-button--small qor-inlineedit__cancel" type="button">cancel edit</button>
+                                    <button class="mdl-button mdl-button--colored mdl-js-button qor-button--small qor-inlineedit__save" type="button">save</button>
+                                    </div>`;
 
     QorInlineEdit.plugin = function(options) {
         return this.each(function() {
