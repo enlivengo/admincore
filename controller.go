@@ -51,7 +51,7 @@ func (ac *Controller) SearchCenter(context *Context) {
 	}
 	var searchResults []Result
 
-	for _, res := range context.Admin.GetSearchResources() {
+	for _, res := range context.GetSearchableResources() {
 		var (
 			resourceName = context.Request.URL.Query().Get("resource_name")
 			ctx          = context.clone().setResource(res)

@@ -12,7 +12,7 @@
   </div>
   <div class="sidebar-body">
     <div class="qor-menu-container">
-      {{if .Admin.GetSearchResources }}
+      {{if .GetSearchableResources }}
         <div qor-icon-name="Search">
           <span class="qor-global-search--show {{if (eq .Action "search_center")}}active{{end}}" data-placeholder="{{t "qor_admin.search_center.hint" "Search…"}}" data-action-url="{{search_center_path}}">{{t "qor_admin.search_center.title" "Search Center" }}</span>
         </div>
