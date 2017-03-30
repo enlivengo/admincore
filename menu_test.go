@@ -10,16 +10,37 @@ import (
 )
 
 func generateResourceMenu(resource *Resource) *Menu {
-	return &Menu{relativePath: resource.ToParam(), Name: resource.Name}
+	return &Menu{RelativePath: resource.ToParam(), Name: resource.Name}
 }
 
 func TestAddMenuAndGetMenus(t *testing.T) {
 	admin := New(&qor.Config{})
-	menu := &Menu{Name: "Dashboard", Link: "/admin"}
+	admin.router.Prefix = "/admin"
+
+	menu := &Menu{Name: "Dashboard", Link: "/link1"}
 	admin.AddMenu(menu)
 
-	if menu != admin.GetMenus()[0] {
-		t.Error("menu not added")
+	if menu.URL() != "/link1" {
+		t.Errorf("menu's URL should be correct")
+	}
+
+	if admin.GetMenu("Dashboard") == nil {
+		t.Errorf("menu %v not added", "Dashboard")
+	}
+
+	menu2 := &Menu{Name: "Dashboard", RelativePath: "/link2"}
+	admin.AddMenu(menu2)
+	if menu2.URL() != "/admin/link2" {
+		t.Errorf("menu's URL should be correct")
+	}
+
+	type Res struct{}
+	admin.AddResource(&Res{})
+
+	if menu := admin.GetMenu("Res"); menu == nil {
+		t.Errorf("menu %v not added", "Res")
+	} else if menu.URL() != "/admin/res" {
+		t.Errorf("menu %v' URL should be correct", "Res")
 	}
 }
 
@@ -74,26 +95,25 @@ func TestMenu(t *testing.T) {
 	menus = appendMenu(menus, res4.Config.Menu, generateResourceMenu(res4))
 	menus = appendMenu(menus, res5.Config.Menu, generateResourceMenu(res5))
 	menus = appendMenu(menus, res6.Config.Menu, generateResourceMenu(res6))
-	prefixMenuLinks(menus, "/admin")
 
 	expect := []*Menu{
 		{Name: "menu1", subMenus: []*Menu{
 			{Name: "menu1-1", subMenus: []*Menu{
 				{Name: "menu1-1-1", subMenus: []*Menu{
-					{Name: res7.Name, relativePath: "res7", Link: "/admin/res7"},
+					{Name: res7.Name, RelativePath: "res7"},
 				}},
-				{Name: res3.Name, relativePath: "res3", Link: "/admin/res3"},
+				{Name: res3.Name, RelativePath: "res3"},
 			}},
-			{Name: res1.Name, relativePath: "res1", Link: "/admin/res1"},
-			{Name: res2.Name, relativePath: "res2", Link: "/admin/res2"},
+			{Name: res1.Name, RelativePath: "res1"},
+			{Name: res2.Name, RelativePath: "res2"},
 			{Name: "menu1-2", subMenus: []*Menu{
-				{Name: res6.Name, relativePath: "res6", Link: "/admin/res6"},
+				{Name: res6.Name, RelativePath: "res6"},
 			}},
 		}},
 		{Name: "menu2", subMenus: []*Menu{
-			{Name: res4.Name, relativePath: "res4", Link: "/admin/res4"},
+			{Name: res4.Name, RelativePath: "res4"},
 		}},
-		{Name: res5.Name, relativePath: "res5", Link: "/admin/res5"},
+		{Name: res5.Name, RelativePath: "res5"},
 	}
 
 	g, err := json.MarshalIndent(menus, "", "  ")

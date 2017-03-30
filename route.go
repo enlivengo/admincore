@@ -285,8 +285,6 @@ func (admin *Admin) NewServeMux(prefix string) http.Handler {
 	router := admin.router
 	router.Prefix = prefix
 
-	admin.generateMenuLinks()
-
 	adminController := &Controller{Admin: admin}
 	router.Get("", adminController.Dashboard)
 	router.Get("/!search", adminController.SearchCenter)
@@ -353,7 +351,7 @@ type serveMux struct {
 func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var (
 		admin        = serveMux.admin
-		relativePath = "/" + strings.Trim(strings.TrimPrefix(req.URL.Path, admin.router.Prefix), "/")
+		RelativePath = "/" + strings.Trim(strings.TrimPrefix(req.URL.Path, admin.router.Prefix), "/")
 		context      = admin.NewContext(w, req)
 	)
 
@@ -365,7 +363,7 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		req.Method = strings.ToUpper(method)
 	}
 
-	if regexp.MustCompile("^/assets/.*$").MatchString(relativePath) && strings.ToUpper(req.Method) == "GET" {
+	if regexp.MustCompile("^/assets/.*$").MatchString(RelativePath) && strings.ToUpper(req.Method) == "GET" {
 		(&Controller{Admin: admin}).Asset(context)
 		return
 	}
@@ -391,7 +389,7 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	handlers := admin.router.routers[strings.ToUpper(req.Method)]
 	for _, handler := range handlers {
-		if params, _, ok := utils.ParamsMatch(handler.Path, relativePath); ok && handler.HasPermission(context.Context) {
+		if params, _, ok := utils.ParamsMatch(handler.Path, RelativePath); ok && handler.HasPermission(context.Context) {
 			if len(params) > 0 {
 				req.URL.RawQuery = url.Values(params).Encode() + "&" + req.URL.RawQuery
 			}

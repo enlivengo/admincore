@@ -171,7 +171,7 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 			menuName = inflection.Plural(res.Name)
 		}
 
-		menu := &Menu{relativePath: res.ToParam(), Name: menuName, Permissioner: res, Priority: res.Config.Priority}
+		menu := &Menu{RelativePath: res.ToParam(), Name: menuName, Permissioner: res, Priority: res.Config.Priority}
 		admin.menus = appendMenu(admin.menus, res.Config.Menu, menu)
 
 		res.Action(&Action{
@@ -188,7 +188,6 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 	admin.resources = append(admin.resources, res)
 
 	if admin.router.Mounted() {
-		admin.generateMenuLinks()
 		res.configure()
 		if !res.Config.Invisible {
 			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")

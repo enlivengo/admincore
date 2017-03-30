@@ -155,7 +155,7 @@ func (meta *Meta) SetPermission(permission *roles.Permission) {
 	}
 }
 
-//  HasPermission check has permission or not
+// HasPermission check has permission or not
 func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
 	if meta.Permission != nil && !meta.Permission.HasPermission(mode, context.Roles...) {
 		return false
