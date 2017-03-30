@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
@@ -112,7 +111,8 @@ func (r *Router) Delete(path string, handle requestHandler, config ...RouteConfi
 	r.routers["DELETE"] = append(r.routers["DELETE"], newRouteHandler(path, handle, config...))
 }
 
-func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
+// RegisterResourceRouters register resource to router
+func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 	var (
 		prefix          string
 		router          = admin.router
@@ -122,23 +122,24 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 	)
 
 	if prefix = func(r *Resource) string {
-		p := param
+		currentParam := param
 
 		for r.ParentResource != nil {
-			bp := r.ParentResource.ToParam()
-			if bp == param {
+			parentPath := r.ParentResource.ToParam()
+			if parentPath == param {
 				return ""
 			}
-			p = path.Join(bp, r.ParentResource.ParamIDName(), p)
+			currentParam = path.Join(parentPath, r.ParentResource.ParamIDName(), currentParam)
 			r = r.ParentResource
 		}
-		return "/" + strings.Trim(p, "/")
+		return "/" + strings.Trim(currentParam, "/")
 	}(res); prefix == "" {
 		return
 	}
 
-	for _, mode := range modes {
-		if mode == "create" {
+	for _, action := range actions {
+		switch action {
+		case "create":
 			if !res.Config.Singleton {
 				// New
 				router.Get(path.Join(prefix, "new"), adminController.New, RouteConfig{
@@ -152,9 +153,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 				PermissionMode: roles.Create,
 				Resource:       res,
 			})
-		}
-
-		if mode == "update" {
+		case "update":
 			if res.Config.Singleton {
 				// Edit
 				router.Get(path.Join(prefix, "edit"), adminController.Edit, RouteConfig{
@@ -214,9 +213,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 					})
 				}
 			}
-		}
-
-		if mode == "read" {
+		case "read":
 			if res.Config.Singleton {
 				// Index
 				router.Get(prefix, adminController.Show, RouteConfig{
@@ -236,9 +233,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 					Resource:       res,
 				})
 			}
-		}
-
-		if mode == "delete" {
+		case "delete":
 			if !res.Config.Singleton {
 				// Delete
 				router.Delete(path.Join(prefix, primaryKey), adminController.Delete, RouteConfig{
@@ -249,9 +244,8 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 		}
 	}
 
-	// Sub Resources
-	scope := gorm.Scope{Value: res.Value}
-	if scope.PrimaryField() != nil {
+	// Register Sub Resources
+	if len(res.PrimaryFields) > 0 {
 		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
 				if len(meta.Resource.newSections) > 0 {
@@ -281,6 +275,13 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, modes ...string) {
 // MountTo mount the service into mux (HTTP request multiplexer) with given path
 func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 	prefix := "/" + strings.Trim(mountTo, "/")
+	serveMux := admin.NewServeMux(prefix)
+	mux.Handle(prefix, serveMux)     // /:prefix
+	mux.Handle(prefix+"/", serveMux) // /:prefix/:xxx
+}
+
+// NewServeMux generate http.Handler for admin
+func (admin *Admin) NewServeMux(prefix string) http.Handler {
 	router := admin.router
 	router.Prefix = prefix
 
@@ -296,15 +297,6 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
 		}
 	}
-
-	mux.Handle(prefix, admin)     // /:prefix
-	mux.Handle(prefix+"/", admin) // /:prefix/:xxx
-
-	admin.compile()
-}
-
-func (admin *Admin) compile() {
-	router := admin.GetRouter()
 
 	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
@@ -349,11 +341,18 @@ func (admin *Admin) compile() {
 			http.NotFound(context.Writer, context.Request)
 		},
 	})
+
+	return &serveMux{admin: admin}
+}
+
+type serveMux struct {
+	admin *Admin
 }
 
 // ServeHTTP dispatches the handler registered in the matched route
-func (admin *Admin) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var (
+		admin        = serveMux.admin
 		relativePath = "/" + strings.Trim(strings.TrimPrefix(req.URL.Path, admin.router.Prefix), "/")
 		context      = admin.NewContext(w, req)
 	)

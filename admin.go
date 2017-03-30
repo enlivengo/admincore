@@ -225,11 +225,6 @@ func (admin *Admin) AddSearchResource(resources ...*Resource) {
 	admin.searchResources = append(admin.searchResources, resources...)
 }
 
-// GetSearchResources get defined search resources from admin
-func (admin *Admin) GetSearchResources() []*Resource {
-	return admin.searchResources
-}
-
 // I18n define admin's i18n interface
 type I18n interface {
 	Scope(scope string) I18n
