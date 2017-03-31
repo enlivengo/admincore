@@ -162,18 +162,9 @@ func (admin *Admin) NewResource(value interface{}, config ...*Config) *Resource 
 // AddResource make a model manageable from admin interface
 func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource {
 	res := admin.newResource(value, config...)
+	admin.resources = append(admin.resources, res)
 
 	if !res.Config.Invisible {
-		var menuName string
-		if res.Config.Singleton {
-			menuName = res.Name
-		} else {
-			menuName = inflection.Plural(res.Name)
-		}
-
-		menu := &Menu{rawPath: res.ToParam(), Name: menuName, Permission: res.Config.Permission, Priority: res.Config.Priority}
-		admin.menus = appendMenu(admin.menus, res.Config.Menu, menu)
-
 		res.Action(&Action{
 			Name:   "Delete",
 			Method: "DELETE",
@@ -183,17 +174,21 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 			Permission: res.Config.Permission,
 			Modes:      []string{"menu_item"},
 		})
+
+		menuName := res.Name
+		if !res.Config.Singleton {
+			menuName = inflection.Plural(res.Name)
+		}
+		admin.AddMenu(&Menu{Name: menuName, Permissioner: res, Priority: res.Config.Priority, Ancestors: res.Config.Menu, RelativePath: res.ToParam()})
 	}
 
-	admin.resources = append(admin.resources, res)
-
 	if admin.router.Mounted() {
-		admin.generateMenuLinks()
 		res.configure()
 		if !res.Config.Invisible {
 			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
 		}
 	}
+
 	return res
 }
 
@@ -223,11 +218,6 @@ func (admin *Admin) GetResource(name string) (resource *Resource) {
 // AddSearchResource make a resource searchable from search center
 func (admin *Admin) AddSearchResource(resources ...*Resource) {
 	admin.searchResources = append(admin.searchResources, resources...)
-}
-
-// GetSearchResources get defined search resources from admin
-func (admin *Admin) GetSearchResources() []*Resource {
-	return admin.searchResources
 }
 
 // I18n define admin's i18n interface

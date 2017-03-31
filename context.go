@@ -2,7 +2,6 @@ package admin
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
+	"github.com/qor/roles"
 )
 
 // Context admin context, which is used for admin controller
@@ -161,7 +161,7 @@ func (context *Context) renderWith(name string, data interface{}) template.HTML 
 func (context *Context) Render(name string, results ...interface{}) template.HTML {
 	defer func() {
 		if r := recover(); r != nil {
-			err := errors.New(fmt.Sprintf("Get error when render file %v: %v", name, r))
+			err := fmt.Errorf("Get error when render file %v: %v", name, r)
 			utils.ExitWithMsg(err)
 		}
 	}()
@@ -235,4 +235,16 @@ func (context *Context) Encode(action string, result interface{}) error {
 		Result:   result,
 	}
 	return context.Admin.Encode(context.Writer, encoder)
+}
+
+// GetSearchableResources get defined searchable resources has performance
+func (context *Context) GetSearchableResources() (resources []*Resource) {
+	if admin := context.Admin; admin != nil {
+		for _, res := range admin.searchResources {
+			if res.HasPermission(roles.Read, context.Context) {
+				resources = append(resources, res)
+			}
+		}
+	}
+	return
 }

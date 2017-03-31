@@ -7,42 +7,69 @@ import (
 	"github.com/qor/roles"
 )
 
-// Menu qor admin sidebar menus definiation
-type Menu struct {
-	Name       string
-	Link       string
-	Ancestors  []string
-	Priority   int
-	Permission *roles.Permission
-	subMenus   []*Menu
-	rawPath    string
-}
-
-func (menu Menu) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
-	if menu.Permission == nil {
-		return true
-	}
-	return menu.Permission.HasPermission(mode, context.Roles...)
-}
-
-// GetMenus get menus for admin sidebar
+// GetMenus get all sidebar menus for admin
 func (admin Admin) GetMenus() []*Menu {
 	return admin.menus
+}
+
+// AddMenu add a menu to admin sidebar
+func (admin *Admin) AddMenu(menu *Menu) *Menu {
+	menu.router = admin.router
+	admin.menus = appendMenu(admin.menus, menu.Ancestors, menu)
+	return menu
+}
+
+// GetMenu get sidebar menu with name
+func (admin Admin) GetMenu(name string) *Menu {
+	return getMenu(admin.menus, name)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Sidebar Menu
+////////////////////////////////////////////////////////////////////////////////
+
+// Menu admin sidebar menu definiation
+type Menu struct {
+	Name         string
+	Link         string
+	RelativePath string
+	Priority     int
+	Ancestors    []string
+	Permissioner HasPermissioner
+	Permission   *roles.Permission
+
+	subMenus []*Menu
+	router   *Router
+}
+
+// URL return menu's URL
+func (menu Menu) URL() string {
+	if menu.Link != "" {
+		return menu.Link
+	}
+
+	if menu.router != nil {
+		return path.Join(menu.router.Prefix, menu.RelativePath)
+	}
+	return menu.RelativePath
+}
+
+// HasPermission check menu has permission or not
+func (menu Menu) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
+	if menu.Permission != nil {
+		return menu.Permission.HasPermission(mode, context.Roles...)
+	}
+
+	if menu.Permissioner != nil {
+		return menu.Permissioner.HasPermission(mode, context)
+	}
+
+	return true
 }
 
 // GetSubMenus get submenus for a menu
 func (menu *Menu) GetSubMenus() []*Menu {
 	return menu.subMenus
-}
-
-// AddMenu add a menu to admin
-func (admin *Admin) AddMenu(menu *Menu) {
-	admin.menus = appendMenu(admin.menus, menu.Ancestors, menu)
-}
-
-// GetMenu get menu with name from admin
-func (admin Admin) GetMenu(name string) *Menu {
-	return getMenu(admin.menus, name)
 }
 
 func getMenu(menus []*Menu, name string) *Menu {
@@ -59,22 +86,6 @@ func getMenu(menus []*Menu, name string) *Menu {
 	}
 
 	return nil
-}
-
-// Generate menu links by current route. e.g "/products" to "/admin/products"
-func (admin *Admin) generateMenuLinks() {
-	prefixMenuLinks(admin.menus, admin.router.Prefix)
-}
-
-func prefixMenuLinks(menus []*Menu, prefix string) {
-	for _, m := range menus {
-		if m.rawPath != "" {
-			m.Link = path.Join(prefix, m.rawPath)
-		}
-		if len(m.subMenus) > 0 {
-			prefixMenuLinks(m.subMenus, prefix)
-		}
-	}
 }
 
 func generateMenu(menus []string, menu *Menu) *Menu {
@@ -109,7 +120,7 @@ func appendMenu(menus []*Menu, ancestors []string, menu *Menu) []*Menu {
 		menus = append(menus, newMenu)
 	} else if newMenu.Priority > 0 {
 		for idx, menu := range menus {
-			if menu.Priority > newMenu.Priority || menu.Priority == 0 {
+			if menu.Priority > newMenu.Priority || menu.Priority <= 0 {
 				menus = append(menus[0:idx], append([]*Menu{newMenu}, menus[idx:]...)...)
 				added = true
 				break
@@ -128,6 +139,10 @@ func appendMenu(menus []*Menu, ancestors []string, menu *Menu) []*Menu {
 					break
 				}
 			}
+
+			if !added {
+				menus = append(menus, menu)
+			}
 		} else {
 			for idx := len(menus) - 1; idx >= 0; idx-- {
 				menu := menus[idx]
@@ -137,10 +152,10 @@ func appendMenu(menus []*Menu, ancestors []string, menu *Menu) []*Menu {
 					break
 				}
 			}
-		}
 
-		if !added {
-			menus = append([]*Menu{menu}, menus...)
+			if !added {
+				menus = append([]*Menu{menu}, menus...)
+			}
 		}
 	}
 
