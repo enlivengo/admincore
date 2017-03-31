@@ -164,6 +164,8 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 	res := admin.newResource(value, config...)
 	admin.resources = append(admin.resources, res)
 
+	res.configure()
+
 	if !res.Config.Invisible {
 		res.Action(&Action{
 			Name:   "Delete",
@@ -180,13 +182,8 @@ func (admin *Admin) AddResource(value interface{}, config ...*Config) *Resource 
 			menuName = inflection.Plural(res.Name)
 		}
 		admin.AddMenu(&Menu{Name: menuName, Permissioner: res, Priority: res.Config.Priority, Ancestors: res.Config.Menu, RelativePath: res.ToParam()})
-	}
 
-	if admin.router.Mounted() {
-		res.configure()
-		if !res.Config.Invisible {
-			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
-		}
+		admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
 	}
 
 	return res

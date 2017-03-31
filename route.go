@@ -111,6 +111,72 @@ func (r *Router) Delete(path string, handle requestHandler, config ...*RouteConf
 	r.routers["DELETE"] = append(r.routers["DELETE"], newRouteHandler(path, handle, config...))
 }
 
+// MountTo mount the service into mux (HTTP request multiplexer) with given path
+func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
+	prefix := "/" + strings.Trim(mountTo, "/")
+	serveMux := admin.NewServeMux(prefix)
+	mux.Handle(prefix, serveMux)     // /:prefix
+	mux.Handle(prefix+"/", serveMux) // /:prefix/:xxx
+}
+
+// NewServeMux generate http.Handler for admin
+func (admin *Admin) NewServeMux(prefix string) http.Handler {
+	// Compile qor templates
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
+	cmdLine.Parse(os.Args[1:])
+	if *compileQORTemplates {
+		admin.AssetFS.Compile()
+	}
+
+	// Register default routes & middlewares
+	router := admin.router
+	router.Prefix = prefix
+
+	adminController := &Controller{Admin: admin}
+	router.Get("", adminController.Dashboard)
+	router.Get("/!search", adminController.SearchCenter)
+
+	browserUserAgentRegexp := regexp.MustCompile("Mozilla|Gecko|WebKit|MSIE|Opera")
+	router.Use(&Middleware{
+		Name: "csrf_check",
+		Handler: func(context *Context, middleware *Middleware) {
+			request := context.Request
+			if request.Method != "GET" {
+				if browserUserAgentRegexp.MatchString(request.UserAgent()) {
+					if referrer := request.Referer(); referrer != "" {
+						if r, err := url.Parse(referrer); err == nil {
+							if r.Host == request.Host {
+								middleware.Next(context)
+								return
+							}
+						}
+					}
+					context.Writer.Write([]byte("Could not authorize you because 'CSRF detected'"))
+					return
+				}
+			}
+
+			middleware.Next(context)
+		},
+	})
+
+	router.Use(&Middleware{
+		Name: "qor_handler",
+		Handler: func(context *Context, middleware *Middleware) {
+			context.Writer.Header().Set("Cache-control", "no-store")
+			context.Writer.Header().Set("Pragma", "no-cache")
+			if context.RouteHandler != nil {
+				context.RouteHandler.Handle(context)
+				return
+			}
+			http.NotFound(context.Writer, context.Request)
+		},
+	})
+
+	return &serveMux{admin: admin}
+}
+
 // RegisterResourceRouters register resource to router
 func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 	var (
@@ -270,77 +336,6 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 			}
 		}
 	}
-}
-
-// MountTo mount the service into mux (HTTP request multiplexer) with given path
-func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
-	prefix := "/" + strings.Trim(mountTo, "/")
-	serveMux := admin.NewServeMux(prefix)
-	mux.Handle(prefix, serveMux)     // /:prefix
-	mux.Handle(prefix+"/", serveMux) // /:prefix/:xxx
-}
-
-// NewServeMux generate http.Handler for admin
-func (admin *Admin) NewServeMux(prefix string) http.Handler {
-	router := admin.router
-	router.Prefix = prefix
-
-	adminController := &Controller{Admin: admin}
-	router.Get("", adminController.Dashboard)
-	router.Get("/!search", adminController.SearchCenter)
-
-	for _, res := range admin.resources {
-		res.configure()
-		if !res.Config.Invisible {
-			admin.RegisterResourceRouters(res, "create", "update", "read", "delete")
-		}
-	}
-
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
-	cmdLine.Parse(os.Args[1:])
-	if *compileQORTemplates {
-		admin.AssetFS.Compile()
-	}
-
-	browserUserAgentRegexp := regexp.MustCompile("Mozilla|Gecko|WebKit|MSIE|Opera")
-	router.Use(&Middleware{
-		Name: "csrf_check",
-		Handler: func(context *Context, middleware *Middleware) {
-			request := context.Request
-			if request.Method != "GET" {
-				if browserUserAgentRegexp.MatchString(request.UserAgent()) {
-					if referrer := request.Referer(); referrer != "" {
-						if r, err := url.Parse(referrer); err == nil {
-							if r.Host == request.Host {
-								middleware.Next(context)
-								return
-							}
-						}
-					}
-					context.Writer.Write([]byte("Could not authorize you because 'CSRF detected'"))
-					return
-				}
-			}
-
-			middleware.Next(context)
-		},
-	})
-
-	router.Use(&Middleware{
-		Name: "qor_handler",
-		Handler: func(context *Context, middleware *Middleware) {
-			context.Writer.Header().Set("Cache-control", "no-store")
-			context.Writer.Header().Set("Pragma", "no-cache")
-			if context.RouteHandler != nil {
-				context.RouteHandler.Handle(context)
-				return
-			}
-			http.NotFound(context.Writer, context.Request)
-		},
-	})
-
-	return &serveMux{admin: admin}
 }
 
 type serveMux struct {
