@@ -93,31 +93,31 @@ var metaConfigorMaps = map[string]func(*Meta){
 	},
 
 	"select_one": func(meta *Meta) {
-		if meta.Config == nil {
+		if _, ok := meta.Config.(*SelectOneConfig); !ok || meta.Config == nil {
 			meta.Config = &SelectOneConfig{Collection: meta.Collection}
 		}
 	},
 
 	"select_many": func(meta *Meta) {
-		if meta.Config == nil {
+		if _, ok := meta.Config.(*SelectManyConfig); !ok || meta.Config == nil {
 			meta.Config = &SelectManyConfig{Collection: meta.Collection}
 		}
 	},
 
 	"single_edit": func(meta *Meta) {
-		if meta.Config == nil {
+		if _, ok := meta.Config.(*SingleEditConfig); !ok || meta.Config == nil {
 			meta.Config = &SingleEditConfig{}
 		}
 	},
 
 	"collection_edit": func(meta *Meta) {
-		if meta.Config == nil {
+		if _, ok := meta.Config.(*CollectionEditConfig); !ok || meta.Config == nil {
 			meta.Config = &CollectionEditConfig{}
 		}
 	},
 
 	"rich_editor": func(meta *Meta) {
-		if meta.Config == nil {
+		if _, ok := meta.Config.(*RichEditorConfig); !ok || meta.Config == nil {
 			meta.Config = &RichEditorConfig{}
 		}
 	},
