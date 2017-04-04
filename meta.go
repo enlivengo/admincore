@@ -225,14 +225,14 @@ func (meta *Meta) updateMeta() {
 			} else {
 				switch fieldType.Kind() {
 				case reflect.String:
-					var tag = meta.FieldStruct.Tag
-					if size, ok := utils.ParseTagOption(tag.Get("sql"))["SIZE"]; ok {
+					var tags = meta.FieldStruct.TagSettings
+					if size, ok := tags["SIZE"]; ok {
 						if i, _ := strconv.Atoi(size); i > 255 {
 							meta.Type = "text"
 						} else {
 							meta.Type = "string"
 						}
-					} else if text, ok := utils.ParseTagOption(tag.Get("sql"))["TYPE"]; ok && text == "text" {
+					} else if text, ok := tags["TYPE"]; ok && text == "text" {
 						meta.Type = "text"
 					} else {
 						meta.Type = "string"
