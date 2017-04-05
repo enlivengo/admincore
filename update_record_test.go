@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	_ "github.com/mattn/go-sqlite3"
-
 	"testing"
 )
 

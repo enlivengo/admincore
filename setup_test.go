@@ -11,8 +11,6 @@ import (
 	"github.com/qor/media/oss"
 	"github.com/qor/qor"
 	"github.com/qor/qor/test/utils"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type CreditCard struct {

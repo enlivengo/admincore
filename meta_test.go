@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"

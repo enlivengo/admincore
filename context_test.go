@@ -6,8 +6,6 @@ import (
 
 	"github.com/qor/admin"
 	"github.com/qor/qor"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // Template helpers test
