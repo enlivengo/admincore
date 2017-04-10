@@ -13,22 +13,23 @@
 
     'use strict';
 
-    var NAMESPACE = 'qor.redactor';
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_KEYUP = 'keyup.' + NAMESPACE;
-    var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
-    var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
-    var EVENT_SHOWN = 'shown.qor.modal';
-    var EVENT_HIDDEN = 'hidden.qor.modal';
+    let NAMESPACE = 'qor.redactor',
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_KEYUP = 'keyup.' + NAMESPACE,
+        EVENT_ADD_CROP = 'addCrop.' + NAMESPACE,
+        EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE,
+        EVENT_SHOWN = 'shown.qor.modal',
+        EVENT_HIDDEN = 'hidden.qor.modal',
+        EVENT_SCROLL = 'scroll.' + NAMESPACE,
 
-    var CLASS_WRAPPER = '.qor-cropper__wrapper';
-    var CLASS_SAVE = '.qor-cropper__save';
-    var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
-    var ID_REDACTOR_LINK_TITLE = '#redactor-link-title';
-    var ID_REDACTOR_LINK_TEXT = '#redactor-link-url-text';
-    var ID_REDACTOR_MODAL_BUTTON_CANCEL = '#redactor-modal-button-cancel';
+        CLASS_WRAPPER = '.qor-cropper__wrapper',
+        CLASS_SAVE = '.qor-cropper__save',
+        CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor',
+        ID_REDACTOR_LINK_TITLE = '#redactor-link-title',
+        ID_REDACTOR_LINK_TEXT = '#redactor-link-url-text',
+        ID_REDACTOR_MODAL_BUTTON_CANCEL = '#redactor-modal-button-cancel';
 
 
     function encodeCropData(data) {
@@ -87,7 +88,7 @@
         if (typeof str === 'string') {
             if (typeof data === 'object') {
                 $.each(data, function(key, val) {
-                    str = str.replace('${' + String(key).toLowerCase() + '}', val);
+                    str = str.replace('$[' + String(key).toLowerCase() + ']', val);
                 });
             }
         }
@@ -103,6 +104,40 @@
             .replace(/\"/g, ' ')
             .replace(/\'/g, ' ')
             .replace(/\`/g, ' ');
+    }
+
+    function redactorToolbarSrcoll($editor, toolbarFixedTopOffset) {
+        let $toolbar = $editor.find('.redactor-toolbar'),
+            offsetTop = $editor.offset().top,
+            editorHeight = $editor.height(),
+            normallCSS = {
+                position: 'relative',
+                top: 'auto',
+                width: 'auto',
+                boxShadow: 'none'
+            },
+            fixedCSS = {
+                position: 'fixed',
+                boxShadow: '0 2px 4px rgba(0,0,0,.1)',
+                top: toolbarFixedTopOffset,
+                width: $editor.width()
+            };
+
+        if ($toolbar.css('position') === 'relative') {
+            editorHeight = $editor.height() - 50;
+        }
+
+        if ((offsetTop < toolbarFixedTopOffset)) {
+            if (((editorHeight - 50 - toolbarFixedTopOffset) < Math.abs(offsetTop))) {
+                $toolbar.css(normallCSS);
+            } else {
+                $toolbar.css(fixedCSS);
+            }
+
+        } else {
+            $toolbar.css(normallCSS);
+        }
+
     }
 
     function QorRedactor(element, options) {
@@ -138,7 +173,8 @@
         unbind: function() {
             this.$element.
             off(EVENT_ADD_CROP).
-            off(EVENT_REMOVE_CROP);
+            off(EVENT_REMOVE_CROP).
+            off(EVENT_SCROLL);
         },
 
         addButton: function(e, image) {
@@ -233,44 +269,40 @@
     };
 
     QorRedactor.BUTTON = (
-        '<div class="qor-redactor__image--buttons">' +
-        '<span class="qor-redactor__image--edit" contenteditable="false">Edit</span>' +
-        '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>' +
-        '</div>'
+        `<div class="qor-redactor__image--buttons">
+            <span class="qor-redactor__image--edit" contenteditable="false">Edit</span>
+            <span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>
+        </div>`
 
     );
 
     QorRedactor.MODAL = (
-        '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="mdl-card mdl-shadow--2dp" role="document">' +
-        '<div class="mdl-card__title">' +
-        '<h2 class="mdl-card__title-text">${title}</h2>' +
-        '</div>' +
-        '<div class="mdl-card__supporting-text">' +
-        '<div class="qor-cropper__wrapper"></div>' +
-        '</div>' +
-        '<div class="mdl-card__actions mdl-card--border">' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">${ok}</a>' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">${cancel}</a>' +
-        '</div>' +
-        '<div class="mdl-card__menu">' +
-        '<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">' +
-        '<i class="material-icons">close</i>' +
-        '</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+        `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="mdl-card mdl-shadow--2dp" role="document">
+              <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">$[title]</h2>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <div class="qor-cropper__wrapper"></div>
+              </div>
+              <div class="mdl-card__actions mdl-card--border">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">$[ok]</a>
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">$[cancel]</a>
+              </div>
+              <div class="mdl-card__menu">
+                <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">
+                  <i class="material-icons">close</i>
+                  </button>
+              </div>
+            </div>
+        </div>`
     );
 
     QorRedactor.plugin = function(option) {
         return this.each(function() {
             let $this = $(this),
-                $slideoutHeader = $('.qor-slideout__body .qor-page__header'),
                 data = $this.data(NAMESPACE),
                 config,
-                redactorFixedTarget = '.qor-layout .mdl-layout__content',
-                redactorFixedTopOffset = 0,
-                isInSlideout = $('.qor-slideout').is(':visible'),
                 fn;
 
             if (!data) {
@@ -284,28 +316,20 @@
 
                 $this.data(NAMESPACE, (data = {}));
 
-                if ($slideoutHeader.length) {
-                    redactorFixedTopOffset = $slideoutHeader.height() - 10;
-                }
-
-                if (isInSlideout) {
-                    redactorFixedTarget = '.qor-slideout';
-                } else {
-                    redactorFixedTopOffset = 20;
-                }
-
                 config = {
                     imageUpload: $this.data("uploadUrl"),
                     fileUpload: $this.data("uploadUrl"),
                     imageResizable: true,
                     imagePosition: true,
-                    toolbarFixed: true,
-                    toolbarFixedTarget: redactorFixedTarget,
-                    toolbarFixedTopOffset: redactorFixedTopOffset,
+                    toolbarFixed: false,
 
                     callbacks: {
                         init: function() {
-                            var button, buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule', 'table'];
+                            let button, $editor = this.core.box(),
+                                isInSlideout = $('.qor-slideout').is(':visible'),
+                                toolbarFixedTarget, toolbarFixedTopOffset = 64,
+                                buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule', 'table'];
+
                             buttons.forEach(function(item) {
                                 button = this.button.get(item);
                                 this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
@@ -329,6 +353,20 @@
                                     this.code.sync();
                                 }, this)
                             })));
+
+                            if (isInSlideout) {
+                                toolbarFixedTarget = '.qor-slideout';
+                                toolbarFixedTopOffset = $('.qor-slideout__header').height();
+                            } else {
+                                toolbarFixedTarget = '.qor-layout main.qor-page';
+                                toolbarFixedTopOffset = toolbarFixedTopOffset + $(toolbarFixedTarget).find('.qor-page__header').height();
+
+                            }
+
+                            $(toolbarFixedTarget).on(EVENT_SCROLL, function() {
+                                redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
+                            });
+
                         },
 
                         imageUpload: function(image, json) {
