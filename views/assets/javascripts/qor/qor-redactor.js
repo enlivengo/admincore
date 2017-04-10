@@ -264,10 +264,13 @@
 
     QorRedactor.plugin = function (option) {
         return this.each(function () {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var config;
-            var fn;
+            let $this = $(this),
+            data = $this.data(NAMESPACE),
+            config,
+            redactorFixedTarget = '.qor-layout .mdl-layout__content',
+            redactorFixedTopOffset = 0,
+            isInSlideout = $('.qor-slideout').is(':visible'),
+            fn;
 
             if (!data) {
                 if (!$.fn.redactor) {
@@ -279,12 +282,26 @@
                 }
 
                 $this.data(NAMESPACE, (data = {}));
+
+                if ($('.qor-pulish2__action').length){
+                    redactorFixedTopOffset = $('.qor-page__header .qor-pulish2__action').height();
+                }
+
+                if (isInSlideout){
+                    redactorFixedTarget = '.qor-slideout';
+                    redactorFixedTopOffset = redactorFixedTopOffset + $('.qor-slideout__header').height();
+                } else {
+                    redactorFixedTopOffset = 20;
+                }
+
                 config = {
                     imageUpload: $this.data("uploadUrl"),
                     fileUpload: $this.data("uploadUrl"),
-                    toolbarFixed: true,
                     imageResizable: true,
                     imagePosition: true,
+                    toolbarFixed: true,
+                    toolbarFixedTarget: redactorFixedTarget,
+                    toolbarFixedTopOffset: redactorFixedTopOffset,
 
                     callbacks: {
                         init: function () {
