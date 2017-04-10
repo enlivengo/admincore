@@ -335,6 +335,18 @@
                                 this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
                             }, this);
 
+                            if (isInSlideout) {
+                                toolbarFixedTarget = '.qor-slideout';
+                                toolbarFixedTopOffset = $('.qor-slideout__header').height();
+                            } else {
+                                toolbarFixedTarget = '.qor-layout main.qor-page';
+                                toolbarFixedTopOffset = toolbarFixedTopOffset + $(toolbarFixedTarget).find('.qor-page__header').height();
+                            }
+
+                            $(toolbarFixedTarget).on(EVENT_SCROLL, function() {
+                                redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
+                            });
+
                             if (!$this.data("cropUrl")) {
                                 return;
                             }
@@ -353,20 +365,6 @@
                                     this.code.sync();
                                 }, this)
                             })));
-
-                            if (isInSlideout) {
-                                toolbarFixedTarget = '.qor-slideout';
-                                toolbarFixedTopOffset = $('.qor-slideout__header').height();
-                            } else {
-                                toolbarFixedTarget = '.qor-layout main.qor-page';
-                                toolbarFixedTopOffset = toolbarFixedTopOffset + $(toolbarFixedTarget).find('.qor-page__header').height();
-
-                            }
-
-                            $(toolbarFixedTarget).on(EVENT_SCROLL, function() {
-                                redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
-                            });
-
                         },
 
                         imageUpload: function(image, json) {
