@@ -111,33 +111,3 @@
     }
   }
 }
-
-.qor-slideout__body{
-  .qor-page__header{
-    box-shadow: none;
-    background: transparent;
-    height: auto;
-    min-height: 0;
-    padding-top: 0;
-    margin: -16px -24px 0;
-    .mdl-button{
-      height: 36px;
-      line-height: 36px;
-      margin-right: 0;
-      margin-left: 24px;
-    }
-    .qor-action-forms{
-      margin-top: 16px;
-      text-align: right;
-      margin-bottom: -50px;
-    }
-  }
-}
-
-@media screen and (max-width: 1024px){
-    .qor-slideout__body .qor-page__header+.qor-page__body{
-      margin-top: 0;
-    }
-}
-
-

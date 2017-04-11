@@ -47,8 +47,7 @@
         width: 100% !important;
     }
     .qor-error {
-        margin-right: 0;
-        margin-left: 0;
+        margin: 24px 0;
         box-shadow: none;
     }
 }
@@ -97,7 +96,7 @@
 }
 
 .qor-slideout__body {
-    padding: 72px 24px 16px 24px;
+    padding: 64px 24px 16px 24px;
     .qor-action-alert {
         margin: 56px 0 0;
     }
@@ -143,5 +142,35 @@
     background-color: unquote("rgba(#{$color-black}, 0.72)");
     >div {
         text-align: center;
+    }
+}
+
+// actoins
+
+.qor-slideout__body{
+  .qor-page__header{
+    box-shadow: none;
+    background: transparent;
+    height: auto;
+    min-height: 0;
+    padding-top: 0;
+    margin: 0 -24px;
+    .mdl-button{
+      height: 36px;
+      line-height: 36px;
+      margin-right: 0;
+      margin-left: 24px;
+    }
+    .qor-action-forms{
+      margin-top: 8px;
+      text-align: right;
+      float: right;
+    }
+  }
+}
+
+@media screen and (max-width: 1024px){
+    .qor-slideout__body .qor-page__header+.qor-page__body{
+      margin-top: 0;
     }
 }
