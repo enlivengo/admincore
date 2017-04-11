@@ -196,102 +196,50 @@ func (admin *Admin) NewServeMux(prefix string) http.Handler {
 // RegisterResourceRouters register resource to router
 func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 	var (
-		prefix          string
-		router          = admin.router
-		param           = res.ToParam()
-		primaryKey      = res.ParamIDName()
-		adminController = &Controller{Admin: admin}
+		primaryKeyParams = res.ParamIDName()
+		adminController  = &Controller{Admin: admin}
 	)
 
-	if prefix = func(r *Resource) string {
-		currentParam := param
-
-		for r.ParentResource != nil {
-			parentPath := r.ParentResource.ToParam()
-			if parentPath == param {
-				return ""
-			}
-			currentParam = path.Join(parentPath, r.ParentResource.ParamIDName(), currentParam)
-			r = r.ParentResource
-		}
-		return "/" + strings.Trim(currentParam, "/")
-	}(res); prefix == "" {
-		return
-	}
-
 	for _, action := range actions {
-		switch action {
+		switch strings.ToLower(action) {
 		case "create":
 			if !res.Config.Singleton {
 				// New
-				router.Get(path.Join(prefix, "new"), adminController.New, &RouteConfig{
-					PermissionMode: roles.Create,
-					Resource:       res,
-				})
+				res.RegisterRoute("GET", "/new", adminController.New, &RouteConfig{PermissionMode: roles.Create})
 			}
 
 			// Create
-			router.Post(prefix, adminController.Create, &RouteConfig{
-				PermissionMode: roles.Create,
-				Resource:       res,
-			})
+			res.RegisterRoute("POST", "/", adminController.Create, &RouteConfig{PermissionMode: roles.Create})
 		case "update":
 			if res.Config.Singleton {
 				// Edit
-				router.Get(path.Join(prefix, "edit"), adminController.Edit, &RouteConfig{
-					PermissionMode: roles.Update,
-					Resource:       res,
-				})
+				res.RegisterRoute("GET", "/edit", adminController.Edit, &RouteConfig{PermissionMode: roles.Update})
 
 				// Update
-				router.Put(prefix, adminController.Update, &RouteConfig{
-					PermissionMode: roles.Update,
-					Resource:       res,
-				})
+				res.RegisterRoute("PUT", "/", adminController.Update, &RouteConfig{PermissionMode: roles.Update})
 			} else {
 				// Edit
-				router.Get(path.Join(prefix, primaryKey, "edit"), adminController.Edit, &RouteConfig{
-					PermissionMode: roles.Update,
-					Resource:       res,
-				})
+				res.RegisterRoute("GET", path.Join(primaryKeyParams, "edit"), adminController.Edit, &RouteConfig{PermissionMode: roles.Update})
 
 				// Update
-				router.Post(path.Join(prefix, primaryKey), adminController.Update, &RouteConfig{
-					PermissionMode: roles.Update,
-					Resource:       res,
-				})
-				router.Put(path.Join(prefix, primaryKey), adminController.Update, &RouteConfig{
-					PermissionMode: roles.Update,
-					Resource:       res,
-				})
+				res.RegisterRoute("POST", primaryKeyParams, adminController.Update, &RouteConfig{PermissionMode: roles.Update})
+				res.RegisterRoute("PUT", primaryKeyParams, adminController.Update, &RouteConfig{PermissionMode: roles.Update})
 			}
 		case "read":
 			if res.Config.Singleton {
 				// Index
-				router.Get(prefix, adminController.Show, &RouteConfig{
-					PermissionMode: roles.Read,
-					Resource:       res,
-				})
+				res.RegisterRoute("GET", "/", adminController.Show, &RouteConfig{PermissionMode: roles.Read})
 			} else {
 				// Index
-				router.Get(prefix, adminController.Index, &RouteConfig{
-					PermissionMode: roles.Read,
-					Resource:       res,
-				})
+				res.RegisterRoute("GET", "/", adminController.Index, &RouteConfig{PermissionMode: roles.Read})
 
 				// Show
-				router.Get(path.Join(prefix, primaryKey), adminController.Show, &RouteConfig{
-					PermissionMode: roles.Read,
-					Resource:       res,
-				})
+				res.RegisterRoute("GET", primaryKeyParams, adminController.Show, &RouteConfig{PermissionMode: roles.Read})
 			}
 		case "delete":
 			if !res.Config.Singleton {
 				// Delete
-				router.Delete(path.Join(prefix, primaryKey), adminController.Delete, &RouteConfig{
-					PermissionMode: roles.Delete,
-					Resource:       res,
-				})
+				res.RegisterRoute("DELETE", primaryKeyParams, adminController.Delete, &RouteConfig{PermissionMode: roles.Delete})
 			}
 		}
 	}
@@ -321,6 +269,48 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 				}
 			}
 		}
+	}
+}
+
+// RegisterRoute register route
+func (res *Resource) RegisterRoute(method string, relativePath string, handler requestHandler, config *RouteConfig) {
+	if config == nil {
+		config = &RouteConfig{}
+	}
+	config.Resource = res
+
+	var (
+		prefix string
+		param  = res.ToParam()
+		router = res.GetAdmin().router
+	)
+
+	if prefix = func(r *Resource) string {
+		currentParam := param
+
+		for r.ParentResource != nil {
+			parentPath := r.ParentResource.ToParam()
+			// don't register same resource as nested routes
+			if parentPath == param {
+				return ""
+			}
+			currentParam = path.Join(parentPath, r.ParentResource.ParamIDName(), currentParam)
+			r = r.ParentResource
+		}
+		return "/" + strings.Trim(currentParam, "/")
+	}(res); prefix == "" {
+		return
+	}
+
+	switch strings.ToUpper(method) {
+	case "GET":
+		router.Get(path.Join(prefix, relativePath), handler, config)
+	case "POST":
+		router.Post(path.Join(prefix, relativePath), handler, config)
+	case "PUT":
+		router.Put(path.Join(prefix, relativePath), handler, config)
+	case "DELETE":
+		router.Delete(path.Join(prefix, relativePath), handler, config)
 	}
 }
 
