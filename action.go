@@ -78,16 +78,18 @@ func (res *Resource) Action(action *Action) *Action {
 	res.Actions = append(res.Actions, action)
 
 	// Register Actions into Router
-	actionController := &Controller{Admin: res.GetAdmin(), action: action}
-	primaryKeyParams := res.ParamIDName()
+	if !res.Config.Invisible {
+		actionController := &Controller{Admin: res.GetAdmin(), action: action}
+		primaryKeyParams := res.ParamIDName()
 
-	// Bulk actions
-	res.RegisterRoute("GET", path.Join("!action", action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
-	res.RegisterRoute("PUT", path.Join("!action", action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+		// Bulk actions
+		res.RegisterRoute("GET", path.Join("!action", action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+		res.RegisterRoute("PUT", path.Join("!action", action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
 
-	// Resource action
-	res.RegisterRoute("GET", path.Join(primaryKeyParams, action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
-	res.RegisterRoute("PUT", path.Join(primaryKeyParams, action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+		// Resource action
+		res.RegisterRoute("GET", path.Join(primaryKeyParams, action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+		res.RegisterRoute("PUT", path.Join(primaryKeyParams, action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+	}
 
 	return action
 }

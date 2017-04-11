@@ -155,6 +155,7 @@ func (admin *Admin) newResource(value interface{}, config ...*Config) *Resource 
 // NewResource initialize a new qor resource, won't add it to admin, just initialize it
 func (admin *Admin) NewResource(value interface{}, config ...*Config) *Resource {
 	res := admin.newResource(value, config...)
+	res.Config.Invisible = true
 	res.configure()
 	return res
 }

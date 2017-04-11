@@ -196,9 +196,19 @@ func (admin *Admin) NewServeMux(prefix string) http.Handler {
 // RegisterResourceRouters register resource to router
 func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 	var (
+		param            = res.ToParam()
 		primaryKeyParams = res.ParamIDName()
 		adminController  = &Controller{Admin: admin}
 	)
+
+	r := res
+	for r.ParentResource != nil {
+		// don't register same resource as nested routes
+		if r.ParentResource.ToParam() == param {
+			return
+		}
+		r = r.ParentResource
+	}
 
 	for _, action := range actions {
 		switch strings.ToLower(action) {
