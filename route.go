@@ -249,21 +249,6 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 					Resource:       res,
 				})
 			} else {
-				// Action
-				for _, action := range res.Actions {
-					actionController := &Controller{Admin: admin, action: action}
-					router.Get(path.Join(prefix, "!action", action.ToParam()), actionController.Action, &RouteConfig{
-						Permissioner:   action,
-						PermissionMode: roles.Update,
-						Resource:       res,
-					})
-					router.Put(path.Join(prefix, "!action", action.ToParam()), actionController.Action, &RouteConfig{
-						Permissioner:   action,
-						PermissionMode: roles.Update,
-						Resource:       res,
-					})
-				}
-
 				// Edit
 				router.Get(path.Join(prefix, primaryKey, "edit"), adminController.Edit, &RouteConfig{
 					PermissionMode: roles.Update,
@@ -279,21 +264,6 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 					PermissionMode: roles.Update,
 					Resource:       res,
 				})
-
-				// Action
-				for _, action := range res.Actions {
-					actionController := &Controller{Admin: admin, action: action}
-					router.Get(path.Join(prefix, primaryKey, action.ToParam()), actionController.Action, &RouteConfig{
-						Permissioner:   action,
-						PermissionMode: roles.Update,
-						Resource:       res,
-					})
-					router.Put(path.Join(prefix, primaryKey, action.ToParam()), actionController.Action, &RouteConfig{
-						Permissioner:   action,
-						PermissionMode: roles.Update,
-						Resource:       res,
-					})
-				}
 			}
 		case "read":
 			if res.Config.Singleton {
