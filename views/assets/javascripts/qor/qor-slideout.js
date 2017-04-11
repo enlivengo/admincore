@@ -1,4 +1,4 @@
-(function (factory) {
+(function(factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as anonymous module.
         define(['jquery'], factory);
@@ -9,7 +9,7 @@
         // Browser globals.
         factory(jQuery);
     }
-})(function ($) {
+})(function($) {
 
     'use strict';
 
@@ -51,7 +51,7 @@
             prop = 'href';
 
         isScript && (prop = 'src');
-        $ele.each(function () {
+        $ele.each(function() {
             array.push($(this).attr(prop));
         });
         return _.uniq(array);
@@ -74,7 +74,7 @@
         for (let i = 0, len = srcs.length; i < len; i++) {
             let script = document.createElement('script');
 
-            script.onload = function () {
+            script.onload = function() {
                 scriptsLoaded++;
 
                 if (scriptsLoaded === srcs.length) {
@@ -100,7 +100,7 @@
 
         ss.type = 'text/css';
         ss.rel = 'stylesheet';
-        ss.onload = function () {
+        ss.onload = function() {
             if (srcs.length) {
                 loadStyles(srcs);
             }
@@ -138,23 +138,23 @@
     QorSlideout.prototype = {
         constructor: QorSlideout,
 
-        init: function () {
+        init: function() {
             this.build();
             this.bind();
         },
 
-        build: function () {
+        build: function() {
             var $slideout;
 
             this.$slideout = $slideout = $(QorSlideout.TEMPLATE).appendTo('body');
             this.$slideoutTemplate = $slideout.html();
         },
 
-        unbuild: function () {
+        unbuild: function() {
             this.$slideout.remove();
         },
 
-        bind: function () {
+        bind: function() {
             this.$slideout
                 .on(EVENT_SUBMIT, 'form', $.proxy(this.submit, this))
                 .on(EVENT_CLICK, '.qor-slideout__fullscreen', $.proxy(this.toggleSlideoutMode, this))
@@ -164,7 +164,7 @@
                 .on(EVENT_KEYUP, $.proxy(this.keyup, this));
         },
 
-        unbind: function () {
+        unbind: function() {
             this.$slideout
                 .off(EVENT_SUBMIT, this.submit);
 
@@ -173,7 +173,7 @@
                 .off(EVENT_CLICK, this.hide);
         },
 
-        keyup: function (e) {
+        keyup: function(e) {
             if (e.which === 27) {
                 if ($('.qor-bottomsheets').is(':visible') || $('.qor-modal').is(':visible') || $('#redactor-modal-box').length) {
                     return;
@@ -184,7 +184,7 @@
             }
         },
 
-        loadExtraResource: function (data) {
+        loadExtraResource: function(data) {
             let styleDiff = compareLinks(data.$links),
                 scriptDiff = compareScripts(data.$scripts);
 
@@ -198,23 +198,23 @@
 
         },
 
-        removeSelectedClass: function () {
+        removeSelectedClass: function() {
             this.$element.find('[data-url]').removeClass(CLASS_IS_SELECTED);
         },
 
-        addLoading: function () {
+        addLoading: function() {
             $(CLASS_BODY_LOADING).remove();
             var $loading = $(QorSlideout.TEMPLATE_LOADING);
             $loading.appendTo($('body')).trigger('enable');
         },
 
-        toggleSlideoutMode: function () {
+        toggleSlideoutMode: function() {
 
             this.$slideout.toggleClass('qor-slideout__fullscreen').find('.qor-slideout__fullscreen i').toggle();
 
         },
 
-        submit: function (e) {
+        submit: function(e) {
             var $slideout = this.$slideout;
             var $body = this.$body;
             var form = e.target;
@@ -233,11 +233,11 @@
                     dataType: 'html',
                     processData: false,
                     contentType: false,
-                    beforeSend: function () {
+                    beforeSend: function() {
                         $submit.prop('disabled', true);
                         $.fn.qorSlideoutBeforeHide = null;
                     },
-                    success: function (html) {
+                    success: function(html) {
                         var returnUrl = $form.data('returnUrl');
                         var refreshUrl = $form.data('refreshUrl');
 
@@ -258,11 +258,15 @@
                         } else {
                             var prefix = '/' + location.pathname.split('/')[1];
                             var flashStructs = [];
-                            $(html).find('.qor-alert').each(function (i, e) {
+                            $(html).find('.qor-alert').each(function(i, e) {
                                 var message = $(e).find('.qor-alert-message').text().trim();
                                 var type = $(e).data('type');
                                 if (message !== '') {
-                                    flashStructs.push({ Type: type, Message: message, Keep: true });
+                                    flashStructs.push({
+                                        Type: type,
+                                        Message: message,
+                                        Keep: true
+                                    });
                                 }
                             });
                             if (flashStructs.length > 0) {
@@ -271,7 +275,7 @@
                             _this.refresh();
                         }
                     },
-                    error: function (xhr, textStatus, errorThrown) {
+                    error: function(xhr, textStatus, errorThrown) {
                         var $error;
 
                         if (xhr.status === 422) {
@@ -282,7 +286,7 @@
                             $error = $(xhr.responseText).find('.qor-error');
                             $form.before($error);
 
-                            $error.find('> li > label').each(function () {
+                            $error.find('> li > label').each(function() {
                                 var $label = $(this);
                                 var id = $label.attr('for');
 
@@ -299,14 +303,14 @@
                             window.alert([textStatus, errorThrown].join(': '));
                         }
                     },
-                    complete: function () {
+                    complete: function() {
                         $submit.prop('disabled', false);
                     }
                 });
             }
         },
 
-        load: function (url, data) {
+        load: function(url, data) {
             var options = this.options;
             var method;
             var dataType;
@@ -323,13 +327,13 @@
             method = data.method ? data.method : 'GET';
             dataType = data.datatype ? data.datatype : 'html';
 
-            load = $.proxy(function () {
+            load = $.proxy(function() {
                 $.ajax(url, {
                     method: method,
                     dataType: dataType,
                     cache: true,
                     ifModified: true,
-                    success: $.proxy(function (response) {
+                    success: $.proxy(function(response) {
                         let $response,
                             $content,
                             $qorFormContainer,
@@ -376,7 +380,7 @@
                                     'response': response
                                 };
 
-                                loadScripts($scripts, data, function () {});
+                                loadScripts($scripts, data, function() {});
 
                             }
 
@@ -395,9 +399,9 @@
                             replaceHtml($slideout.find('.qor-slideout__body')[0], $content.html());
                             this.$body.find(CLASS_HEADER_LOCALE).remove();
 
-                            $slideout.one(EVENT_SHOWN, function () {
+                            $slideout.one(EVENT_SHOWN, function() {
                                 $(this).trigger('enable');
-                            }).one(EVENT_HIDDEN, function () {
+                            }).one(EVENT_HIDDEN, function() {
                                 $(this).trigger('disable');
                             });
 
@@ -431,11 +435,11 @@
                     }, this),
 
 
-                    error: $.proxy(function () {
+                    error: $.proxy(function() {
                         var errors;
                         $(CLASS_BODY_LOADING).remove();
                         if ($('.qor-error span').length > 0) {
-                            errors = $('.qor-error span').map(function () {
+                            errors = $('.qor-error span').map(function() {
                                 return $(this).text();
                             }).get().join(', ');
                         } else {
@@ -455,17 +459,17 @@
             }
         },
 
-        open: function (options) {
+        open: function(options) {
             this.addLoading();
             this.load(options.url, options.data);
         },
 
-        reload: function (url) {
+        reload: function(url) {
             this.hide();
             this.load(url);
         },
 
-        show: function () {
+        show: function() {
             var $slideout = this.$slideout;
             var showEvent;
 
@@ -490,14 +494,14 @@
             scrollTop(0);
         },
 
-        shown: function () {
+        shown: function() {
             this.slided = true;
             // Disable to scroll body element
             $('body').addClass(CLASS_OPEN);
             this.$slideout.trigger('beforeEnable.qor.slideout').trigger(EVENT_SHOWN).trigger('afterEnable.qor.slideout');
         },
 
-        hide: function () {
+        hide: function() {
 
             if ($.fn.qorSlideoutBeforeHide) {
                 if (window.confirm('You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes!')) {
@@ -510,7 +514,7 @@
             this.removeSelectedClass();
         },
 
-        hideSlideout: function () {
+        hideSlideout: function() {
             var $slideout = this.$slideout;
             var hideEvent;
             var $datePicker = $('.qor-datepicker').not('.hidden');
@@ -537,12 +541,12 @@
 
             $slideout.
             one(EVENT_TRANSITIONEND, $.proxy(this.hidden, this)).
-            removeClass(CLASS_IS_SLIDED);
+            removeClass(`${CLASS_IS_SLIDED} qor-slideout__fullscreen`);
 
             $slideout.trigger(EVENT_SLIDEOUT_CLOSED);
         },
 
-        hidden: function () {
+        hidden: function() {
             this.slided = false;
 
             // Enable to scroll body element
@@ -551,15 +555,15 @@
             this.$slideout.removeClass(CLASS_IS_SHOWN).trigger(EVENT_HIDDEN);
         },
 
-        refresh: function () {
+        refresh: function() {
             this.hide();
 
-            setTimeout(function () {
+            setTimeout(function() {
                 window.location.reload();
             }, 350);
         },
 
-        destroy: function () {
+        destroy: function() {
             this.unbind();
             this.unbuild();
             this.$element.removeData(NAMESPACE);
@@ -596,8 +600,8 @@
         </div>`
     );
 
-    QorSlideout.plugin = function (options) {
-        return this.each(function () {
+    QorSlideout.plugin = function(options) {
+        return this.each(function() {
             var $this = $(this);
             var data = $this.data(NAMESPACE);
             var fn;

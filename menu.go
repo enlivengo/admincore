@@ -48,9 +48,10 @@ func (menu Menu) URL() string {
 		return menu.Link
 	}
 
-	if menu.router != nil {
+	if (menu.router != nil) && (menu.RelativePath != "") {
 		return path.Join(menu.router.Prefix, menu.RelativePath)
 	}
+
 	return menu.RelativePath
 }
 

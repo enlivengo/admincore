@@ -1,4 +1,4 @@
-(function (factory) {
+(function(factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as anonymous module.
         define(['jquery'], factory);
@@ -9,33 +9,34 @@
         // Browser globals.
         factory(jQuery);
     }
-})(function ($) {
+})(function($) {
 
     'use strict';
 
-    var NAMESPACE = 'qor.redactor';
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_KEYUP = 'keyup.' + NAMESPACE;
-    var EVENT_ADD_CROP = 'addCrop.' + NAMESPACE;
-    var EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE;
-    var EVENT_SHOWN = 'shown.qor.modal';
-    var EVENT_HIDDEN = 'hidden.qor.modal';
+    let NAMESPACE = 'qor.redactor',
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_KEYUP = 'keyup.' + NAMESPACE,
+        EVENT_ADD_CROP = 'addCrop.' + NAMESPACE,
+        EVENT_REMOVE_CROP = 'removeCrop.' + NAMESPACE,
+        EVENT_SHOWN = 'shown.qor.modal',
+        EVENT_HIDDEN = 'hidden.qor.modal',
+        EVENT_SCROLL = 'scroll.' + NAMESPACE,
 
-    var CLASS_WRAPPER = '.qor-cropper__wrapper';
-    var CLASS_SAVE = '.qor-cropper__save';
-    var CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor';
-    var ID_REDACTOR_LINK_TITLE = '#redactor-link-title';
-    var ID_REDACTOR_LINK_TEXT = '#redactor-link-url-text';
-    var ID_REDACTOR_MODAL_BUTTON_CANCEL = '#redactor-modal-button-cancel';
+        CLASS_WRAPPER = '.qor-cropper__wrapper',
+        CLASS_SAVE = '.qor-cropper__save',
+        CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor',
+        ID_REDACTOR_LINK_TITLE = '#redactor-link-title',
+        ID_REDACTOR_LINK_TEXT = '#redactor-link-url-text',
+        ID_REDACTOR_MODAL_BUTTON_CANCEL = '#redactor-modal-button-cancel';
 
 
     function encodeCropData(data) {
         var nums = [];
 
         if ($.isPlainObject(data)) {
-            $.each(data, function () {
+            $.each(data, function() {
                 nums.push(arguments[1]);
             });
         }
@@ -86,8 +87,8 @@
     function replaceText(str, data) {
         if (typeof str === 'string') {
             if (typeof data === 'object') {
-                $.each(data, function (key, val) {
-                    str = str.replace('${' + String(key).toLowerCase() + '}', val);
+                $.each(data, function(key, val) {
+                    str = str.replace('$[' + String(key).toLowerCase() + ']', val);
                 });
             }
         }
@@ -105,6 +106,40 @@
             .replace(/\`/g, ' ');
     }
 
+    function redactorToolbarSrcoll($editor, toolbarFixedTopOffset) {
+        let $toolbar = $editor.find('.redactor-toolbar'),
+            offsetTop = $editor.offset().top,
+            editorHeight = $editor.height(),
+            normallCSS = {
+                position: 'relative',
+                top: 'auto',
+                width: 'auto',
+                boxShadow: 'none'
+            },
+            fixedCSS = {
+                position: 'fixed',
+                boxShadow: '0 2px 4px rgba(0,0,0,.1)',
+                top: toolbarFixedTopOffset,
+                width: $editor.width()
+            };
+
+        if ($toolbar.css('position') === 'relative') {
+            editorHeight = $editor.height() - 50;
+        }
+
+        if ((offsetTop < toolbarFixedTopOffset)) {
+            if (((editorHeight - 50 - toolbarFixedTopOffset) < Math.abs(offsetTop))) {
+                $toolbar.css(normallCSS);
+            } else {
+                $toolbar.css(fixedCSS);
+            }
+
+        } else {
+            $toolbar.css(normallCSS);
+        }
+
+    }
+
     function QorRedactor(element, options) {
         this.$element = $(element);
         this.options = $.extend(true, {}, QorRedactor.DEFAULTS, $.isPlainObject(options) && options);
@@ -114,7 +149,7 @@
     QorRedactor.prototype = {
         constructor: QorRedactor,
 
-        init: function () {
+        init: function() {
             var options = this.options;
             var $this = this.$element;
             var $parent = $this.closest(options.parent);
@@ -129,19 +164,20 @@
             this.bind();
         },
 
-        bind: function () {
+        bind: function() {
             this.$element.
             on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
             on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
         },
 
-        unbind: function () {
+        unbind: function() {
             this.$element.
             off(EVENT_ADD_CROP).
-            off(EVENT_REMOVE_CROP);
+            off(EVENT_REMOVE_CROP).
+            off(EVENT_SCROLL);
         },
 
-        addButton: function (e, image) {
+        addButton: function(e, image) {
             var $image = $(image);
 
             this.$button.css('left', $(image).width() / 2).
@@ -150,12 +186,12 @@
             one(EVENT_CLICK, $.proxy(this.crop, this, $image));
         },
 
-        removeButton: function () {
+        removeButton: function() {
             this.$button.find(CLASS_CROPPER_TOGGLE).off(EVENT_CLICK);
             this.$button.detach();
         },
 
-        crop: function ($image) {
+        crop: function($image) {
             var options = this.options;
             var url = $image.attr('src');
             var originalUrl = url;
@@ -167,7 +203,7 @@
             }
 
             $clone.attr('src', originalUrl);
-            $modal.one(EVENT_SHOWN, function () {
+            $modal.one(EVENT_SHOWN, function() {
                 $clone.cropper({
                     data: decodeCropData($image.attr('data-crop-options')),
                     background: false,
@@ -177,8 +213,8 @@
                     rotatable: false,
                     checkImageOrigin: false,
 
-                    built: function () {
-                        $modal.find(CLASS_SAVE).one(EVENT_CLICK, function () {
+                    built: function() {
+                        $modal.find(CLASS_SAVE).one(EVENT_CLICK, function() {
                             var cropData = $clone.cropper('getData', true);
 
                             $.ajax(options.remote, {
@@ -193,7 +229,7 @@
                                 }),
                                 dataType: 'json',
 
-                                success: function (response) {
+                                success: function(response) {
                                     if ($.isPlainObject(response) && response.url) {
                                         $image.attr('src', response.url).attr('data-crop-options', encodeCropData(cropData)).removeAttr('style').removeAttr('rel');
 
@@ -207,12 +243,12 @@
                         });
                     }
                 });
-            }).one(EVENT_HIDDEN, function () {
+            }).one(EVENT_HIDDEN, function() {
                 $clone.cropper('destroy').remove();
             }).qorModal('show').find(CLASS_WRAPPER).append($clone);
         },
 
-        destroy: function () {
+        destroy: function() {
             this.unbind();
             this.$modal.qorModal('hide').remove();
             this.$element.removeData(NAMESPACE);
@@ -233,41 +269,41 @@
     };
 
     QorRedactor.BUTTON = (
-        '<div class="qor-redactor__image--buttons">' +
-        '<span class="qor-redactor__image--edit" contenteditable="false">Edit</span>' +
-        '<span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>' +
-        '</div>'
+        `<div class="qor-redactor__image--buttons">
+            <span class="qor-redactor__image--edit" contenteditable="false">Edit</span>
+            <span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>
+        </div>`
 
     );
 
     QorRedactor.MODAL = (
-        '<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="mdl-card mdl-shadow--2dp" role="document">' +
-        '<div class="mdl-card__title">' +
-        '<h2 class="mdl-card__title-text">${title}</h2>' +
-        '</div>' +
-        '<div class="mdl-card__supporting-text">' +
-        '<div class="qor-cropper__wrapper"></div>' +
-        '</div>' +
-        '<div class="mdl-card__actions mdl-card--border">' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">${ok}</a>' +
-        '<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">${cancel}</a>' +
-        '</div>' +
-        '<div class="mdl-card__menu">' +
-        '<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">' +
-        '<i class="material-icons">close</i>' +
-        '</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+        `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="mdl-card mdl-shadow--2dp" role="document">
+              <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">$[title]</h2>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <div class="qor-cropper__wrapper"></div>
+              </div>
+              <div class="mdl-card__actions mdl-card--border">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">$[ok]</a>
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">$[cancel]</a>
+              </div>
+              <div class="mdl-card__menu">
+                <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">
+                  <i class="material-icons">close</i>
+                  </button>
+              </div>
+            </div>
+        </div>`
     );
 
-    QorRedactor.plugin = function (option) {
-        return this.each(function () {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var config;
-            var fn;
+    QorRedactor.plugin = function(option) {
+        return this.each(function() {
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                config,
+                fn;
 
             if (!data) {
                 if (!$.fn.redactor) {
@@ -279,20 +315,37 @@
                 }
 
                 $this.data(NAMESPACE, (data = {}));
+
                 config = {
                     imageUpload: $this.data("uploadUrl"),
                     fileUpload: $this.data("uploadUrl"),
-                    toolbarFixed: true,
                     imageResizable: true,
                     imagePosition: true,
+                    toolbarFixed: false,
 
                     callbacks: {
-                        init: function () {
-                            var button, buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule', 'table'];
-                            buttons.forEach(function (item) {
+                        init: function() {
+                            let button, $editor = this.core.box(),
+                                isInSlideout = $('.qor-slideout').is(':visible'),
+                                toolbarFixedTarget, toolbarFixedTopOffset = 64,
+                                buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule', 'table'];
+
+                            buttons.forEach(function(item) {
                                 button = this.button.get(item);
                                 this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
                             }, this);
+
+                            if (isInSlideout) {
+                                toolbarFixedTarget = '.qor-slideout';
+                                toolbarFixedTopOffset = $('.qor-slideout__header').height();
+                            } else {
+                                toolbarFixedTarget = '.qor-layout main.qor-page';
+                                toolbarFixedTopOffset = toolbarFixedTopOffset + $(toolbarFixedTarget).find('.qor-page__header').height();
+                            }
+
+                            $(toolbarFixedTarget).on(EVENT_SCROLL, function() {
+                                redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
+                            });
 
                             if (!$this.data("cropUrl")) {
                                 return;
@@ -303,23 +356,23 @@
                                 text: $this.data("text"),
                                 parent: '.qor-field',
                                 toggle: '.qor-cropper__toggle--redactor',
-                                replace: function (url) {
-                                    return url.replace(/\.\w+$/, function (extension) {
+                                replace: function(url) {
+                                    return url.replace(/\.\w+$/, function(extension) {
                                         return '.original' + extension;
                                     });
                                 },
-                                complete: $.proxy(function () {
+                                complete: $.proxy(function() {
                                     this.code.sync();
                                 }, this)
                             })));
                         },
 
-                        imageUpload: function (image, json) {
+                        imageUpload: function(image, json) {
                             var $image = $(image);
                             json.filelink && $image.prop('src', json.filelink);
                         },
 
-                        click: function (e) {
+                        click: function(e) {
                             var $currentTag = $(this.selection.parent());
 
                             if ($currentTag.is('.redactor-layer')) {
@@ -337,7 +390,7 @@
 
                         },
 
-                        modalOpened: function (name, modal) {
+                        modalOpened: function(name, modal) {
                             var _this = this;
                             if (name == 'link') {
                                 $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.link.linkDescription + '" type="text" id="redactor-link-title" placeholder="If blank, will use Text value above" /></section>');
@@ -350,16 +403,16 @@
                                 $(ID_REDACTOR_MODAL_BUTTON_CANCEL).off(EVENT_CLICK);
 
 
-                                $(ID_REDACTOR_MODAL_BUTTON_CANCEL).on(EVENT_CLICK, function () {
+                                $(ID_REDACTOR_MODAL_BUTTON_CANCEL).on(EVENT_CLICK, function() {
                                     _this.link.clickCancel = true;
                                 });
 
-                                $(ID_REDACTOR_LINK_TITLE).on(EVENT_KEYUP, function () {
+                                $(ID_REDACTOR_LINK_TITLE).on(EVENT_KEYUP, function() {
                                     _this.link.valueChanged = true;
                                     _this.link.description = escapeHTML($(this).val());
                                 });
 
-                                $(ID_REDACTOR_LINK_TEXT).on(EVENT_KEYUP, function () {
+                                $(ID_REDACTOR_LINK_TEXT).on(EVENT_KEYUP, function() {
                                     _this.link.valueChanged = true;
                                     _this.link.linkUrlText = escapeHTML($(this).val());
                                 });
@@ -367,7 +420,7 @@
                             }
                         },
 
-                        modalClosed: function (name) {
+                        modalClosed: function(name) {
                             var $linkHtml = this.link.$linkHtml,
                                 description = this.link.description;
 
@@ -386,7 +439,7 @@
                             this.link.clickCancel = false;
                         },
 
-                        insertedLink: function (link) {
+                        insertedLink: function(link) {
                             var $link = $(link),
                                 description = this.link.description;
 
@@ -396,7 +449,7 @@
                             this.link.insertedTriggered = true;
                         },
 
-                        fileUpload: function (link, json) {
+                        fileUpload: function(link, json) {
                             $(link).prop('href', json.filelink).html(json.filename);
                         }
 
@@ -417,14 +470,14 @@
         });
     };
 
-    $(function () {
+    $(function() {
         var selector = 'textarea[data-toggle="qor.redactor"]';
 
         $(document).
-        on(EVENT_DISABLE, function (e) {
+        on(EVENT_DISABLE, function(e) {
             QorRedactor.plugin.call($(selector, e.target), 'destroy');
         }).
-        on(EVENT_ENABLE, function (e) {
+        on(EVENT_ENABLE, function(e) {
             QorRedactor.plugin.call($(selector, e.target));
         }).
         triggerHandler(EVENT_ENABLE);

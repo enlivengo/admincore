@@ -1,4 +1,4 @@
-(function (factory) {
+(function(factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as anonymous module.
         define(['jquery'], factory);
@@ -9,7 +9,7 @@
         // Browser globals.
         factory(jQuery);
     }
-})(function ($) {
+})(function($) {
 
     'use strict';
 
@@ -79,7 +79,7 @@
     function replaceText(str, data) {
         if (typeof str === 'string') {
             if (typeof data === 'object') {
-                $.each(data, function (key, val) {
+                $.each(data, function(key, val) {
                     str = str.replace('$[' + String(key).toLowerCase() + ']', val);
                 });
             }
@@ -98,11 +98,10 @@
     QorCropper.prototype = {
         constructor: QorCropper,
 
-        init: function () {
+        init: function() {
             var options = this.options;
             var $this = this.$element;
             var $parent = $this.closest(options.parent);
-            var $list;
             var data;
             var outputValue;
             var fetchUrl;
@@ -115,16 +114,12 @@
 
             this.$parent = $parent;
             this.$output = $parent.find(options.output);
-            this.$list = $list = $parent.find(options.list);
+            this.$list = $parent.find(options.list);
 
             fetchUrl = this.$output.data('fetchSizedata');
 
-            if (!$list.find('img').attr('src')) {
-                $list.find('ul').hide();
-            }
-
             if (fetchUrl) {
-                $.getJSON(fetchUrl, function (data) {
+                $.getJSON(fetchUrl, function(data) {
                     imageData = JSON.parse(data.MediaOption);
                     _this.$output.val(JSON.stringify(data));
                     _this.data = imageData || {};
@@ -143,7 +138,7 @@
             }
         },
 
-        build: function () {
+        build: function() {
             var textData = this.$output.data(),
                 text = {},
                 replaceTexts;
@@ -166,33 +161,39 @@
             this.$modal = $(replaceText(QorCropper.MODAL, replaceTexts)).appendTo('body');
         },
 
-        unbuild: function () {
+        unbuild: function() {
             this.$modal.remove();
             this.unwrap();
         },
 
-        wrap: function () {
+        wrap: function() {
             var $list = this.$list;
             var $img;
 
             $list.find('li').append(QorCropper.TOGGLE);
             $img = $list.find('img');
-            $img.wrap(QorCropper.CANVAS);
-            this.center($img);
+
+            if ($img.length) {
+                $img.wrap(QorCropper.CANVAS);
+                this.center($img);
+            } else {
+                $list.find(CLASS_CROP).remove();
+            }
+
         },
 
-        unwrap: function () {
+        unwrap: function() {
             var $list = this.$list;
 
             $list.find(CLASS_TOGGLE).remove();
-            $list.find(CLASS_CANVAS).each(function () {
+            $list.find(CLASS_CANVAS).each(function() {
                 var $this = $(this);
 
                 $this.before($this.html()).remove();
             });
         },
 
-        bind: function () {
+        bind: function() {
             this.$element.
             on(EVENT_CHANGE, $.proxy(this.read, this));
 
@@ -204,7 +205,7 @@
             on(EVENT_HIDDEN, $.proxy(this.stop, this));
         },
 
-        unbind: function () {
+        unbind: function() {
             this.$element.
             off(EVENT_CHANGE, this.read);
 
@@ -216,7 +217,7 @@
             off(EVENT_HIDDEN, this.stop);
         },
 
-        click: function (e) {
+        click: function(e) {
             var target = e.target;
             var $target;
             var data = this.data;
@@ -235,7 +236,7 @@
                 this.$list.hide();
 
                 $alert = $(QorCropper.ALERT);
-                $alert.find(CLASS_UNDO).one(EVENT_CLICK, function () {
+                $alert.find(CLASS_UNDO).one(EVENT_CLICK, function() {
                     $alert.remove();
                     this.$list.show();
                     delete data.Delete;
@@ -251,7 +252,7 @@
             }
         },
 
-        read: function (e) {
+        read: function(e) {
             var files = e.target.files,
                 file,
                 $alert = this.$parent.find('.qor-fieldset__alert');
@@ -273,7 +274,7 @@
             }
         },
 
-        load: function (url, callback) {
+        load: function(url, callback) {
             var options = this.options;
             var _this = this;
             var $list = this.$list;
@@ -292,7 +293,7 @@
 
             $image = $list.find('img');
             imageLength = $image.length;
-            $image.one('load', function () {
+            $image.one('load', function() {
                 var $this = $(this);
                 var naturalWidth = this.naturalWidth;
                 var naturalHeight = this.naturalHeight;
@@ -360,7 +361,7 @@
             $list.show();
         },
 
-        start: function () {
+        start: function() {
             var options = this.options;
             var $modal = this.$modal;
             var $target = this.$target;
@@ -406,12 +407,12 @@
                 checkImageOrigin: false,
                 autoCropArea: 1,
 
-                built: function () {
-                    $modal.find('.qor-cropper__options-toggle').on(EVENT_CLICK, function () {
+                built: function() {
+                    $modal.find('.qor-cropper__options-toggle').on(EVENT_CLICK, function() {
                         $modal.find('.qor-cropper__options-input').prop('checked', $(this).prop('checked'));
                     }).prop('checked', true);
 
-                    $modal.find(CLASS_SAVE).one(EVENT_CLICK, function () {
+                    $modal.find(CLASS_SAVE).one(EVENT_CLICK, function() {
                         let cropData = $clone.cropper('getData', true),
                             croppedCanvas = $clone.cropper('getCroppedCanvas'),
                             syncData = [],
@@ -426,7 +427,7 @@
                             url = croppedCanvas.toDataURL();
                         }
 
-                        $modal.find(CLASS_OPTIONS + ' input').each(function () {
+                        $modal.find(CLASS_OPTIONS + ' input').each(function() {
                             var $this = $(this);
 
                             if ($this.prop('checked')) {
@@ -441,7 +442,7 @@
             });
         },
 
-        stop: function () {
+        stop: function() {
             this.$modal.
             trigger('disable.qor.material').
             find(CLASS_WRAPPER + ' > img').
@@ -454,10 +455,10 @@
             remove();
         },
 
-        getList: function (aspectRatio) {
+        getList: function(aspectRatio) {
             var list = [];
 
-            this.$list.find('img').not(this.$target).each(function () {
+            this.$list.find('img').not(this.$target).each(function() {
                 var data = $(this).data();
                 var resolution = data.sizeResolution;
                 var name = data.sizeName;
@@ -486,7 +487,7 @@
             return list.length ? ('<ul><li>' + list.join('</li><li>') + '</li></ul>') : '';
         },
 
-        output: function (url, data) {
+        output: function(url, data) {
             var $target = this.$target;
 
             if (url) {
@@ -502,7 +503,7 @@
             this.$output.val(JSON.stringify(this.data)).trigger(EVENT_CHANGE);
         },
 
-        preview: function ($target, emulateImageData, emulateCropData) {
+        preview: function($target, emulateImageData, emulateCropData) {
             var $canvas = $target.parent();
             var $container = $canvas.parent();
             var containerWidth = $container.width();
@@ -531,8 +532,8 @@
             this.center($target);
         },
 
-        center: function ($target, reset) {
-            $target.each(function () {
+        center: function($target, reset) {
+            $target.each(function() {
                 var $this = $(this);
                 var $canvas = $this.parent();
                 var $container = $canvas.parent();
@@ -561,12 +562,12 @@
             });
         },
 
-        autoCrop: function (url, data) {
+        autoCrop: function(url, data) {
             var cropData = this.cropData;
             var cropOptions = this.data[this.options.key];
             var _this = this;
 
-            this.$list.find('img').not(this.$target).each(function () {
+            this.$list.find('img').not(this.$target).each(function() {
                 var $this = $(this);
                 var sizeName = $this.data('sizeName');
 
@@ -582,7 +583,7 @@
             });
         },
 
-        destroy: function () {
+        destroy: function() {
             this.unbind();
             this.unbuild();
             this.$element.removeData(NAMESPACE);
@@ -643,8 +644,8 @@
         </div>`
     );
 
-    QorCropper.plugin = function (option) {
-        return this.each(function () {
+    QorCropper.plugin = function(option) {
+        return this.each(function() {
             var $this = $(this);
             var data = $this.data(NAMESPACE);
             var options;
@@ -669,7 +670,7 @@
         });
     };
 
-    $(function () {
+    $(function() {
         var selector = '.qor-file__input';
         var options = {
             parent: '.qor-file',
@@ -679,10 +680,10 @@
         };
 
         $(document).
-        on(EVENT_ENABLE, function (e) {
+        on(EVENT_ENABLE, function(e) {
             QorCropper.plugin.call($(selector, e.target), options);
         }).
-        on(EVENT_DISABLE, function (e) {
+        on(EVENT_DISABLE, function(e) {
             QorCropper.plugin.call($(selector, e.target), 'destroy');
         }).
         triggerHandler(EVENT_ENABLE);
