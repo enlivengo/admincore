@@ -177,12 +177,18 @@ table {
             &.qor-table--video {
                 padding: 0;
                 height: 200px;
+                line-height: 200px;
+                text-align: center;
+                background-color: unquote("rgba(#{$color-black}, 0.05)");
+                img{
+                  max-height: 200px;
+                }
             }
             .qor-table--medialibrary-file {
                 display: flex;
                 justify-content: center;
                 flex-direction: column;
-                background-color: rgba(0, 0, 0, .1);
+                background-color: unquote("rgba(#{$color-black}, 0.1)");
                 height: 200px;
                 a {
                     padding: 0 32px;
@@ -205,6 +211,6 @@ table {
     }
     img {
         max-width: 100%;
-        width: 100%;
+        margin: 0 auto;
     }
 }
