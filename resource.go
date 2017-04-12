@@ -39,11 +39,58 @@ type Resource struct {
 
 // Meta register meta for admin resource
 func (res *Resource) Meta(meta *Meta) *Meta {
-	if res.GetMeta(meta.Name) != nil {
-		utils.ExitWithMsg("Duplicated meta %v defined for resource %v", meta.Name, res.Name)
+	if oldMeta := res.GetMeta(meta.Name); oldMeta != nil {
+		if meta.Type != "" {
+			oldMeta.Type = meta.Type
+		}
+
+		if meta.Label != "" {
+			oldMeta.Label = meta.Label
+		}
+
+		if meta.FieldName != "" {
+			oldMeta.FieldName = meta.FieldName
+		}
+
+		if meta.Setter != nil {
+			oldMeta.Setter = meta.Setter
+		} else {
+			oldMeta.Setter = oldMeta.Meta.Setter
+		}
+
+		if meta.Valuer != nil {
+			oldMeta.Valuer = meta.Valuer
+		} else {
+			oldMeta.Valuer = oldMeta.Meta.Valuer
+		}
+
+		if meta.FormattedValuer != nil {
+			oldMeta.FormattedValuer = meta.FormattedValuer
+		} else {
+			oldMeta.FormattedValuer = oldMeta.Meta.FormattedValuer
+		}
+
+		if meta.Resource != nil {
+			oldMeta.Resource = meta.Resource
+		}
+
+		if meta.Permission != nil {
+			oldMeta.Permission = meta.Permission
+		}
+
+		if meta.Config != nil {
+			oldMeta.Config = meta.Config
+		}
+
+		if meta.Collection != nil {
+			oldMeta.Collection = meta.Collection
+		}
+		meta = oldMeta
+	} else {
+		res.Metas = append(res.Metas, meta)
+		meta.baseResource = res
 	}
-	res.Metas = append(res.Metas, meta)
-	meta.baseResource = res
+
 	meta.updateMeta()
 	return meta
 }

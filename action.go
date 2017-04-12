@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"path"
 	"reflect"
 	"strings"
 
@@ -10,7 +11,50 @@ import (
 )
 
 // Action register action for qor resource
-func (res *Resource) Action(action *Action) {
+func (res *Resource) Action(action *Action) *Action {
+	for _, a := range res.Actions {
+		if a.Name == action.Name {
+			if action.Label != "" {
+				a.Label = action.Label
+			}
+
+			if action.Method != "" {
+				a.Method = action.Method
+			}
+
+			if action.URL != nil {
+				a.URL = action.URL
+			}
+
+			if action.URLOpenType != "" {
+				a.URLOpenType = action.URLOpenType
+			}
+
+			if action.Visible != nil {
+				a.Visible = action.Visible
+			}
+
+			if action.Handle != nil {
+				a.Handle = action.Handle
+			}
+
+			if len(action.Modes) != 0 {
+				a.Modes = action.Modes
+			}
+
+			if action.Resource != nil {
+				a.Resource = action.Resource
+			}
+
+			if action.Permission != nil {
+				a.Permission = action.Permission
+			}
+
+			*action = *a
+			return a
+		}
+	}
+
 	if action.Label == "" {
 		action.Label = utils.HumanizeString(action.Name)
 	}
@@ -32,8 +76,25 @@ func (res *Resource) Action(action *Action) {
 	}
 
 	res.Actions = append(res.Actions, action)
+
+	// Register Actions into Router
+	if !res.Config.Invisible {
+		actionController := &Controller{Admin: res.GetAdmin(), action: action}
+		primaryKeyParams := res.ParamIDName()
+
+		// Bulk actions
+		res.RegisterRoute("GET", path.Join("!action", action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+		res.RegisterRoute("PUT", path.Join("!action", action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+
+		// Resource action
+		res.RegisterRoute("GET", path.Join(primaryKeyParams, action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+		res.RegisterRoute("PUT", path.Join(primaryKeyParams, action.ToParam()), actionController.Action, &RouteConfig{Permissioner: action, PermissionMode: roles.Update})
+	}
+
+	return action
 }
 
+// GetAction get defined action
 func (res *Resource) GetAction(name string) *Action {
 	for _, action := range res.Actions {
 		if action.Name == name {
