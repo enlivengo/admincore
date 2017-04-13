@@ -37,8 +37,6 @@
         let key,
             value = data[names[0].slice(1)];
 
-        console.log(data);
-
         if (names.length > 1) {
             for (let i = 1; i < names.length; i++) {
                 key = names[i].slice(1);
@@ -107,8 +105,6 @@
             if ($hiddenInput.length) {
                 inputData = `${inputData}&${$hiddenInput.serialize()}`;
             }
-
-            console.log(inputData);
 
             if (names.length) {
 
