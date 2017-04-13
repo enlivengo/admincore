@@ -196,19 +196,9 @@ func (admin *Admin) NewServeMux(prefix string) http.Handler {
 // RegisterResourceRouters register resource to router
 func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 	var (
-		param            = res.ToParam()
 		primaryKeyParams = res.ParamIDName()
 		adminController  = &Controller{Admin: admin}
 	)
-
-	r := res
-	for r.ParentResource != nil {
-		// don't register same resource as nested routes
-		if r.ParentResource.ToParam() == param {
-			return
-		}
-		r = r.ParentResource
-	}
 
 	for _, action := range actions {
 		switch strings.ToLower(action) {
@@ -254,10 +244,26 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 		}
 	}
 
+	isValidSubResource := func(r *Resource) bool {
+		if r == nil || r.ParentResource == nil {
+			return false
+		}
+
+		modelType := utils.ModelType(r.Value)
+		for r.ParentResource != nil {
+			// don't register same resource as nested routes
+			if utils.ModelType(r.ParentResource.Value) == modelType {
+				return false
+			}
+			r = r.ParentResource
+		}
+		return true
+	}
+
 	// Register Sub Resources
 	if len(res.PrimaryFields) > 0 {
 		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
 				if len(meta.Resource.newSections) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "create")
 				}
@@ -265,7 +271,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 		}
 
 		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
 				if len(meta.Resource.showSections) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "read")
 				}
@@ -273,7 +279,7 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 		}
 
 		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
-			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && meta.Resource.ParentResource != nil {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
 				if len(meta.Resource.editSections) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "update", "delete")
 				}
