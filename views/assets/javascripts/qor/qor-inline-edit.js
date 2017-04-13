@@ -34,13 +34,15 @@
     }
 
     function getJsonData(names, data) {
-        let key = '',
+        let key,
             value = data[names[0].slice(1)];
+
+        console.log(data);
 
         if (names.length > 1) {
             for (let i = 1; i < names.length; i++) {
                 key = names[i].slice(1);
-                value = value[key];
+                value = $.isArray(value) ? value[0][key] : value[key];
             }
         }
 
@@ -97,11 +99,18 @@
             let $btn = $(this),
                 $parent = $btn.closest(CLASS_FIELD),
                 $form = $btn.closest('form'),
+                $hiddenInput = $parent.closest('.qor-fieldset').find('input.qor-hidden__primary_key[type="hidden"]'),
                 $input = $parent.find('input[name*="QorResource"],textarea[name*="QorResource"],select[name*="QorResource"]'),
                 names = $input.length && $input.prop('name').match(/\.\w+/g),
                 inputData = $input.serialize();
 
-            if (names.length)
+            if ($hiddenInput.length) {
+                inputData = `${inputData}&${$hiddenInput.serialize()}`;
+            }
+
+            console.log(inputData);
+
+            if (names.length) {
 
                 $.ajax($form.prop('action'), {
                     method: $form.prop('method'),
@@ -122,6 +131,7 @@
                         $btn.prop('disabled', false);
                     }
                 });
+            }
         },
 
         destroy: function() {
