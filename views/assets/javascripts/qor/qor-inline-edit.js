@@ -107,13 +107,14 @@
                     method: $form.prop('method'),
                     data: inputData,
                     dataType: 'json',
-                    processData: false,
-                    contentType: false,
                     beforeSend: function() {
                         $btn.prop('disabled', true);
                     },
                     success: function(data) {
                         let newValue = getJsonData(names, data);
+
+                        console.log(data);
+                        console.log(newValue);
 
                         $parent.removeClass(CLASS_CONTAINER).find(CLASS_FIELD_SHOW).html(newValue);
                         $parent.find(CLASS_BUTTONS).remove();
