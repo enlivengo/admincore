@@ -113,9 +113,6 @@
                     success: function(data) {
                         let newValue = getJsonData(names, data);
 
-                        console.log(data);
-                        console.log(newValue);
-
                         $parent.removeClass(CLASS_CONTAINER).find(CLASS_FIELD_SHOW).html(newValue);
                         $parent.find(CLASS_BUTTONS).remove();
                         $btn.prop('disabled', false);
