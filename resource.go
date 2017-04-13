@@ -436,7 +436,7 @@ Attrs:
 			meta = &Meta{Name: attr, baseResource: res}
 			for _, primaryField := range res.PrimaryFields {
 				if attr == primaryField.Name {
-					meta.Type = "hidden"
+					meta.Type = "hidden_primary_key"
 					break
 				}
 			}
@@ -468,7 +468,7 @@ func (res *Resource) GetMetaOrNew(name string) *Meta {
 	if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
 		meta := &Meta{Name: name, baseResource: res}
 		if field.IsPrimaryKey {
-			meta.Type = "hidden"
+			meta.Type = "hidden_primary_key"
 		}
 		meta.updateMeta()
 		res.Metas = append(res.Metas, meta)
