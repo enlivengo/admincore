@@ -66,34 +66,3 @@ $.fn.select2.ajaxFormatResult = function(data, tmpl) {
     }
     return result;
 };
-
-window.QOR.qorConfirm = function(message, resultCallback) {
-    let dialogHtml = `<div id="dialog"><div class="mdl-dialog-bg"></div><div class="mdl-dialog">
-                        <div class="mdl-dialog__content">
-                          <p><i class="material-icons">warning</i></p>
-                          <p class="mdl-dialog__message">
-                            ${message}
-                          </p>
-                        </div>
-                        <div class="mdl-dialog__actions">
-                          <button type="button" class="mdl-button mdl-button--raised mdl-button--colored dialog-button" data-type="confirm">Confirm</button>
-                          <button type="button" class="mdl-button dialog-button" data-type="">Cancel</button>
-                        </div>
-                      </div></div>`,
-        $dialog = $(dialogHtml);
-
-    $('#dialog').remove();
-    $dialog.appendTo($('body'));
-
-    $(document)
-        .off('click', '.dialog-button')
-        .on('click', '.dialog-button', function() {
-            let value = $(this).data('type');
-            $.isFunction(resultCallback) && resultCallback(value);
-            $('#dialog').remove();
-            return false;
-        });
-
-    return false;
-
-};
