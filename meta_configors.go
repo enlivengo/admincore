@@ -93,14 +93,18 @@ var metaConfigorMaps = map[string]func(*Meta){
 	},
 
 	"select_one": func(meta *Meta) {
-		if _, ok := meta.Config.(*SelectOneConfig); !ok || meta.Config == nil {
+		if metaConfig, ok := meta.Config.(*SelectOneConfig); !ok || metaConfig == nil {
 			meta.Config = &SelectOneConfig{Collection: meta.Collection}
+		} else if meta.Collection != nil {
+			metaConfig.Collection = meta.Collection
 		}
 	},
 
 	"select_many": func(meta *Meta) {
-		if _, ok := meta.Config.(*SelectManyConfig); !ok || meta.Config == nil {
+		if metaConfig, ok := meta.Config.(*SelectManyConfig); !ok || metaConfig == nil {
 			meta.Config = &SelectManyConfig{Collection: meta.Collection}
+		} else if meta.Collection != nil {
+			metaConfig.Collection = meta.Collection
 		}
 	},
 
