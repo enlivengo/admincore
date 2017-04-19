@@ -42,6 +42,7 @@ func (res *Resource) Meta(meta *Meta) *Meta {
 	if oldMeta := res.GetMeta(meta.Name); oldMeta != nil {
 		if meta.Type != "" {
 			oldMeta.Type = meta.Type
+			oldMeta.Config = nil
 		}
 
 		if meta.Label != "" {
