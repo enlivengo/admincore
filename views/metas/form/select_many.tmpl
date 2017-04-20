@@ -4,9 +4,9 @@
   </label>
 
   {{$current_values := (raw_value_of .ResourceValue .Meta)}}
-  <div class="qor-field__show">
+  <div class="qor-field__show qor-field__selectmany-show">
     {{range $value := $current_values}}
-      {{stringify $value}}
+      <span>{{stringify $value}}</span>
     {{end}}
   </div>
 

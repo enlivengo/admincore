@@ -41,7 +41,11 @@ func (selectOneConfig SelectOneConfig) GetTemplate(context *Context, metaType st
 }
 
 // GetCollection get collections from select one meta
-func (selectOneConfig SelectOneConfig) GetCollection(value interface{}, context *Context) [][]string {
+func (selectOneConfig *SelectOneConfig) GetCollection(value interface{}, context *Context) [][]string {
+	if selectOneConfig.getCollection == nil {
+		selectOneConfig.prepareDataSource(nil, nil, "!remote_data_selector")
+	}
+
 	if selectOneConfig.getCollection != nil {
 		return selectOneConfig.getCollection(value, context)
 	}
@@ -131,7 +135,7 @@ func (selectOneConfig *SelectOneConfig) prepareDataSource(field *gorm.StructFiel
 
 	// Set GetCollection if normal select mode
 	if selectOneConfig.getCollection == nil {
-		if selectOneConfig.RemoteDataResource == nil {
+		if selectOneConfig.RemoteDataResource == nil && field != nil {
 			fieldType := field.Struct.Type
 			for fieldType.Kind() == reflect.Ptr || fieldType.Kind() == reflect.Slice {
 				fieldType = fieldType.Elem()
@@ -163,7 +167,7 @@ func (selectOneConfig *SelectOneConfig) prepareDataSource(field *gorm.StructFiel
 		}
 	}
 
-	if selectOneConfig.SelectMode == "select_async" || selectOneConfig.SelectMode == "bottom_sheet" {
+	if res != nil && (selectOneConfig.SelectMode == "select_async" || selectOneConfig.SelectMode == "bottom_sheet") {
 		if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
 			if remoteDataResource.params == "" {
 				remoteDataResource.params = path.Join(routePrefix, res.ToParam(), field.Name)

@@ -93,32 +93,43 @@ var metaConfigorMaps = map[string]func(*Meta){
 	},
 
 	"select_one": func(meta *Meta) {
-		if _, ok := meta.Config.(*SelectOneConfig); !ok || meta.Config == nil {
+		if metaConfig, ok := meta.Config.(*SelectOneConfig); !ok || metaConfig == nil {
 			meta.Config = &SelectOneConfig{Collection: meta.Collection}
+			meta.Config.ConfigureQorMeta(meta)
+		} else if meta.Collection != nil {
+			metaConfig.Collection = meta.Collection
+			meta.Config.ConfigureQorMeta(meta)
 		}
 	},
 
 	"select_many": func(meta *Meta) {
-		if _, ok := meta.Config.(*SelectManyConfig); !ok || meta.Config == nil {
+		if metaConfig, ok := meta.Config.(*SelectManyConfig); !ok || metaConfig == nil {
 			meta.Config = &SelectManyConfig{Collection: meta.Collection}
+			meta.Config.ConfigureQorMeta(meta)
+		} else if meta.Collection != nil {
+			metaConfig.Collection = meta.Collection
+			meta.Config.ConfigureQorMeta(meta)
 		}
 	},
 
 	"single_edit": func(meta *Meta) {
 		if _, ok := meta.Config.(*SingleEditConfig); !ok || meta.Config == nil {
 			meta.Config = &SingleEditConfig{}
+			meta.Config.ConfigureQorMeta(meta)
 		}
 	},
 
 	"collection_edit": func(meta *Meta) {
 		if _, ok := meta.Config.(*CollectionEditConfig); !ok || meta.Config == nil {
 			meta.Config = &CollectionEditConfig{}
+			meta.Config.ConfigureQorMeta(meta)
 		}
 	},
 
 	"rich_editor": func(meta *Meta) {
 		if _, ok := meta.Config.(*RichEditorConfig); !ok || meta.Config == nil {
 			meta.Config = &RichEditorConfig{}
+			meta.Config.ConfigureQorMeta(meta)
 		}
 	},
 }
