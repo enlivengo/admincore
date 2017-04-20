@@ -5,7 +5,9 @@
   </div>
 {{end}}
 
-<div class="qor-page__body qor-page__show" data-toggle="qor.inlineEdit">
+<div class="qor-page__body qor-page__show" data-toggle="qor.inlineEdit"
+      data-button-save="{{t "qor_admin.showpage.inlineedit.button.save" "save"}}"
+      data-button-cancel="{{t "qor_admin.showpage.inlineedit.button.cancel_edit" "cancel edit"}}">
   {{render "shared/flashes"}}
   {{render "shared/errors"}}
 

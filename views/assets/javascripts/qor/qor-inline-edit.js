@@ -51,6 +51,14 @@
         constructor: QorInlineEdit,
 
         init: function() {
+            let $element = this.$element,
+                saveButton = $element.data('button-save'),
+                cancelButton = $element.data('button-cancel');
+
+            this.TEMPLATE_SAVE = `<div class="qor-inlineedit__buttons">
+                                        <button class="mdl-button mdl-button--colored mdl-js-button qor-button--small qor-inlineedit__cancel" type="button">${cancelButton}</button>
+                                        <button class="mdl-button mdl-button--colored mdl-js-button qor-button--small qor-inlineedit__save" type="button">${saveButton}</button>
+                                      </div>`;
             this.bind();
         },
 
@@ -60,7 +68,7 @@
                 .on(EVENT_MOUSELEAVE, CLASS_FIELD_SHOW, this.hideEditButton)
                 .on(EVENT_CLICK, CLASS_CANCEL, this.hideEdit)
                 .on(EVENT_CLICK, CLASS_SAVE, this.saveEdit)
-                .on(EVENT_CLICK, CLASS_EDIT, this.showEdit);
+                .on(EVENT_CLICK, CLASS_EDIT, this.showEdit.bind(this));
         },
 
         unbind: function() {
@@ -81,9 +89,9 @@
             $('.qor-inlineedit__edit').remove();
         },
 
-        showEdit: function() {
-            let $parent = $(this).hide().closest(CLASS_FIELD).addClass(CLASS_CONTAINER),
-                $save = $(QorInlineEdit.TEMPLATE_SAVE);
+        showEdit: function(e) {
+            let $parent = $(e.target).closest(CLASS_EDIT).hide().closest(CLASS_FIELD).addClass(CLASS_CONTAINER),
+                $save = $(this.TEMPLATE_SAVE);
 
             $save.appendTo($parent);
         },
@@ -139,10 +147,6 @@
     QorInlineEdit.DEFAULTS = {};
 
     QorInlineEdit.TEMPLATE_EDIT = `<button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored qor-inlineedit__edit" type="button"><i class="material-icons">mode_edit</i></button>`;
-    QorInlineEdit.TEMPLATE_SAVE = `<div class="qor-inlineedit__buttons">
-                                    <button class="mdl-button mdl-button--colored mdl-js-button qor-button--small qor-inlineedit__cancel" type="button">cancel edit</button>
-                                    <button class="mdl-button mdl-button--colored mdl-js-button qor-button--small qor-inlineedit__save" type="button">save</button>
-                                    </div>`;
 
     QorInlineEdit.plugin = function(options) {
         return this.each(function() {

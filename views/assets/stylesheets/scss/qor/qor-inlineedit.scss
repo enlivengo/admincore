@@ -41,6 +41,13 @@
         padding: 16px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
         margin-bottom: 16px;
+        .redactor-box {
+            box-shadow: none;
+            border: 1px solid rgba(0, 0, 0, .1);
+            .redactor-toolbar {
+                background-color: rgba(0, 0, 0, .02);
+            }
+        }
         .qor-field__show {
             display: none !important;
         }
@@ -69,9 +76,18 @@
         margin-top: -10px;
         text-align: right;
     }
-    .qor-fieldset-container {
-        .qor-fieldset__add {
-            display: block;
+    .qor-field__selectmany-show {
+        >span {
+            display: inline-block;
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 0 6px 6px 0;
+            font-size: 12px;
+            line-height: 1;
+            vertical-align: top;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e1e2;
+            border-radius: 2px;
         }
     }
     [data-toggle="qor.variations"] {
@@ -90,6 +106,10 @@
         }
     }
     [data-toggle="qor.mediabox"] {
+        [data-mediabox-url],
+        .qor-cropper__toggle {
+            display: none;
+        }
         .qor-field__edit {
             display: block;
         }
