@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -32,11 +33,6 @@ type Encoding struct {
 	Decoders map[string][]DecoderInterface
 }
 
-type EncodingInterface interface {
-	EncoderInterface
-	DecoderInterface
-}
-
 func (encoding *Encoding) RegisterEncoding(format string, encodings ...interface{}) error {
 	for _, e := range encodings {
 		valid := false
@@ -57,10 +53,6 @@ func (encoding *Encoding) RegisterEncoding(format string, encodings ...interface
 	}
 
 	return nil
-}
-
-func (encoding *Encoding) RegisterDecoder(encoder DecoderInterface) {
-	encoding.Decoders = append(encoding.Decoders, encoder)
 }
 
 type EncoderInterface interface {
@@ -110,15 +102,20 @@ func (encoding *Encoding) Decode(writer io.Writer, decoder Decoder) error {
 	return ErrUnsupportedDecoder
 }
 
-func getAcceptMimeTypes(request *http.Request) (results []string) {
-	if types, err := mime.ExtensionsByType(request.Header.Get("Accept")); err == nil {
-		return types
+func getFormats(request *http.Request) (formats []string) {
+	if format := path.Ext(encoder.Context.Request.URL.Path); format != "" {
+		formats = append(formats, format)
+	}
+
+	if extensions, err := mime.ExtensionsByType(request.Header.Get("Accept")); err == nil {
+		formats = append(formats, extensions...)
 	} else {
 		for _, accept := range strings.FieldsFunc(request.Header.Get("Accept"), func(s rune) bool { return string(s) == "," || string(s) == ";" }) {
-			if types, err := mime.ExtensionsByType(accept); err == nil {
-				results = append(results, types...)
+			if extensions, err := mime.ExtensionsByType(accept); err == nil {
+				formats = append(formats, extensions...)
 			}
 		}
 	}
+
 	return
 }
