@@ -216,13 +216,6 @@ func (context *Context) JSON(action string, result interface{}) {
 	}
 }
 
-// XML generate xml outputs for action
-func (context *Context) XML(action string, result interface{}) {
-	if context.Encode(action, result) == nil {
-		context.Writer.Header().Set("Content-Type", "application/xml")
-	}
-}
-
 func (context *Context) Encode(action string, result interface{}) error {
 	if action == "show" && !context.Resource.isSetShowAttrs {
 		action = "edit"
