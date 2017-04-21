@@ -21,7 +21,7 @@ type Admin struct {
 	I18n     I18n
 	AssetFS  AssetFSInterface
 	Auth     Auth
-	*Encoding
+	*Transformer
 
 	menus            []*Menu
 	resources        []*Resource
@@ -43,7 +43,7 @@ func New(config *qor.Config) *Admin {
 		funcMaps:         make(template.FuncMap),
 		router:           newRouter(),
 		metaConfigorMaps: metaConfigorMaps,
-		Encoding:         DefaultEncoding,
+		Transformer:      DefaultTransformer,
 	}
 
 	admin.SetAssetFS(&AssetFileSystem{})

@@ -16,37 +16,38 @@ var (
 	ErrUnsupportedDecoder = errors.New("unsupported decoder")
 )
 
-// DefaultEncoding  admin default encoding
-var DefaultEncoding = &Encoding{
+// DefaultTransformer registered encoders, decoders for admin
+var DefaultTransformer = &Transformer{
 	Encoders: map[string][]EncoderInterface{},
 	Decoders: map[string][]DecoderInterface{},
 }
 
 func init() {
-	DefaultEncoding.RegisterEncoding("xml", &XMLEncoding{})
-	DefaultEncoding.RegisterEncoding("json", &JSONEncoding{})
+	DefaultTransformer.RegisterTransformer("xml", &XMLEncoding{})
+	DefaultTransformer.RegisterTransformer("json", &JSONEncoding{})
 }
 
-// Encoding encoder & decoder
-type Encoding struct {
+// Transformer encoder & decoder transformer
+type Transformer struct {
 	Encoders map[string][]EncoderInterface
 	Decoders map[string][]DecoderInterface
 }
 
-func (encoding *Encoding) RegisterEncoding(format string, encodings ...interface{}) error {
+// RegisterEncoding register transformers
+func (transformer *Transformer) RegisterTransformer(format string, transformers ...interface{}) error {
 	format = "." + strings.TrimPrefix(format, ".")
 
-	for _, e := range encodings {
+	for _, e := range transformers {
 		valid := false
 
 		if encoder, ok := e.(EncoderInterface); ok {
 			valid = true
-			encoding.Encoders[format] = append(encoding.Encoders[format], encoder)
+			transformer.Encoders[format] = append(transformer.Encoders[format], encoder)
 		}
 
 		if decoder, ok := e.(DecoderInterface); ok {
 			valid = true
-			encoding.Decoders[format] = append(encoding.Decoders[format], decoder)
+			transformer.Decoders[format] = append(transformer.Decoders[format], decoder)
 		}
 
 		if !valid {
@@ -69,9 +70,9 @@ type Encoder struct {
 	Result   interface{}
 }
 
-func (encoding *Encoding) Encode(writer io.Writer, encoder Encoder) error {
+func (transformer *Transformer) Encode(writer io.Writer, encoder Encoder) error {
 	for _, format := range getFormats(encoder.Context.Request) {
-		if encoders, ok := encoding.Encoders[format]; ok {
+		if encoders, ok := transformer.Encoders[format]; ok {
 			for _, e := range encoders {
 				if e.CouldEncode(encoder) {
 					if err := e.Encode(writer, encoder); err != ErrUnsupportedEncoder {
@@ -97,9 +98,9 @@ type Decoder struct {
 	Result   interface{}
 }
 
-func (encoding *Encoding) Decode(writer io.Writer, decoder Decoder) error {
+func (transformer *Transformer) Decode(writer io.Writer, decoder Decoder) error {
 	for _, format := range getFormats(decoder.Context.Request) {
-		if decoders, ok := encoding.Decoders[format]; ok {
+		if decoders, ok := transformer.Decoders[format]; ok {
 			for _, d := range decoders {
 				if d.CouldDecode(decoder) {
 					if err := d.Decode(writer, decoder); err != ErrUnsupportedDecoder {
