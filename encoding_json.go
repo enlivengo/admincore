@@ -9,13 +9,16 @@ import (
 	"github.com/qor/roles"
 )
 
-type JSONEncoding struct{}
+// JSONTransformer json transformer
+type JSONTransformer struct{}
 
-func (JSONEncoding) CouldEncode(encoder Encoder) bool {
+// CouldEncode check if encodable
+func (JSONTransformer) CouldEncode(encoder Encoder) bool {
 	return true
 }
 
-func (JSONEncoding) Encode(writer io.Writer, encoder Encoder) error {
+// Encode encode encoder to writer as JSON
+func (JSONTransformer) Encode(writer io.Writer, encoder Encoder) error {
 	var res *Resource
 	var context = encoder.Context
 

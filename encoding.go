@@ -23,8 +23,8 @@ var DefaultTransformer = &Transformer{
 }
 
 func init() {
-	DefaultTransformer.RegisterTransformer("xml", &XMLEncoding{})
-	DefaultTransformer.RegisterTransformer("json", &JSONEncoding{})
+	DefaultTransformer.RegisterTransformer("xml", &XMLTransformer{})
+	DefaultTransformer.RegisterTransformer("json", &JSONTransformer{})
 }
 
 // Transformer encoder & decoder transformer
@@ -33,7 +33,7 @@ type Transformer struct {
 	Decoders map[string][]DecoderInterface
 }
 
-// RegisterEncoding register transformers
+// RegisterTransformer register transformers for encode, decode
 func (transformer *Transformer) RegisterTransformer(format string, transformers ...interface{}) error {
 	format = "." + strings.TrimPrefix(format, ".")
 
@@ -58,11 +58,13 @@ func (transformer *Transformer) RegisterTransformer(format string, transformers 
 	return nil
 }
 
+// EncoderInterface encoder interface
 type EncoderInterface interface {
 	CouldEncode(Encoder) bool
 	Encode(writer io.Writer, encoder Encoder) error
 }
 
+// Encoder encoder struct used for encode
 type Encoder struct {
 	Action   string
 	Resource *Resource
@@ -70,6 +72,7 @@ type Encoder struct {
 	Result   interface{}
 }
 
+// Encode encode data based on request accept type
 func (transformer *Transformer) Encode(writer io.Writer, encoder Encoder) error {
 	for _, format := range getFormats(encoder.Context.Request) {
 		if encoders, ok := transformer.Encoders[format]; ok {
@@ -86,11 +89,13 @@ func (transformer *Transformer) Encode(writer io.Writer, encoder Encoder) error 
 	return ErrUnsupportedEncoder
 }
 
+// DecoderInterface decoder interface
 type DecoderInterface interface {
 	CouldDecode(Decoder) bool
 	Decode(writer io.Writer, decoder Decoder) error
 }
 
+// Decoder decoder struct used for decode
 type Decoder struct {
 	Action   string
 	Resource *Resource
@@ -98,6 +103,7 @@ type Decoder struct {
 	Result   interface{}
 }
 
+// Decode decode data based on request content type #FIXME
 func (transformer *Transformer) Decode(writer io.Writer, decoder Decoder) error {
 	for _, format := range getFormats(decoder.Context.Request) {
 		if decoders, ok := transformer.Decoders[format]; ok {
