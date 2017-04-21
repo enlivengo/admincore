@@ -34,6 +34,8 @@ type Encoding struct {
 }
 
 func (encoding *Encoding) RegisterEncoding(format string, encodings ...interface{}) error {
+	format = "." + strings.TrimPrefix(format, ".")
+
 	for _, e := range encodings {
 		valid := false
 
@@ -68,13 +70,18 @@ type Encoder struct {
 }
 
 func (encoding *Encoding) Encode(writer io.Writer, encoder Encoder) error {
-	for _, f := range encoding.Encoders {
-		if f.CouldEncode(encoder) {
-			if err := f.Encode(writer, encoder); err != ErrUnsupportedEncoder {
-				return err
+	for _, format := range getFormats(encoder.Context.Request) {
+		if encoders, ok := encoding.Encoders[format]; ok {
+			for _, e := range encoders {
+				if e.CouldEncode(encoder) {
+					if err := e.Encode(writer, encoder); err != ErrUnsupportedEncoder {
+						return err
+					}
+				}
 			}
 		}
 	}
+
 	return ErrUnsupportedEncoder
 }
 
@@ -91,10 +98,14 @@ type Decoder struct {
 }
 
 func (encoding *Encoding) Decode(writer io.Writer, decoder Decoder) error {
-	for _, d := range encoding.Decoders {
-		if d.CouldDecode(decoder) {
-			if err := d.Decode(writer, decoder); err != ErrUnsupportedDecoder {
-				return err
+	for _, format := range getFormats(decoder.Context.Request) {
+		if decoders, ok := encoding.Decoders[format]; ok {
+			for _, d := range decoders {
+				if d.CouldDecode(decoder) {
+					if err := d.Decode(writer, decoder); err != ErrUnsupportedDecoder {
+						return err
+					}
+				}
 			}
 		}
 	}
@@ -103,7 +114,7 @@ func (encoding *Encoding) Decode(writer io.Writer, decoder Decoder) error {
 }
 
 func getFormats(request *http.Request) (formats []string) {
-	if format := path.Ext(encoder.Context.Request.URL.Path); format != "" {
+	if format := path.Ext(request.URL.Path); format != "" {
 		formats = append(formats, format)
 	}
 

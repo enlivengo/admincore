@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"path"
 	"reflect"
 
 	"github.com/qor/roles"
@@ -13,19 +12,7 @@ import (
 type JSONEncoding struct{}
 
 func (JSONEncoding) CouldEncode(encoder Encoder) bool {
-	if encoder.Context != nil && encoder.Context.Request != nil {
-		if path.Ext(encoder.Context.Request.URL.Path) == ".json" {
-			return true
-		}
-
-		for _, typ := range getAcceptMimeTypes(encoder.Context.Request) {
-			if typ == ".json" {
-				return true
-			}
-		}
-	}
-
-	return false
+	return true
 }
 
 func (JSONEncoding) Encode(writer io.Writer, encoder Encoder) error {
