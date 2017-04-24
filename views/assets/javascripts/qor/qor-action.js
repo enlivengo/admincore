@@ -205,88 +205,86 @@
             }
 
             if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
-                if (window.confirm(properties.confirm)) {
-                    properties = $.extend({}, properties, {
-                        _method: properties.method
-                    });
+                window.QOR.qorConfirm(properties, function(confirm) {
+                    if (confirm) {
+                        properties = $.extend({}, properties, {
+                            _method: properties.method
+                        });
 
-                    $.post(properties.url, properties, function() {
-                        window.location.reload();
-                    });
-
-                    return;
-
-                } else {
-                    return;
-                }
-            }
-
-            if (properties.confirm && !window.confirm(properties.confirm)) {
-                return;
-            }
-
-            if (isUndo) {
-                url = properties.undoUrl;
-            }
-
-            $.ajax(url, {
-                method: properties.method,
-                data: ajaxForm.formData,
-                dataType: properties.datatype,
-                beforeSend: function() {
-                    if (undoUrl) {
-                        $actionButton.prop('disabled', true);
-                    } else if (needDisableButtons) {
-                        _this.switchButtons($element, 1);
+                        $.post(properties.url, properties, function() {
+                            window.location.reload();
+                        });
+                    } else {
+                        return;
                     }
-                },
-                success: function(data, status, response) {
-                    var contentType = response.getResponseHeader("content-type");
+                });
 
-                    // handle file download from form submit
-                    var disposition = response.getResponseHeader('Content-Disposition');
-                    if (disposition && disposition.indexOf('attachment') !== -1) {
-                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
-                            matches = filenameRegex.exec(disposition),
-                            filename = '';
+            } else {
 
-                        if (matches != null && matches[1]) {
-                            filename = matches[1].replace(/['"]/g, '');
+                if (isUndo) {
+                    url = properties.undoUrl;
+                }
+
+                $.ajax(url, {
+                    method: properties.method,
+                    data: ajaxForm.formData,
+                    dataType: properties.datatype,
+                    beforeSend: function() {
+                        if (undoUrl) {
+                            $actionButton.prop('disabled', true);
+                        } else if (needDisableButtons) {
+                            _this.switchButtons($element, 1);
+                        }
+                    },
+                    success: function(data, status, response) {
+                        var contentType = response.getResponseHeader("content-type");
+
+                        // handle file download from form submit
+                        var disposition = response.getResponseHeader('Content-Disposition');
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+                                matches = filenameRegex.exec(disposition),
+                                filename = '';
+
+                            if (matches != null && matches[1]) {
+                                filename = matches[1].replace(/['"]/g, '');
+                            }
+
+                            $.fn.qorAjaxHandleFile(url, contentType, filename, ajaxForm.formData);
+
+                            return;
                         }
 
-                        $.fn.qorAjaxHandleFile(url, contentType, filename, ajaxForm.formData);
+                        // has undo action
+                        if (undoUrl) {
+                            $element.triggerHandler(EVENT_UNDO, [$actionButton, isUndo, data]);
+                            isUndo ? $actionButton.removeClass(CLASS_IS_UNDO) : $actionButton.addClass(CLASS_IS_UNDO);
+                            $actionButton.prop('disabled', false);
+                            return;
+                        }
 
-                        return;
+                        if (contentType.indexOf('json') > -1) {
+                            // render notification
+                            $('.qor-alert').remove();
+                            needDisableButtons && _this.switchButtons($element);
+                            isInSlideout ? $parent = $(QOR_SLIDEOUT) : $parent = $(MDL_BODY);
+                            $parent.find(ACTION_BODY).prepend(_this.renderFlashMessage(data));
+                        } else {
+                            // properties.fromIndex || properties.fromMenu
+                            window.location.reload();
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        if (undoUrl) {
+                            $actionButton.prop('disabled', false);
+                        } else if (needDisableButtons) {
+                            _this.switchButtons($element);
+                        }
+                        window.alert([textStatus, errorThrown].join(': '));
                     }
+                });
 
-                    // has undo action
-                    if (undoUrl) {
-                        $element.triggerHandler(EVENT_UNDO, [$actionButton, isUndo, data]);
-                        isUndo ? $actionButton.removeClass(CLASS_IS_UNDO) : $actionButton.addClass(CLASS_IS_UNDO);
-                        $actionButton.prop('disabled', false);
-                        return;
-                    }
-
-                    if (contentType.indexOf('json') > -1) {
-                        // render notification
-                        $('.qor-alert').remove();
-                        needDisableButtons && _this.switchButtons($element);
-                        isInSlideout ? $parent = $(QOR_SLIDEOUT) : $parent = $(MDL_BODY);
-                        $parent.find(ACTION_BODY).prepend(_this.renderFlashMessage(data));
-                    } else {
-                        // properties.fromIndex || properties.fromMenu
-                        window.location.reload();
-                    }
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    if (undoUrl) {
-                        $actionButton.prop('disabled', false);
-                    } else if (needDisableButtons) {
-                        _this.switchButtons($element);
-                    }
-                    window.alert([textStatus, errorThrown].join(': '));
-                }
-            });
+            }
         },
 
         switchButtons: function($element, disbale) {
@@ -362,7 +360,6 @@
         }
 
     };
-
     QorAction.FLASHMESSAGETMPL = (
         '<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">' +
         '<button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">' +

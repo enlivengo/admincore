@@ -175,7 +175,8 @@
 
         keyup: function(e) {
             if (e.which === 27) {
-                if ($('.qor-bottomsheets').is(':visible') || $('.qor-modal').is(':visible') || $('#redactor-modal-box').length) {
+
+                if ($('.qor-bottomsheets').is(':visible') || $('.qor-modal').is(':visible') || $('#redactor-modal-box').length || $('#dialog').is(':visible')) {
                     return;
                 }
 
@@ -503,10 +504,17 @@
 
         hide: function() {
 
+            let _this = this,
+                message = {
+                    confirm: 'You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes. Are you sure you want to close the slideout?'
+                };
+
             if ($.fn.qorSlideoutBeforeHide) {
-                if (window.confirm('You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes!')) {
-                    this.hideSlideout();
-                }
+                window.QOR.qorConfirm(message, function(confirm) {
+                    if (confirm) {
+                        _this.hideSlideout();
+                    }
+                });
             } else {
                 this.hideSlideout();
             }
