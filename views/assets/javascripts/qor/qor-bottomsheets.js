@@ -410,16 +410,16 @@
                     // handle file download from form submit
                     var disposition = jqXHR.getResponseHeader('Content-Disposition');
                     if (disposition && disposition.indexOf('attachment') !== -1) {
-                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
-                            matches = filenameRegex.exec(disposition),
+                        var fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+                            matches = fileNameRegex.exec(disposition),
                             contentType = jqXHR.getResponseHeader('Content-Type'),
-                            filename = '';
+                            fileName = '';
 
                         if (matches != null && matches[1]) {
-                            filename = matches[1].replace(/['"]/g, '');
+                            fileName = matches[1].replace(/['"]/g, '');
                         }
 
-                        $.fn.qorAjaxHandleFile(url, contentType, filename, formData);
+                        window.QOR.qorAjaxHandleFile(url, contentType, fileName, formData);
 
                         return;
                     }

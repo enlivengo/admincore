@@ -21,6 +21,9 @@ $(function() {
         _ = window._,
         $dialog = $(html).appendTo('body');
 
+
+
+    // ************************************ Refactor window.confirm ************************************
     $(document).on('keyup.qor.confirm', function(e) {
         if (e.which === 27) {
             if ($dialog.is(':visible')) {
@@ -67,4 +70,78 @@ $(function() {
         window.QOR.qorConfirmCallback = callback;
         return false;
     };
+
+    // *******************************************************************************
+
+
+
+
+    // ****************Handle download file from AJAX POST****************************
+    let objectToFormData = function(obj, form, namespace) {
+        let formdata = form || new FormData(),
+            key;
+
+        for (var variable in obj) {
+
+            if (obj.hasOwnProperty(variable) && obj[variable]) {
+                if (namespace) {
+                    key = namespace + '[' + variable + ']';
+                } else {
+                    key = variable;
+                }
+
+            }
+
+            if (obj[variable] instanceof Date) {
+                formdata.append(key, obj[variable].toISOString());
+            } else if (typeof obj[variable] === 'object' && !(obj[variable] instanceof File)) {
+                objectToFormData(obj[variable], formdata, key);
+            } else {
+                formdata.append(key, obj[variable]);
+            }
+
+        }
+
+        return formdata;
+
+    };
+
+    window.QOR.qorAjaxHandleFile = function(url, contentType, fileName, data) {
+        let request = new XMLHttpRequest();
+
+        request.responseType = "arraybuffer";
+        request.open("POST", url, true);
+        request.onload = function() {
+
+            if (this.status === 200) {
+                let blob = new Blob([this.response], {
+                        type: contentType
+                    }),
+                    url = window.URL.createObjectURL(blob),
+                    a = document.createElement("a");
+
+                document.body.appendChild(a);
+                a.href = url;
+                a.download = fileName || "download-" + $.now();
+                a.click();
+            } else {
+                window.alert('server error, please try again!');
+            }
+        };
+
+        if (_.isObject(data)) {
+
+            if (Object.prototype.toString.call(data) != '[object FormData]') {
+                data = objectToFormData(data);
+            }
+
+            request.send(data);
+        }
+
+
+    };
+
+    // *******************************************************************************
+
+
 });

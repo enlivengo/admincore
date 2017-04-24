@@ -228,7 +228,6 @@
                 $.ajax(url, {
                     method: properties.method,
                     data: ajaxForm.formData,
-                    dataType: properties.datatype,
                     beforeSend: function() {
                         if (undoUrl) {
                             $actionButton.prop('disabled', true);
@@ -242,16 +241,22 @@
                         // handle file download from form submit
                         var disposition = response.getResponseHeader('Content-Disposition');
                         if (disposition && disposition.indexOf('attachment') !== -1) {
-                            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
-                                matches = filenameRegex.exec(disposition),
-                                filename = '';
+                            var fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+                                matches = fileNameRegex.exec(disposition),
+                                fileData = {},
+                                fileName = '';
 
                             if (matches != null && matches[1]) {
-                                filename = matches[1].replace(/['"]/g, '');
+                                fileName = matches[1].replace(/['"]/g, '');
                             }
 
-                            $.fn.qorAjaxHandleFile(url, contentType, filename, ajaxForm.formData);
+                            if (properties.method) {
+                                fileData = $.extend({}, ajaxForm.formData, {
+                                    _method: properties.method
+                                });
+                            }
 
+                            window.QOR.qorAjaxHandleFile(url, contentType, fileName, fileData);
                             return;
                         }
 
