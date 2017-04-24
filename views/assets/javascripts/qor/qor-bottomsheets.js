@@ -363,33 +363,6 @@
             });
         },
 
-        formDownloadFile: function(url, contentType, fileName, data) {
-            var request = new XMLHttpRequest();
-
-            request.responseType = "arraybuffer";
-            request.open("POST", url, true);
-            request.onload = function() {
-
-                if (this.status === 200) {
-                    var blob = new Blob([this.response], {
-                        type: contentType
-                    });
-
-                    var url = window.URL.createObjectURL(blob);
-                    var a = document.createElement("a");
-                    document.body.appendChild(a);
-                    a.href = url;
-                    a.download = fileName || "download-" + $.now();
-                    a.click();
-                } else {
-                    // TODO: use custom alert
-                    window.alert('server error, please try again!');
-                }
-            };
-
-            request.send(data);
-        },
-
         submit: function(e) {
             let resourseData = this.resourseData;
             // will ingore submit event if need handle with other submit event: like select one, many...
@@ -446,7 +419,7 @@
                             filename = matches[1].replace(/['"]/g, '');
                         }
 
-                        _this.formDownloadFile(url, contentType, filename, formData);
+                        $.fn.qorAjaxHandleFile(url, contentType, filename, formData);
 
                         return;
                     }
