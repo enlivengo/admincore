@@ -257,6 +257,13 @@
                             }
 
                             window.QOR.qorAjaxHandleFile(url, contentType, fileName, fileData);
+
+                            if (undoUrl) {
+                                $actionButton.prop('disabled', false);
+                            } else {
+                                _this.switchButtons($element);
+                            }
+
                             return;
                         }
 

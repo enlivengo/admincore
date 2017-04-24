@@ -420,6 +420,7 @@
                         }
 
                         window.QOR.qorAjaxHandleFile(url, contentType, fileName, formData);
+                        $submit.prop('disabled', false);
 
                         return;
                     }
