@@ -19,6 +19,7 @@
               data-from-index="true"
               data-error-no-item="{{t "qor_admin.actions.please_select_an_item" "Please select an item"}}"
               data-confirm="{{t "qor_admin.form.are_you_sure" "Are You Sure?"}}"
+              data-confirm-ok="{{t "qor_admin.form.confirm.button.ok" "ok"}}" data-confirm-cancel="{{t "qor_admin.form.confirm.button.cancel" "cancel"}}"
               data-method="{{$action.Method}}"
             {{end}}>
             {{t (printf "%v.actions.%v" $resource.ToParam $action.Label) $action.Label}}

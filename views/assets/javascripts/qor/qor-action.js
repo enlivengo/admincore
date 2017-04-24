@@ -205,7 +205,7 @@
             }
 
             if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
-                window.QOR.qorConfirm(properties.confirm, function(confirm) {
+                window.QOR.qorConfirm(properties, function(confirm) {
                     if (confirm) {
                         properties = $.extend({}, properties, {
                             _method: properties.method
