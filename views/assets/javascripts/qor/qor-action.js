@@ -239,6 +239,22 @@
                     success: function(data, status, response) {
                         var contentType = response.getResponseHeader("content-type");
 
+                        // handle file download from form submit
+                        var disposition = response.getResponseHeader('Content-Disposition');
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+                                matches = filenameRegex.exec(disposition),
+                                filename = '';
+
+                            if (matches != null && matches[1]) {
+                                filename = matches[1].replace(/['"]/g, '');
+                            }
+
+                            $.fn.qorAjaxHandleFile(url, contentType, filename, ajaxForm.formData);
+
+                            return;
+                        }
+
                         // has undo action
                         if (undoUrl) {
                             $element.triggerHandler(EVENT_UNDO, [$actionButton, isUndo, data]);
@@ -344,7 +360,6 @@
         }
 
     };
-
     QorAction.FLASHMESSAGETMPL = (
         '<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">' +
         '<button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">' +
