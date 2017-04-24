@@ -90,7 +90,6 @@ func (ac *Controller) Create(context *Context) {
 			context.Flash(string(context.t("qor_admin.form.successfully_created", "{{.Name}} was successfully created", res)), "success")
 			http.Redirect(context.Writer, context.Request, context.URLFor(result, res), http.StatusFound)
 		}).With([]string{"json", "xml"}, func() {
-			context.Writer.WriteHeader(HTTPUnprocessableEntity)
 			context.Encode("show", result)
 		}).Respond(context.Request)
 	}
