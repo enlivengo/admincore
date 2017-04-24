@@ -18,6 +18,7 @@ $(function() {
                       </div>
                     </div>
                 </div>`,
+        _ = window._,
         $dialog = $(html).appendTo('body');
 
     $(document).on('keyup.qor.confirm', function(e) {
@@ -42,15 +43,26 @@ $(function() {
         let okBtn = $dialog.find('.dialog-ok'),
             cancelBtn = $dialog.find('.dialog-cancel');
 
-        if (data.confirmOk && data.confirmCancel) {
-            okBtn.text(data.confirmOk);
-            cancelBtn.text(data.confirmCancel);
-        } else {
+        if (_.isString(data)) {
+
+            $dialog.find('.dialog-message').text(data);
             okBtn.text('ok');
             cancelBtn.text('cancel');
+
+        } else if (_.isObject(data)) {
+
+            if (data.confirmOk && data.confirmCancel) {
+                okBtn.text(data.confirmOk);
+                cancelBtn.text(data.confirmCancel);
+            } else {
+                okBtn.text('ok');
+                cancelBtn.text('cancel');
+            }
+
+            $dialog.find('.dialog-message').text(data.confirm);
         }
 
-        $dialog.find('.dialog-message').text(data.confirm);
+
         $dialog.show();
         window.QOR.qorConfirmCallback = callback;
         return false;
