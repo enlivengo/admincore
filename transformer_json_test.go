@@ -3,6 +3,7 @@ package admin_test
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/qor/admin"
@@ -23,6 +24,8 @@ func TestJSONTransformerEncode(t *testing.T) {
 	if err := jsonTransformer.Encode(&buffer, encoder); err != nil {
 		t.Errorf("no error should returned when encode object to JSON")
 	}
+
+	fmt.Println(buffer.String())
 }
 
 func TestJSONTransformerEncodeMap(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"github.com/qor/admin"
 )
 
-func TestMarshalMapToXML(t *testing.T) {
+func TestXMLTransformerEncode(t *testing.T) {
 	t.Skip()
 	xmlResult := admin.XMLStruct{
 		Result: map[string]interface{}{"error": errors.New("error message"), "status": map[string]int{"code": 200}},

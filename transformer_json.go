@@ -19,12 +19,10 @@ func (JSONTransformer) CouldEncode(encoder Encoder) bool {
 
 // Encode encode encoder to writer as JSON
 func (JSONTransformer) Encode(writer io.Writer, encoder Encoder) error {
-	var res *Resource
-	var context = encoder.Context
-
-	if context != nil {
-		res = context.Resource
-	}
+	var (
+		context = encoder.Context
+		res     = encoder.Resource
+	)
 
 	js, err := json.MarshalIndent(convertObjectToJSONMap(res, context, encoder.Result, encoder.Action), "", "\t")
 	if err != nil {

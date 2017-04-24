@@ -20,6 +20,11 @@ type CreditCard struct {
 	Issuer string
 }
 
+type Company struct {
+	gorm.Model
+	Name string
+}
+
 type Address struct {
 	gorm.Model
 	UserID   uint
@@ -40,11 +45,12 @@ type User struct {
 	Active       bool
 	RegisteredAt *time.Time
 	Avatar       oss.OSS
+	Profile      Profile
 	CreditCard   CreditCard
 	Addresses    []Address
 	Languages    []Language `gorm:"many2many:user_languages;"`
-
-	Profile Profile
+	CompanyID    uint
+	Company      Company // FIXME use pointer
 }
 
 type Profile struct {
@@ -72,7 +78,7 @@ var (
 func init() {
 	mux := http.NewServeMux()
 	db = utils.TestDB()
-	models := []interface{}{&User{}, &CreditCard{}, &Address{}, &Language{}, &Profile{}, &Phone{}}
+	models := []interface{}{&User{}, &CreditCard{}, &Address{}, &Language{}, &Profile{}, &Phone{}, &Company{}}
 	for _, value := range models {
 		db.DropTableIfExists(value)
 		db.AutoMigrate(value)
