@@ -9,7 +9,7 @@ import (
 )
 
 // NewDummyAdmin generate admin for dummy app
-func NewDummyAdmin() *admin.Admin {
+func NewDummyAdmin(keepData ...bool) *admin.Admin {
 	var (
 		db     = utils.TestDB()
 		models = []interface{}{&User{}, &CreditCard{}, &Address{}, &Language{}, &Profile{}, &Phone{}, &Company{}}
@@ -17,11 +17,19 @@ func NewDummyAdmin() *admin.Admin {
 	)
 
 	for _, value := range models {
-		db.DropTableIfExists(value)
+		if len(keepData) == 0 {
+			db.DropTableIfExists(value)
+		}
 		db.AutoMigrate(value)
 	}
 
+	Admin.AddResource(&Company{})
+	Admin.AddResource(&Language{}, &admin.Config{Priority: -1})
 	user := Admin.AddResource(&User{})
+	user.Meta(&admin.Meta{
+		Name: "CreditCard",
+		Type: "single_edit",
+	})
 	user.Meta(&admin.Meta{
 		Name: "Languages",
 		Type: "select_many",

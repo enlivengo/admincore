@@ -9,7 +9,6 @@ import (
 
 type CreditCard struct {
 	gorm.Model
-	UserID uint
 	Number string
 	Issuer string
 }
@@ -40,6 +39,7 @@ type User struct {
 	RegisteredAt *time.Time
 	Avatar       oss.OSS
 	Profile      Profile
+	CreditCardID uint
 	CreditCard   CreditCard
 	Addresses    []Address
 	Languages    []Language `gorm:"many2many:user_languages;"`

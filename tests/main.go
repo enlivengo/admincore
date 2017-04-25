@@ -15,5 +15,5 @@ func main() {
 	}
 
 	fmt.Printf("Listening on: %s\n", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), dummy.NewDummyAdmin().NewServeMux("/admin"))
+	http.ListenAndServe(fmt.Sprintf(":%s", port), dummy.NewDummyAdmin(true).NewServeMux("/admin"))
 }
