@@ -1,12 +1,9 @@
-package admin_test
+package dummy
 
 import (
-	"net/http/httptest"
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/qor/admin"
-	"github.com/qor/admin/tests/dummy"
 	"github.com/qor/media/oss"
 )
 
@@ -64,16 +61,4 @@ type Phone struct {
 
 	ProfileID uint64
 	Num       string
-}
-
-var (
-	server *httptest.Server
-	db     *gorm.DB
-	Admin  *admin.Admin
-)
-
-func init() {
-	Admin = dummy.NewAdmin()
-	db = Admin.Config.DB
-	server = httptest.NewServer(Admin.NewServeMux("/admin"))
 }
