@@ -34,26 +34,8 @@ func TestCreateRecord(t *testing.T) {
 	}
 }
 
-// func TestCreateRecordWithXML(t *testing.T) {
-// 	xml := []byte(`<?xml version="1.0" encoding="utf-8"?>
-// <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-//   <soap:Body>
-//     <ClientGetByGuid xmlns="http://tempuri.org/">
-//       <guid>fc40a874-2902-4539-b8e7-6aa7084644ec</guid>
-//     </ClientGetByGuid>
-//   </soap:Body>
-// </soap:Envelope>`)
-// 	buf := bytes.NewBuffer(xml)
-
-// 	if req, err := http.Post(server.URL+"/admin/user", "application/xml", buf); err == nil {
-// 		fmt.Println(req)
-// 		fmt.Println(err)
-// 		t.Errorf("sss")
-// 	}
-// }
-
-func TestCreateHasOneRecord(t *testing.T) {
-	name := "create_record_and_has_one"
+func TestCreateBelongsToRecord(t *testing.T) {
+	name := "create_belongs_to_record"
 	form := url.Values{
 		"QorResource.Name":              {name},
 		"QorResource.Role":              {"admin"},

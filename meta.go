@@ -61,6 +61,9 @@ func (meta *Meta) GetMetas() []resource.Metaor {
 
 // GetResource get resource from meta
 func (meta *Meta) GetResource() resource.Resourcer {
+	if meta.Resource == nil {
+		return nil
+	}
 	return meta.Resource
 }
 
