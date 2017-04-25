@@ -77,25 +77,20 @@ $(function() {
 
 
     // ****************Handle download file from AJAX POST****************************
-    let objectToFormData = function(obj, form, namespace) {
+    let objectToFormData = function(obj, form) {
         let formdata = form || new FormData(),
             key;
 
         for (var variable in obj) {
 
             if (obj.hasOwnProperty(variable) && obj[variable]) {
-                if (namespace) {
-                    key = namespace + '[' + variable + ']';
-                } else {
-                    key = variable;
-                }
-
+                key = variable;
             }
 
             if (obj[variable] instanceof Date) {
                 formdata.append(key, obj[variable].toISOString());
             } else if (typeof obj[variable] === 'object' && !(obj[variable] instanceof File)) {
-                objectToFormData(obj[variable], formdata, key);
+                objectToFormData(obj[variable], formdata);
             } else {
                 formdata.append(key, obj[variable]);
             }

@@ -77,21 +77,30 @@
         },
 
         collectFormData: function() {
-            var checkedInputs = $(QOR_TABLE_BULK).find('.mdl-checkbox__input:checked');
-            var formData = [];
+            let checkedInputs = $(QOR_TABLE_BULK).find('.mdl-checkbox__input:checked'),
+                formData = [],
+                normalFormData = [],
+                tempObj;
 
             if (checkedInputs.length) {
                 checkedInputs.each(function() {
-                    var id = $(this).closest('tr').data('primary-key');
+                    let id = $(this).closest('tr').data('primary-key');
+
+                    tempObj = {};
                     if (id) {
+
                         formData.push({
                             name: ACTION_FORM_DATA,
                             value: id.toString()
                         });
+
+                        tempObj[ACTION_FORM_DATA] = id.toString();
+                        normalFormData.push(tempObj);
                     }
                 });
             }
             this.ajaxForm.formData = formData;
+            this.ajaxForm.normalFormData = normalFormData;
             return this.ajaxForm;
         },
 
@@ -251,7 +260,7 @@
                             }
 
                             if (properties.method) {
-                                fileData = $.extend({}, ajaxForm.formData, {
+                                fileData = $.extend({}, ajaxForm.normalFormData, {
                                     _method: properties.method
                                 });
                             }
