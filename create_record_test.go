@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	. "github.com/qor/admin/tests/dummy"
 )
 
 func TestCreateRecord(t *testing.T) {

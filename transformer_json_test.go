@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/qor/admin"
+	. "github.com/qor/admin/tests/dummy"
 )
 
 func TestJSONTransformerEncode(t *testing.T) {

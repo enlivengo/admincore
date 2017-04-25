@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 	"testing"
+
+	. "github.com/qor/admin/tests/dummy"
 )
 
 func TestDeleteRecord(t *testing.T) {

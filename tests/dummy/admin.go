@@ -8,8 +8,8 @@ import (
 	"github.com/qor/qor/test/utils"
 )
 
-// NewAdmin generate admin for dummy app
-func NewAdmin() *admin.Admin {
+// NewDummyAdmin generate admin for dummy app
+func NewDummyAdmin() *admin.Admin {
 	var (
 		db     = utils.TestDB()
 		models = []interface{}{&User{}, &CreditCard{}, &Address{}, &Language{}, &Profile{}, &Phone{}, &Company{}}
