@@ -12,28 +12,28 @@
 })(function($) {
 
     'use strict';
-    var Mustache = window.Mustache;
-    var NAMESPACE = 'qor.action';
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_UNDO = 'undo.' + NAMESPACE;
-    var ACTION_FORMS = '.qor-action-forms';
-    var ACTION_HEADER = '.qor-page__header';
-    var ACTION_BODY = '.qor-page__body';
-    var ACTION_BUTTON = '.qor-action-button';
-    var MDL_BODY = '.mdl-layout__content';
-    var ACTION_SELECTORS = '.qor-actions';
-    var ACTION_LINK = 'a.qor-action--button';
-    var MENU_ACTIONS = '.qor-table__actions a[data-url],[data-url][data-method=POST],[data-url][data-method=PUT],[data-url][data-method=DELETE]';
-    var BUTTON_BULKS = '.qor-action-bulk-buttons';
-    var QOR_TABLE = '.qor-table-container';
-    var QOR_TABLE_BULK = '.qor-table--bulking';
-    var QOR_SEARCH = '.qor-search-container';
-    var CLASS_IS_UNDO = 'is_undo';
-    var QOR_SLIDEOUT = '.qor-slideout';
+    let Mustache = window.Mustache,
+        NAMESPACE = 'qor.action',
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_UNDO = 'undo.' + NAMESPACE,
+        ACTION_FORMS = '.qor-action-forms',
+        ACTION_HEADER = '.qor-page__header',
+        ACTION_BODY = '.qor-page__body',
+        ACTION_BUTTON = '.qor-action-button',
+        MDL_BODY = '.mdl-layout__content',
+        ACTION_SELECTORS = '.qor-actions',
+        ACTION_LINK = 'a.qor-action--button',
+        MENU_ACTIONS = '.qor-table__actions a[data-url],[data-url][data-method=POST],[data-url][data-method=PUT],[data-url][data-method=DELETE]',
+        BUTTON_BULKS = '.qor-action-bulk-buttons',
+        QOR_TABLE = '.qor-table-container',
+        QOR_TABLE_BULK = '.qor-table--bulking',
+        QOR_SEARCH = '.qor-search-container',
+        CLASS_IS_UNDO = 'is_undo',
+        QOR_SLIDEOUT = '.qor-slideout',
 
-    var ACTION_FORM_DATA = 'primary_values[]';
+        ACTION_FORM_DATA = 'primary_values[]';
 
     function QorAction(element, options) {
         this.$element = $(element);
@@ -112,7 +112,7 @@
         },
 
         actionSubmit: function($action) {
-            var $target = $($action);
+            let $target = $($action);
             this.$actionButton = $target;
             if ($target.data().method) {
                 this.submit();
@@ -121,7 +121,7 @@
         },
 
         click: function(e) {
-            var $target = $(e.target);
+            let $target = $(e.target);
             this.$actionButton = $target;
 
             if ($target.data().ajaxForm) {
@@ -153,21 +153,22 @@
 
             if ($(this).is('tr') && !$target.is('a')) {
 
-                var $firstTd = $(this).find('td').first();
+                let $firstTd = $(this).find('td').first();
 
                 // Manual make checkbox checked or not
                 if ($firstTd.find('.mdl-checkbox__input').get(0)) {
-                    var hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open');
-                    var $checkbox = $firstTd.find('.mdl-js-checkbox');
-                    var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
-                    var formValueInput = slideroutActionForm.find('.js-primary-value');
-                    var primaryValue = $(this).data('primary-key');
-                    var $alreadyHaveValue = formValueInput.filter('[value="' + primaryValue + '"]');
+                    let hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open'),
+                        $checkbox = $firstTd.find('.mdl-js-checkbox'),
+                        slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form'),
+                        formValueInput = slideroutActionForm.find('.js-primary-value'),
+                        primaryValue = $(this).data('primary-key'),
+                        $alreadyHaveValue = formValueInput.filter('[value="' + primaryValue + '"]'),
+                        isChecked;
 
                     $checkbox.toggleClass('is-checked');
                     $firstTd.parents('tr').toggleClass('is-selected');
 
-                    var isChecked = $checkbox.hasClass('is-checked');
+                    isChecked = $checkbox.hasClass('is-checked');
 
                     $firstTd.find('input').prop('checked', isChecked);
 
@@ -190,13 +191,13 @@
         },
 
         renderFlashMessage: function(data) {
-            var flashMessageTmpl = QorAction.FLASHMESSAGETMPL;
+            let flashMessageTmpl = QorAction.FLASHMESSAGETMPL;
             Mustache.parse(flashMessageTmpl);
             return Mustache.render(flashMessageTmpl, data);
         },
 
         submit: function() {
-            var _this = this,
+            let _this = this,
                 $parent,
                 $element = this.$element,
                 $actionButton = this.$actionButton,
@@ -245,10 +246,10 @@
                         }
                     },
                     success: function(data, status, response) {
-                        var contentType = response.getResponseHeader("content-type");
+                        let contentType = response.getResponseHeader("content-type"),
+                            // handle file download from form submit
+                            disposition = response.getResponseHeader('Content-Disposition');
 
-                        // handle file download from form submit
-                        var disposition = response.getResponseHeader('Content-Disposition');
                         if (disposition && disposition.indexOf('attachment') !== -1) {
                             var fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
                                 matches = fileNameRegex.exec(disposition),
@@ -309,7 +310,7 @@
         },
 
         switchButtons: function($element, disbale) {
-            var needDisbale = disbale ? true : false;
+            let needDisbale = disbale ? true : false;
             $element.find(ACTION_BUTTON).prop('disabled', needDisbale);
         },
 
@@ -346,9 +347,9 @@
             new window.MaterialDataTable($('.qor-page__body table').get(0));
             $('thead.is-hidden tr th:not(".mdl-data-table__cell--non-numeric")').clone().prependTo($('thead:not(".is-hidden") tr'));
 
-            var $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input');
-            var isMediaLibrary = $('.qor-table--medialibrary').length;
-            var hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open');
+            let $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input'),
+                isMediaLibrary = $('.qor-table--medialibrary').length,
+                hasPopoverForm = $('body').hasClass('qor-bottomsheets-open') || $('body').hasClass('qor-slideout-open');
 
             isMediaLibrary && ($fixedHeadCheckBox = $('thead .mdl-checkbox__input'));
 
@@ -359,15 +360,15 @@
                     $(this).closest('label').toggleClass('is-checked');
                 }
 
-                var slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form');
-                var slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
+                let slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form'),
+                    slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
 
                 if (slideroutActionForm.length && hasPopoverForm) {
 
                     if ($(this).is(':checked')) {
-                        var allPrimaryValues = $('.qor-table--bulking tbody tr');
+                        let allPrimaryValues = $('.qor-table--bulking tbody tr');
                         allPrimaryValues.each(function() {
-                            var primaryValue = $(this).data('primary-key');
+                            let primaryValue = $(this).data('primary-key');
                             if (primaryValue) {
                                 slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
                             }
@@ -382,32 +383,32 @@
 
     };
     QorAction.FLASHMESSAGETMPL = (
-        '<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">' +
-        '<button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">' +
-        '<i class="material-icons">close</i>' +
-        '</button>' +
-        '<span class="qor-alert-message">' +
-        '[[#message]]' +
-        '[[message]]' +
-        '[[/message]]' +
-        '[[#error]]' +
-        '[[error]]' +
-        '[[/error]]' +
-        '</span>' +
-        '</div>'
+        `<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">
+          <button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">
+            <i class="material-icons">close</i>
+          </button>
+          <span class="qor-alert-message">
+            [[#message]]
+              [[message]]
+            [[/message]]
+            [[#error]]
+              [[error]]
+            [[/error]]
+          </span>
+        </div>`
     );
 
     QorAction.DEFAULTS = {};
 
     $.fn.qorSliderAfterShow.qorActionInit = function(url, html) {
-        var hasAction = $(html).find('[data-toggle="qor-action-slideout"]').length;
-        var $actionForm = $('[data-toggle="qor-action-slideout"]').find('form');
-        var $checkedItem = $('.qor-page__body .mdl-checkbox__input:checked');
+        let hasAction = $(html).find('[data-toggle="qor-action-slideout"]').length,
+            $actionForm = $('[data-toggle="qor-action-slideout"]').find('form'),
+            $checkedItem = $('.qor-page__body .mdl-checkbox__input:checked');
 
         if (hasAction && $checkedItem.length) {
             // insert checked value into sliderout form
             $checkedItem.each(function(i, e) {
-                var id = $(e).parents('tbody tr').data('primary-key');
+                let id = $(e).parents('tbody tr').data('primary-key');
                 if (id) {
                     $actionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + id + '" />');
                 }
@@ -418,9 +419,9 @@
 
     QorAction.plugin = function(options) {
         return this.each(function() {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var fn;
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                fn;
 
             if (!data) {
                 $this.data(NAMESPACE, (data = new QorAction(this, options)));
@@ -433,8 +434,8 @@
     };
 
     $(function() {
-        var options = {};
-        var selector = '[data-toggle="qor.action.bulk"]';
+        let options = {},
+            selector = '[data-toggle="qor.action.bulk"]';
 
         $(document).
         on(EVENT_DISABLE, function(e) {
