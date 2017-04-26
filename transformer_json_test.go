@@ -6,6 +6,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/now"
 	"github.com/qor/admin"
 	. "github.com/qor/admin/tests/dummy"
 	"github.com/theplant/testingutils"
@@ -14,12 +16,30 @@ import (
 func TestJSONTransformerEncode(t *testing.T) {
 	var (
 		buffer          bytes.Buffer
+		registeredAt    = now.MustParse("2017-01-01")
 		jsonTransformer = &admin.JSONTransformer{}
 		encoder         = admin.Encoder{
 			Action:   "show",
 			Resource: Admin.GetResource("User"),
 			Context:  Admin.NewContext(nil, nil),
-			Result:   &User{},
+			Result: &User{
+				Active:       true,
+				Model:        gorm.Model{ID: 1},
+				Name:         "jinzhu",
+				Role:         "admin",
+				RegisteredAt: &registeredAt,
+				CreditCard: CreditCard{
+					Number: "411111111111",
+					Issuer: "visa",
+				},
+				Profile: Profile{
+					Name: "jinzhu",
+					Phone: Phone{
+						Num: "110",
+					},
+					Sex: "male",
+				},
+			},
 		}
 	)
 
@@ -31,32 +51,37 @@ func TestJSONTransformerEncode(t *testing.T) {
 	json.Unmarshal(buffer.Bytes(), &response)
 
 	jsonResponse := `{
-        "Active": false,
+        "Active": true,
         "Addresses": [],
-        "Age": null,
+        "Age": 0,
         "Avatar": "",
         "Company": "",
-        "CreditCard": "",
-        "ID": 0,
+        "CreditCard": {
+                "ID": 0,
+                "Issuer": "visa",
+                "Number": "411111111111"
+        },
+        "ID": 1,
         "Languages": null,
-        "Name": "",
+        "Name": "jinzhu",
         "Profile": {
                 "ID": 0,
-                "Name": "",
+                "Name": "jinzhu",
                 "Phone": {
                         "ID": 0,
-                        "Num": ""
+                        "Num": "110"
                 },
-                "Sex": ""
+                "Sex": "male"
         },
-        "RegisteredAt": "",
-        "Role": ""
+        "RegisteredAt": "2017-01-01 00:00",
+        "Role": "admin"
 }`
+
 	json.Unmarshal([]byte(jsonResponse), &expect)
 
 	diff := testingutils.PrettyJsonDiff(expect, response)
 	if len(diff) > 0 {
-		t.Errorf(diff)
+		t.Errorf("Got %v\n%v", string(buffer.Bytes()), diff)
 	}
 }
 
