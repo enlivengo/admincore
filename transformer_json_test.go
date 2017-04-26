@@ -2,12 +2,13 @@ package admin_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/qor/admin"
 	. "github.com/qor/admin/tests/dummy"
+	"github.com/theplant/testingutils"
 )
 
 func TestJSONTransformerEncode(t *testing.T) {
@@ -26,7 +27,37 @@ func TestJSONTransformerEncode(t *testing.T) {
 		t.Errorf("no error should returned when encode object to JSON")
 	}
 
-	fmt.Println(buffer.String())
+	var response, expect json.RawMessage
+	json.Unmarshal(buffer.Bytes(), &response)
+
+	jsonResponse := `{
+        "Active": false,
+        "Addresses": [],
+        "Age": null,
+        "Avatar": "",
+        "Company": "",
+        "CreditCard": "",
+        "ID": 0,
+        "Languages": null,
+        "Name": "",
+        "Profile": {
+                "ID": 0,
+                "Name": "",
+                "Phone": {
+                        "ID": 0,
+                        "Num": ""
+                },
+                "Sex": ""
+        },
+        "RegisteredAt": "",
+        "Role": ""
+}`
+	json.Unmarshal([]byte(jsonResponse), &expect)
+
+	diff := testingutils.PrettyJsonDiff(expect, response)
+	if len(diff) > 0 {
+		t.Errorf(diff)
+	}
 }
 
 func TestJSONTransformerEncodeMap(t *testing.T) {
