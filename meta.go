@@ -305,7 +305,9 @@ func (meta *Meta) updateMeta() {
 				var result interface{}
 
 				if fieldType.Kind() == reflect.Struct {
-					result = reflect.New(fieldType).Interface()
+					if _, ok := reflect.New(fieldType).Interface().(sql.Scanner); !ok {
+						result = reflect.New(fieldType).Interface()
+					}
 				} else if fieldType.Kind() == reflect.Slice {
 					refelectType := fieldType.Elem()
 					for refelectType.Kind() == reflect.Ptr {
@@ -316,7 +318,7 @@ func (meta *Meta) updateMeta() {
 					}
 				}
 
-				if result != nil && meta.FieldStruct.Relationship != nil {
+				if result != nil {
 					res := meta.baseResource.NewResource(result)
 					meta.Resource = res
 					meta.Meta.Permission = meta.Meta.Permission.Concat(res.Config.Permission)
