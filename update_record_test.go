@@ -1,9 +1,15 @@
 package admin_test
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
+	"regexp"
 	"testing"
 
 	. "github.com/qor/admin/tests/dummy"
@@ -180,5 +186,70 @@ func TestUpdateManyToManyRecord(t *testing.T) {
 		}
 	} else {
 		t.Errorf(err.Error())
+	}
+}
+
+func TestUpdateAttachment(t *testing.T) {
+	name := "update_record_attachment"
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	if attachment, err := filepath.Abs("tests/qor.png"); err == nil {
+		if part, err := writer.CreateFormFile("QorResource.Avatar", filepath.Base(attachment)); err == nil {
+			if file, err := os.Open(attachment); err == nil {
+				io.Copy(part, file)
+			}
+		}
+		form := url.Values{
+			"QorResource.Name": {name},
+			"QorResource.Role": {"admin"},
+		}
+		for key, val := range form {
+			_ = writer.WriteField(key, val[0])
+		}
+		writer.Close()
+
+		var user User
+		if req, err := http.Post(server.URL+"/admin/users", writer.FormDataContentType(), body); err == nil {
+			if req.StatusCode != 200 {
+				t.Errorf("Create request should be processed successfully")
+			}
+
+			if db.First(&user, "name = ?", name).RecordNotFound() {
+				t.Errorf("User should be created successfully")
+			}
+
+			if !regexp.MustCompile("qor").MatchString(user.Avatar.URL()) {
+				t.Errorf("Avatar should be saved, but its URL is %v", user.Avatar.URL())
+			}
+		}
+
+		attachment, err := filepath.Abs("tests/logo.png")
+		if err != nil {
+			panic(err)
+		}
+		if part, err := writer.CreateFormFile("QorResource.Avatar", filepath.Base(attachment)); err == nil {
+			if file, err := os.Open(attachment); err == nil {
+				io.Copy(part, file)
+			}
+		}
+		for key, val := range form {
+			_ = writer.WriteField(key, val[0])
+		}
+		writer.Close()
+
+		if req, err := http.Post(fmt.Sprintf("%v/admin/users/%v", server.URL, user.ID), writer.FormDataContentType(), body); err == nil {
+			if req.StatusCode != 200 {
+				t.Errorf("Create request should be processed successfully")
+			}
+
+			if db.First(&user, "name = ?", name).RecordNotFound() {
+				t.Errorf("User should be created successfully")
+			}
+
+			if !regexp.MustCompile("logo").MatchString(user.Avatar.URL()) {
+				t.Errorf("Avatar should be updated, but its URL is %v", user.Avatar.URL())
+			}
+		}
 	}
 }
