@@ -189,6 +189,38 @@ func TestUpdateManyToManyRecord(t *testing.T) {
 	}
 }
 
+func TestUpdateSelectOne(t *testing.T) {
+	name := "update_record_select_one"
+	var company1, company2 Company
+	db.FirstOrCreate(&company1, Language{Name: "Company 1"})
+	db.FirstOrCreate(&company2, Language{Name: "Company 2"})
+	user := User{Name: name, Role: "admin", Company: company1}
+	db.Save(&user)
+
+	form := url.Values{
+		"QorResource.Name":    {name + "_new"},
+		"QorResource.Role":    {"admin"},
+		"QorResource.Company": {fmt.Sprint(company2.ID)},
+	}
+
+	if req, err := http.PostForm(server.URL+"/admin/users/"+fmt.Sprint(user.ID), form); err == nil {
+		if req.StatusCode != 200 {
+			t.Errorf("Update request should be processed successfully")
+		}
+
+		var user User
+		if db.Preload("Company").First(&user, "name = ?", name+"_new").RecordNotFound() {
+			t.Errorf("User should be updated successfully")
+		}
+
+		if user.Company.ID != company2.ID {
+			t.Errorf("user's company should be updated")
+		}
+	} else {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestUpdateAttachment(t *testing.T) {
 	name := "update_record_attachment"
 
