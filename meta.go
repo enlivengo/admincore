@@ -316,7 +316,7 @@ func (meta *Meta) updateMeta() {
 					}
 				}
 
-				if result != nil {
+				if result != nil && meta.FieldStruct.Relationship != nil {
 					res := meta.baseResource.NewResource(result)
 					meta.Resource = res
 					meta.Meta.Permission = meta.Meta.Permission.Concat(res.Config.Permission)

@@ -163,10 +163,9 @@ func TestUploadAttachment(t *testing.T) {
 				t.Errorf("User should be created successfully")
 			}
 
-			// fmt.Println(user.Avatar.Path)
-			// if user.Avatar.Path == "" {
-			// 	t.Errorf("Avatar should be saved")
-			// }
+			if user.Avatar.URL() == "" {
+				t.Error("Avatar should be saved, but its URL is blank")
+			}
 		}
 	}
 }

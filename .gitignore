@@ -1,4 +1,5 @@
 # Back end
+public
 Gemfile.lock
 gin-bin
 .DS_Store

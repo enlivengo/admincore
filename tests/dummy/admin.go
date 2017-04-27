@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/qor/admin"
+	"github.com/qor/media"
 	"github.com/qor/qor"
 	"github.com/qor/qor/test/utils"
 )
@@ -15,6 +16,8 @@ func NewDummyAdmin(keepData ...bool) *admin.Admin {
 		models = []interface{}{&User{}, &CreditCard{}, &Address{}, &Language{}, &Profile{}, &Phone{}, &Company{}}
 		Admin  = admin.New(&qor.Config{DB: db})
 	)
+
+	media.RegisterCallbacks(db)
 
 	for _, value := range models {
 		if len(keepData) == 0 {
