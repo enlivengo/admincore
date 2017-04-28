@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/qor/admin/tests/dummy"
+	"github.com/qor/qor/utils"
 )
 
 func main() {
@@ -15,5 +16,9 @@ func main() {
 	}
 
 	fmt.Printf("Listening on: %s\n", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), dummy.NewDummyAdmin(true).NewServeMux("/admin"))
+
+	mux := http.NewServeMux()
+	mux.Handle("/system/", utils.FileServer(http.Dir("public")))
+	dummy.NewDummyAdmin(true).MountTo("/admin", mux)
+	http.ListenAndServe(fmt.Sprintf(":%s", port), mux)
 }
