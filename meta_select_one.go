@@ -20,6 +20,7 @@ type SelectOneConfig struct {
 	AllowBlank               bool
 	SelectionTemplate        string
 	SelectMode               string // select, select_async, bottom_sheet
+	PrimaryField             string
 	Select2ResultTemplate    template.JS
 	Select2SelectionTemplate template.JS
 	RemoteDataResource       *Resource
@@ -143,6 +144,13 @@ func (selectOneConfig *SelectOneConfig) prepareDataSource(field *gorm.StructFiel
 			selectOneConfig.RemoteDataResource = res.GetAdmin().GetResource(fieldType.Name())
 			if selectOneConfig.RemoteDataResource == nil {
 				selectOneConfig.RemoteDataResource = res.GetAdmin().NewResource(reflect.New(fieldType).Interface())
+			}
+		}
+
+		if selectOneConfig.PrimaryField == "" {
+			for _, primaryField := range selectOneConfig.RemoteDataResource.PrimaryFields {
+				selectOneConfig.PrimaryField = primaryField.Name
+				break
 			}
 		}
 
