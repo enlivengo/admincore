@@ -27,25 +27,25 @@
         constructor: QorChooser,
 
         init: function() {
-            var $this = this.$element,
-                fromRemote = $this.data('remote-data'),
+            let $this = this.$element,
+                select2Data = $this.data(),
                 resetSelect2Width,
                 option = {
                     minimumResultsForSearch: 8,
                     dropdownParent: $this.parent()
                 };
 
-            if (fromRemote) {
-                option.ajax = $.fn.select2.ajaxCommonOptions;
+            if (select2Data.remoteData) {
+                option.ajax = $.fn.select2.ajaxCommonOptions(select2Data);
 
                 option.templateResult = function(data) {
-                    var tmpl = $this.parents('.qor-field').find('[name="select2-result-template"]');
+                    let tmpl = $this.parents('.qor-field').find('[name="select2-result-template"]');
                     return $.fn.select2.ajaxFormatResult(data, tmpl);
                 };
 
                 option.templateSelection = function(data) {
                     if (data.loading) return data.text;
-                    var tmpl = $this.parents('.qor-field').find('[name="select2-selection-template"]');
+                    let tmpl = $this.parents('.qor-field').find('[name="select2-selection-template"]');
                     return $.fn.select2.ajaxFormatResult(data, tmpl);
                 };
             }

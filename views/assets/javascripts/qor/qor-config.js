@@ -18,36 +18,45 @@ $(document).ajaxComplete(function(event, xhr, settings) {
 
 // select2 ajax common options
 // $.fn.select2 = $.fn.select2 || function(){};
-$.fn.select2.ajaxCommonOptions = {
-    dataType: 'json',
-    cache: true,
-    delay: 250,
-    data: function(params) {
-        return {
-            keyword: params.term, // search term
-            page: params.page,
-            per_page: 20
-        };
-    },
-    processResults: function(data, params) {
-        // parse the results into the format expected by Select2
-        // since we are using custom formatting functions we do not need to
-        // alter the remote JSON data, except to indicate that infinite
-        // scrolling can be used
-        params.page = params.page || 1;
+$.fn.select2.ajaxCommonOptions = function(select2Data) {
+    let remoteDataPrimaryKey = select2Data.remoteDataPrimaryKey;
 
-        var processedData = $.map(data, function(obj) {
-            obj.id = obj.Id || obj.ID;
-            return obj;
-        });
+    return {
+        dataType: 'json',
+        cache: true,
+        delay: 250,
+        data: function(params) {
+            return {
+                keyword: params.term, // search term
+                page: params.page,
+                per_page: 20
+            };
+        },
+        processResults: function(data, params) {
+            // parse the results into the format expected by Select2
+            // since we are using custom formatting functions we do not need to
+            // alter the remote JSON data, except to indicate that infinite
+            // scrolling can be used
+            params.page = params.page || 1;
 
-        return {
-            results: processedData,
-            pagination: {
-                more: processedData.length >= 20
-            }
-        };
-    }
+            var processedData = $.map(data, function(obj) {
+                if (remoteDataPrimaryKey) {
+                    obj.id = obj[remoteDataPrimaryKey];
+                } else {
+                    obj.id = obj.Id || obj.ID;
+                }
+                return obj;
+            });
+
+            return {
+                results: processedData,
+                pagination: {
+                    more: processedData.length >= 20
+                }
+            };
+        }
+    };
+
 };
 
 // select2 ajax common options
