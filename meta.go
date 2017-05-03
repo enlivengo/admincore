@@ -30,7 +30,7 @@ type Meta struct {
 
 	Metas      []resource.Metaor
 	Collection interface{}
-	resource.Meta
+	*resource.Meta
 	baseResource *Resource
 }
 
@@ -172,7 +172,7 @@ func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) 
 }
 
 func (meta *Meta) updateMeta() {
-	meta.Meta = resource.Meta{
+	meta.Meta = &resource.Meta{
 		Name:            meta.Name,
 		FieldName:       meta.FieldName,
 		Setter:          meta.Setter,
