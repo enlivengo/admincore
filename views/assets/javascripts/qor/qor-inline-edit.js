@@ -21,6 +21,7 @@
         EVENT_MOUSELEAVE = 'mouseleave.' + NAMESPACE,
         CLASS_FIELD = '.qor-field',
         CLASS_FIELD_SHOW = '.qor-field__show',
+        CLASS_FIELD_SHOW_INNER = '.qor-field__show-inner',
         CLASS_EDIT = '.qor-inlineedit__edit',
         CLASS_SAVE = '.qor-inlineedit__save',
         CLASS_BUTTONS = '.qor-inlineedit__buttons',
@@ -124,9 +125,15 @@
                         $btn.prop('disabled', true);
                     },
                     success: function(data) {
-                        let newValue = getJsonData(names, data);
+                        let newValue = getJsonData(names, data),
+                            $show = $parent.removeClass(CLASS_CONTAINER).find(CLASS_FIELD_SHOW);
 
-                        $parent.removeClass(CLASS_CONTAINER).find(CLASS_FIELD_SHOW).html(newValue);
+                        if ($show.find(CLASS_FIELD_SHOW_INNER).length) {
+                            $show.find(CLASS_FIELD_SHOW_INNER).html(newValue);
+                        } else {
+                            $show.html(newValue);
+                        }
+
                         $parent.find(CLASS_BUTTONS).remove();
                         $btn.prop('disabled', false);
                     },

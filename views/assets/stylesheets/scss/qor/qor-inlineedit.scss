@@ -3,10 +3,11 @@
         min-height: 24px;
         max-width: 95%;
 
-        &.redactor-styles {
+        &.qor-redactor__show {
             background-color: #fff;
             padding: 24px;
             box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            max-width: 100%;
 
             .qor-inlineedit__edit {
                 top: 10px;
