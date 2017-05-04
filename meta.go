@@ -305,9 +305,7 @@ func (meta *Meta) updateMeta() {
 				var result interface{}
 
 				if fieldType.Kind() == reflect.Struct {
-					if _, ok := reflect.New(fieldType).Interface().(sql.Scanner); !ok {
-						result = reflect.New(fieldType).Interface()
-					}
+					result = reflect.New(fieldType).Interface()
 				} else if fieldType.Kind() == reflect.Slice {
 					refelectType := fieldType.Elem()
 					for refelectType.Kind() == reflect.Ptr {
