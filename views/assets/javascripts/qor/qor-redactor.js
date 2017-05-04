@@ -347,6 +347,8 @@
                                 redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
                             });
 
+                            $editor.closest('.qor-form-section').addClass('qor-form-redactor-box').find('.qor-field__show').addClass('redactor-styles');
+
                             if (!$this.data("cropUrl")) {
                                 return;
                             }
