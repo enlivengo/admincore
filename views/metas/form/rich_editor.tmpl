@@ -3,7 +3,7 @@
     {{meta_label .Meta}}
   </label>
 
-  <div class="qor-field__show qor-redactor__show">{{raw .Value}}</div>
+  <div class="qor-field__show qor-redactor__show redactor-styles">{{raw .Value}}</div>
 
   {{if .Meta.Config.Plugins}}
     {{range $plugin := .Meta.Config.Plugins}}
