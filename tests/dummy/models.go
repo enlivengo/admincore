@@ -38,13 +38,13 @@ type User struct {
 	Active       bool
 	RegisteredAt *time.Time
 	Avatar       oss.OSS
-	Profile      Profile
+	Profile      Profile // has one
 	CreditCardID uint
-	CreditCard   CreditCard
-	Addresses    []Address
-	Languages    []Language `gorm:"many2many:user_languages;"`
+	CreditCard   CreditCard // belongs to
+	Addresses    []Address  // has many
 	CompanyID    uint
-	Company      Company // FIXME use pointer
+	Company      *Company   // belongs to
+	Languages    []Language `gorm:"many2many:user_languages;"` // many 2 many
 }
 
 type Profile struct {

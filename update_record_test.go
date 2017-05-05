@@ -194,7 +194,7 @@ func TestUpdateSelectOne(t *testing.T) {
 	var company1, company2 Company
 	db.FirstOrCreate(&company1, Language{Name: "Company 1"})
 	db.FirstOrCreate(&company2, Language{Name: "Company 2"})
-	user := User{Name: name, Role: "admin", Company: company1}
+	user := User{Name: name, Role: "admin", Company: &company1}
 	db.Save(&user)
 
 	form := url.Values{
