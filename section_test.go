@@ -1,7 +1,6 @@
 package admin_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/qor/admin"
@@ -20,5 +19,4 @@ func TestSections(t *testing.T) {
 	})
 
 	indexSections := userRes.IndexAttrs()
-	fmt.Println(indexSections)
 }
