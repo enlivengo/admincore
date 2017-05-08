@@ -24,9 +24,13 @@ import (
 //      "ColorVariations",
 //    }
 type Section struct {
-	Resource *Resource
-	Title    string
-	Rows     [][]string
+	Resource  *Resource
+	Title     string
+	Rows      [][]string
+	Permanent bool
+	Priority  int
+	Formats   []string
+	Visible   func(interface{}, *Context) bool
 }
 
 // String stringify section
