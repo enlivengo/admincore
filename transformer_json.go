@@ -30,7 +30,8 @@ func (JSONTransformer) Encode(writer io.Writer, encoder Encoder) error {
 		result["error"] = err.Error()
 		js, _ = json.Marshal(result)
 	}
-
+	context.Writer.Header().Set("Content-Type", "application/json")
+	
 	_, err = writer.Write(js)
 	return err
 }
