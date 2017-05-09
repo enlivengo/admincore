@@ -1022,6 +1022,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"pagination": context.Pagination,
 		"escape":     html.EscapeString,
 		"raw":        func(str string) template.HTML { return template.HTML(utils.HTMLSanitizer.Sanitize(str)) },
+		"unsafe_raw": func(str string) template.HTML { return template.HTML(str) },
 		"equal":      equal,
 		"stringify":  utils.Stringify,
 		"lower": func(value interface{}) string {
