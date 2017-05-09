@@ -215,13 +215,13 @@ func (context *Context) FormattedValueOf(value interface{}, meta *Meta) interfac
 	return result
 }
 
-func (context *Context) renderForm(value interface{}, sections []*Section) template.HTML {
+func (context *Context) renderForm(value interface{}, sections []*Attributes) template.HTML {
 	var result = bytes.NewBufferString("")
-	context.renderSections(value, sections, []string{"QorResource"}, result, "form")
+	context.renderAttributes(value, sections, []string{"QorResource"}, result, "form")
 	return template.HTML(result.String())
 }
 
-func (context *Context) renderSections(value interface{}, sections []*Section, prefix []string, writer *bytes.Buffer, kind string) {
+func (context *Context) renderAttributes(value interface{}, sections []*Attributes, prefix []string, writer *bytes.Buffer, kind string) {
 	for _, section := range sections {
 		var rows []struct {
 			Length      int
@@ -302,8 +302,8 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	)
 	prefix = append(prefix, meta.Name)
 
-	var generateNestedRenderSections = func(kind string) func(interface{}, []*Section, int) template.HTML {
-		return func(value interface{}, sections []*Section, index int) template.HTML {
+	var generateNestedRenderAttributes = func(kind string) func(interface{}, []*Attributes, int) template.HTML {
+		return func(value interface{}, sections []*Attributes, index int) template.HTML {
 			var result = bytes.NewBufferString("")
 			var newPrefix = append([]string{}, prefix...)
 
@@ -319,14 +319,14 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 					}
 				}
 
-				context.renderSections(value, sections, newPrefix, result, kind)
+				context.renderAttributes(value, sections, newPrefix, result, kind)
 			}
 
 			return template.HTML(result.String())
 		}
 	}
 
-	funcsMap["render_nested_form"] = generateNestedRenderSections("form")
+	funcsMap["render_nested_form"] = generateNestedRenderAttributes("form")
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -462,24 +462,24 @@ func (context *Context) getResource(resources ...*Resource) *Resource {
 	return context.Resource
 }
 
-func (context *Context) indexSections(resources ...*Resource) []*Section {
+func (context *Context) indexAttributes(resources ...*Resource) []*Attributes {
 	res := context.getResource(resources...)
-	return res.allowedSections(res.IndexAttrs(), context, roles.Read)
+	return res.allowedAttributes(res.IndexAttrs(), context, roles.Read)
 }
 
-func (context *Context) editSections(resources ...*Resource) []*Section {
+func (context *Context) editAttributes(resources ...*Resource) []*Attributes {
 	res := context.getResource(resources...)
-	return res.allowedSections(res.EditAttrs(), context, roles.Read)
+	return res.allowedAttributes(res.EditAttrs(), context, roles.Read)
 }
 
-func (context *Context) newSections(resources ...*Resource) []*Section {
+func (context *Context) newAttributes(resources ...*Resource) []*Attributes {
 	res := context.getResource(resources...)
-	return res.allowedSections(res.NewAttrs(), context, roles.Create)
+	return res.allowedAttributes(res.NewAttrs(), context, roles.Create)
 }
 
-func (context *Context) showSections(resources ...*Resource) []*Section {
+func (context *Context) showAttributes(resources ...*Resource) []*Attributes {
 	res := context.getResource(resources...)
-	return res.allowedSections(res.ShowAttrs(), context, roles.Read)
+	return res.allowedAttributes(res.ShowAttrs(), context, roles.Read)
 }
 
 type menu struct {
@@ -896,8 +896,8 @@ func (context *Context) isSortableMeta(meta *Meta) bool {
 	return false
 }
 
-func (context *Context) convertSectionToMetas(res *Resource, sections []*Section) []*Meta {
-	return res.ConvertSectionToMetas(sections)
+func (context *Context) convertAttributesToMetas(res *Resource, sections []*Attributes) []*Meta {
+	return res.ConvertAttributesToMetas(sections)
 }
 
 type formatedError struct {
@@ -1106,11 +1106,11 @@ func (context *Context) FuncMap() template.FuncMap {
 		"load_actions":              context.loadActions,
 		"allowed_actions":           context.AllowedActions,
 		"is_sortable_meta":          context.isSortableMeta,
-		"index_sections":            context.indexSections,
-		"show_sections":             context.showSections,
-		"new_sections":              context.newSections,
-		"edit_sections":             context.editSections,
-		"convert_sections_to_metas": context.convertSectionToMetas,
+		"index_sections":            context.indexAttributes,
+		"show_sections":             context.showAttributes,
+		"new_sections":              context.newAttributes,
+		"edit_sections":             context.editAttributes,
+		"convert_sections_to_metas": context.convertAttributesToMetas,
 
 		"has_create_permission": context.hasCreatePermission,
 		"has_read_permission":   context.hasReadPermission,

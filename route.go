@@ -262,25 +262,25 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 
 	// Register Sub Resources
 	if len(res.PrimaryFields) > 0 {
-		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
+		for _, meta := range res.ConvertAttributesToMetas(res.NewAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
-				if len(meta.Resource.newSections) > 0 {
+				if len(meta.Resource.newAttributes) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "create")
 				}
 			}
 		}
 
-		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
+		for _, meta := range res.ConvertAttributesToMetas(res.ShowAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
-				if len(meta.Resource.showSections) > 0 {
+				if len(meta.Resource.showAttributes) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "read")
 				}
 			}
 		}
 
-		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
+		for _, meta := range res.ConvertAttributesToMetas(res.EditAttrs()) {
 			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
-				if len(meta.Resource.editSections) > 0 {
+				if len(meta.Resource.editAttributes) > 0 {
 					admin.RegisterResourceRouters(meta.Resource, "update", "delete")
 				}
 			}

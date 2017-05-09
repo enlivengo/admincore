@@ -59,11 +59,11 @@ func convertObjectToJSONMap(res *Resource, context *Context, value interface{}, 
 	case reflect.Struct:
 		var metas []*Meta
 		if kind == "index" {
-			metas = res.ConvertSectionToMetas(res.allowedSections(res.IndexAttrs(), context, roles.Update))
+			metas = res.ConvertAttributesToMetas(res.allowedAttributes(res.IndexAttrs(), context, roles.Update))
 		} else if kind == "edit" {
-			metas = res.ConvertSectionToMetas(res.allowedSections(res.EditAttrs(), context, roles.Update))
+			metas = res.ConvertAttributesToMetas(res.allowedAttributes(res.EditAttrs(), context, roles.Update))
 		} else if kind == "show" {
-			metas = res.ConvertSectionToMetas(res.allowedSections(res.ShowAttrs(), context, roles.Read))
+			metas = res.ConvertAttributesToMetas(res.allowedAttributes(res.ShowAttrs(), context, roles.Read))
 		}
 
 		values := map[string]interface{}{}

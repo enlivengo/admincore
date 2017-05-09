@@ -23,18 +23,18 @@ type Resource struct {
 	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 	ParentResource *Resource
 
-	admin          *Admin
-	params         string
-	scopes         []*Scope
-	filters        []*Filter
-	searchAttrs    *[]string
-	sortableAttrs  *[]string
-	indexSections  []*Section
-	newSections    []*Section
-	editSections   []*Section
-	showSections   []*Section
-	isSetShowAttrs bool
-	cachedMetas    *map[string][]*Meta
+	admin           *Admin
+	params          string
+	scopes          []*Scope
+	filters         []*Filter
+	searchAttrs     *[]string
+	sortableAttrs   *[]string
+	indexAttributes []*Attributes
+	newAttributes   []*Attributes
+	editAttributes  []*Attributes
+	showAttributes  []*Attributes
+	isSetShowAttrs  bool
+	cachedMetas     *map[string][]*Meta
 }
 
 // Meta register meta for admin resource
@@ -250,10 +250,10 @@ func (res *Resource) getAttrs(attrs []string) []string {
 //     order.IndexAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
 //     // show all attributes except `State` in the index page
 //     order.IndexAttrs("-State")
-func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
-	res.setSections(&res.indexSections, values...)
+func (res *Resource) IndexAttrs(values ...interface{}) []*Attributes {
+	res.setAttributes(&res.indexAttributes, values...)
 	res.SearchAttrs()
-	return res.indexSections
+	return res.indexAttributes
 }
 
 // NewAttrs set attributes will be shown in the new page
@@ -261,15 +261,15 @@ func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 //     order.NewAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
 //     // show all attributes except `State` in the new page
 //     order.NewAttrs("-State")
-//  You could also use `Section` to structure form to make it tidy and clean
+//  You could also use `Attributes` to structure form to make it tidy and clean
 //     product.NewAttrs(
-//       &admin.Section{
+//       &admin.Attributes{
 //       	Title: "Basic Information",
 //       	Rows: [][]string{
 //       		{"Name"},
 //       		{"Code", "Price"},
 //       	}},
-//       &admin.Section{
+//       &admin.Attributes{
 //       	Title: "Organization",
 //       	Rows: [][]string{
 //       		{"Category", "Collections", "MadeCountry"},
@@ -277,9 +277,9 @@ func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 //       "Description",
 //       "ColorVariations",
 //     }
-func (res *Resource) NewAttrs(values ...interface{}) []*Section {
-	res.setSections(&res.newSections, values...)
-	return res.newSections
+func (res *Resource) NewAttrs(values ...interface{}) []*Attributes {
+	res.setAttributes(&res.newAttributes, values...)
+	return res.newAttributes
 }
 
 // EditAttrs set attributes will be shown in the edit page
@@ -287,15 +287,15 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 //     order.EditAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
 //     // show all attributes except `State` in the edit page
 //     order.EditAttrs("-State")
-//  You could also use `Section` to structure form to make it tidy and clean
+//  You could also use `Attributes` to structure form to make it tidy and clean
 //     product.EditAttrs(
-//       &admin.Section{
+//       &admin.Attributes{
 //       	Title: "Basic Information",
 //       	Rows: [][]string{
 //       		{"Name"},
 //       		{"Code", "Price"},
 //       	}},
-//       &admin.Section{
+//       &admin.Attributes{
 //       	Title: "Organization",
 //       	Rows: [][]string{
 //       		{"Category", "Collections", "MadeCountry"},
@@ -303,9 +303,9 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 //       "Description",
 //       "ColorVariations",
 //     }
-func (res *Resource) EditAttrs(values ...interface{}) []*Section {
-	res.setSections(&res.editSections, values...)
-	return res.editSections
+func (res *Resource) EditAttrs(values ...interface{}) []*Attributes {
+	res.setAttributes(&res.editAttributes, values...)
+	return res.editAttributes
 }
 
 // ShowAttrs set attributes will be shown in the show page
@@ -313,15 +313,15 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 //     order.ShowAttrs("User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
 //     // show all attributes except `State` in the show page
 //     order.ShowAttrs("-State")
-//  You could also use `Section` to structure form to make it tidy and clean
+//  You could also use `Attributes` to structure form to make it tidy and clean
 //     product.ShowAttrs(
-//       &admin.Section{
+//       &admin.Attributes{
 //       	Title: "Basic Information",
 //       	Rows: [][]string{
 //       		{"Name"},
 //       		{"Code", "Price"},
 //       	}},
-//       &admin.Section{
+//       &admin.Attributes{
 //       	Title: "Organization",
 //       	Rows: [][]string{
 //       		{"Category", "Collections", "MadeCountry"},
@@ -329,7 +329,7 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 //       "Description",
 //       "ColorVariations",
 //     }
-func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
+func (res *Resource) ShowAttrs(values ...interface{}) []*Attributes {
 	if len(values) > 0 {
 		if values[len(values)-1] == false {
 			values = values[:len(values)-1]
@@ -337,15 +337,15 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 			res.isSetShowAttrs = true
 		}
 	}
-	res.setSections(&res.showSections, values...)
-	return res.showSections
+	res.setAttributes(&res.showAttributes, values...)
+	return res.showAttributes
 }
 
 // SortableAttrs set sortable attributes, sortable attributes could be click to order in qor table
 func (res *Resource) SortableAttrs(columns ...string) []string {
 	if len(columns) != 0 || res.sortableAttrs == nil {
 		if len(columns) == 0 {
-			columns = res.ConvertSectionToStrings(res.indexSections)
+			columns = res.ConvertAttributesToStrings(res.indexAttributes)
 		}
 		res.sortableAttrs = &[]string{}
 		scope := res.GetAdmin().Config.DB.NewScope(res.Value)
@@ -365,7 +365,7 @@ func (res *Resource) SortableAttrs(columns ...string) []string {
 func (res *Resource) SearchAttrs(columns ...string) []string {
 	if len(columns) != 0 || res.searchAttrs == nil {
 		if len(columns) == 0 {
-			columns = res.ConvertSectionToStrings(res.indexSections)
+			columns = res.ConvertAttributesToStrings(res.indexAttributes)
 		}
 
 		if len(columns) > 0 {
@@ -406,19 +406,19 @@ func (res *Resource) GetMetas(attrs []string) []resource.Metaor {
 	if len(attrs) == 0 {
 		attrs = res.allAttrs()
 	}
-	var showSections, ignoredAttrs []string
+	var showAttributes, ignoredAttrs []string
 	for _, attr := range attrs {
 		if strings.HasPrefix(attr, "-") {
 			ignoredAttrs = append(ignoredAttrs, strings.TrimLeft(attr, "-"))
 		} else {
-			showSections = append(showSections, attr)
+			showAttributes = append(showAttributes, attr)
 		}
 	}
 
 	metas := []resource.Metaor{}
 
 Attrs:
-	for _, attr := range showSections {
+	for _, attr := range showAttributes {
 		for _, a := range ignoredAttrs {
 			if attr == a {
 				continue Attrs
@@ -479,10 +479,10 @@ func (res *Resource) GetMetaOrNew(name string) *Meta {
 	return nil
 }
 
-func (res *Resource) allowedSections(sections []*Section, context *Context, roles ...roles.PermissionMode) []*Section {
-	var newSections []*Section
+func (res *Resource) allowedAttributes(sections []*Attributes, context *Context, roles ...roles.PermissionMode) []*Attributes {
+	var attributes []*Attributes
 	for _, section := range sections {
-		newSection := Section{Resource: section.Resource, Title: section.Title}
+		newAttributes := Attributes{Resource: section.Resource, Title: section.Title}
 		var editableRows [][]string
 		for _, row := range section.Rows {
 			var editableColumns []string
@@ -499,10 +499,10 @@ func (res *Resource) allowedSections(sections []*Section, context *Context, role
 				editableRows = append(editableRows, editableColumns)
 			}
 		}
-		newSection.Rows = editableRows
-		newSections = append(newSections, &newSection)
+		newAttributes.Rows = editableRows
+		attributes = append(attributes, &newAttributes)
 	}
-	return newSections
+	return attributes
 }
 
 func (res *Resource) configure() {

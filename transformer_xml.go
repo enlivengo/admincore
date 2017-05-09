@@ -141,11 +141,11 @@ var XMLMarshalDefaultHandler = func(xmlStruct XMLStruct, e *xml.Encoder, start x
 			metas := []*Meta{}
 			switch xmlStruct.Action {
 			case "index":
-				metas = res.ConvertSectionToMetas(res.allowedSections(res.IndexAttrs(), context, roles.Update))
+				metas = res.ConvertAttributesToMetas(res.allowedAttributes(res.IndexAttrs(), context, roles.Update))
 			case "edit":
-				metas = res.ConvertSectionToMetas(res.allowedSections(res.EditAttrs(), context, roles.Update))
+				metas = res.ConvertAttributesToMetas(res.allowedAttributes(res.EditAttrs(), context, roles.Update))
 			case "show":
-				metas = res.ConvertSectionToMetas(res.allowedSections(res.ShowAttrs(), context, roles.Read))
+				metas = res.ConvertAttributesToMetas(res.allowedAttributes(res.ShowAttrs(), context, roles.Read))
 			}
 
 			for _, meta := range metas {
