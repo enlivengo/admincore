@@ -7,15 +7,19 @@ import (
 	"github.com/qor/qor/utils"
 )
 
-// Section is used to structure fields, it could group your fields into sections, to make your form clean & tidy
+// Section alias to Attributes for compatibility
+type Section Attributes
+
+// Attributes attributes group
+// used to structure fields, it could group your fields into sections, to make your form clean & tidy
 //    product.EditAttrs(
-//      &admin.Section{
+//      &admin.Attributes{
 //      	Title: "Basic Information",
 //      	Rows: [][]string{
 //      		{"Name"},
 //      		{"Code", "Price"},
 //      	}},
-//      &admin.Section{
+//      &admin.Attributes{
 //      	Title: "Organization",
 //      	Rows: [][]string{
 //      		{"Category", "Collections", "MadeCountry"},
@@ -23,19 +27,41 @@ import (
 //      "Description",
 //      "ColorVariations",
 //    }
-type Section struct {
-	Resource  *Resource
+type Attributes struct {
+	Resource  *Resource // TODO remove that
 	Title     string
 	Rows      [][]string
-	Permanent bool                             // Keep your section's definition, don't overwrite it
-	Priority  int                              // Have a higher priority to overwrite other section's option, the priority will apply to all rows
-	Formats   []string                         // Show section or not based on request's format
-	Visible   func(interface{}, *Context) bool // Show section or not based on request's context
+	rows      [][]*Attribute
+	Permanent bool
+	Priority  int
+	Formats   []string
+	Visible   func(interface{}, *Context) bool
+}
+
+// Attribute attribute setting
+type Attribute struct {
+	Name      string
+	Permanent bool
+	Priority  int
+	Formats   []string
+	Visible   func(interface{}, *Context) bool
 }
 
 // String stringify section
-func (section *Section) String() string {
-	return fmt.Sprint(section.Rows)
+func (attributes *Attributes) String() string {
+	return fmt.Sprint(attributes.Rows)
+}
+
+// GetAttribute get attribute from Attributes
+func (attributes *Attributes) GetAttribute(name string) *Attribute {
+	for _, row := range attributes.rows {
+		for _, attribute := range row {
+			if attribute.Name == name {
+				return attribute
+			}
+		}
+	}
+	return nil
 }
 
 func (res *Resource) generateSections(values ...interface{}) []*Section {

@@ -1,13 +1,14 @@
 package admin_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/qor/admin"
 	. "github.com/qor/admin/tests/dummy"
 )
 
-func TestSections(t *testing.T) {
+func TestAttributes(t *testing.T) {
 	userRes := Admin.NewResource(&User{})
 	userRes.IndexAttrs(&admin.Section{
 		Rows:      [][]string{{"Name", "Age", "Role"}},
@@ -18,5 +19,6 @@ func TestSections(t *testing.T) {
 		Rows: [][]string{{"RegisteredAt", "Avatar"}},
 	})
 
-	indexSections := userRes.IndexAttrs()
+	indexAttributes := userRes.IndexAttrs()
+	fmt.Println(indexAttributes)
 }
