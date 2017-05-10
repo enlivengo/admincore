@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"reflect"
 
 	"github.com/qor/roles"
@@ -31,6 +32,10 @@ func (JSONTransformer) Encode(writer io.Writer, encoder Encoder) error {
 		js, _ = json.Marshal(result)
 	}
 	context.Writer.Header().Set("Content-Type", "application/json")
+
+	if w, ok := writer.(http.ResponseWriter); ok {
+		w.Header().Set("Content-Type", "application/json")
+	}
 
 	_, err = writer.Write(js)
 	return err
