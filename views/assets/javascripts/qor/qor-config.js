@@ -43,7 +43,7 @@ $.fn.select2.ajaxCommonOptions = function(select2Data) {
                 if (remoteDataPrimaryKey) {
                     obj.id = obj[remoteDataPrimaryKey];
                 } else {
-                    obj.id = obj.Id || obj.ID || obj.Name || obj.name;
+                    obj.id = obj.Id || obj.ID || obj.primaryKey || obj.Name || obj.name;
                 }
                 return obj;
             });
