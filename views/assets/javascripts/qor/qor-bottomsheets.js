@@ -524,6 +524,10 @@
                             $body.html($content.html());
                             this.$title.html($response.find(options.title).html());
 
+                            if (data.selectDefaultCreating) {
+                                this.$title.append(`<button class="mdl-button mdl-button--primary" type="button" data-select-nohint="${data.selectNohint}" data-select-modal="${data.selectModal}" data-select-listing-url="${data.selectListingUrl}">${data.selectBacktolistTitle}</button>`);
+                            }
+
                             if (selectModal) {
                                 $body.find('.qor-button--new').data('ingoreSubmit', true).data('selectId', resourseData.selectId);
                                 if (selectModal != 'one' && !data.selectNohint && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
