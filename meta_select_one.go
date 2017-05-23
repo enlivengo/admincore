@@ -18,6 +18,7 @@ type SelectOneConfig struct {
 	Collection               interface{} // []string, [][]string, func(interface{}, *qor.Context) [][]string, func(interface{}, *admin.Context) [][]string
 	Placeholder              string
 	AllowBlank               bool
+	DefaultCreating          bool
 	SelectionTemplate        string
 	SelectMode               string // select, select_async, bottom_sheet
 	PrimaryField             string

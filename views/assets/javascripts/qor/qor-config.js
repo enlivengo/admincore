@@ -40,11 +40,7 @@ $.fn.select2.ajaxCommonOptions = function(select2Data) {
             params.page = params.page || 1;
 
             var processedData = $.map(data, function(obj) {
-                if (remoteDataPrimaryKey) {
-                    obj.id = obj[remoteDataPrimaryKey];
-                } else {
-                    obj.id = obj.Id || obj.ID;
-                }
+                obj.id = obj[remoteDataPrimaryKey] || obj.primaryKey || obj.Id || obj.ID;
                 return obj;
             });
 

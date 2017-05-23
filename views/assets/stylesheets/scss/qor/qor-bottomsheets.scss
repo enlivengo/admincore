@@ -186,6 +186,11 @@
         background-color: #fff;
         font-size: 24px;
         line-height: 1;
+
+        button {
+            float: right;
+            margin: -4px 8px 0 0;
+        }
     }
 
     .qor-bottomsheets__close {
@@ -227,8 +232,7 @@
     }
 
     .qor-page__body {
-        overflow-y: auto;
-        overflow-x: hidden;
+        overflow: auto;
         height: 100%;
         padding-left: 13px;
 
