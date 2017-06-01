@@ -1,11 +1,9 @@
 package admin
 
 import (
-	"flag"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
 	"regexp"
 	"sort"
@@ -137,14 +135,6 @@ func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
 
 // NewServeMux generate http.Handler for admin
 func (admin *Admin) NewServeMux(prefix string) http.Handler {
-	// Compile qor templates
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	compileQORTemplates := cmdLine.Bool("compile-qor-templates", false, "Compile QOR templates")
-	cmdLine.Parse(os.Args[1:])
-	if *compileQORTemplates {
-		admin.AssetFS.Compile()
-	}
-
 	// Register default routes & middlewares
 	router := admin.router
 	router.Prefix = prefix
