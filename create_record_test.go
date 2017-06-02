@@ -99,6 +99,57 @@ func TestCreateHasManyRecord(t *testing.T) {
 	}
 }
 
+func TestCreateHasManyRecordWithOrder(t *testing.T) {
+	name := "create_record_and_has_many_with_order"
+	form := url.Values{
+		"QorResource.Name":                   {name},
+		"QorResource.Role":                   {"admin"},
+		"QorResource.Addresses[0].Address1":  {"address_0"},
+		"QorResource.Addresses[1].Address1":  {"address_1"},
+		"QorResource.Addresses[2].Address1":  {"address_2"},
+		"QorResource.Addresses[11].Address1": {"address_11"},
+	}
+
+	if req, err := http.PostForm(server.URL+"/admin/users", form); err == nil {
+		if req.StatusCode != 200 {
+			t.Errorf("Create request should be processed successfully")
+		}
+
+		var user User
+		if db.First(&user, "name = ?", name).RecordNotFound() {
+			t.Errorf("User should be created successfully")
+		}
+
+		var address0, address1, address2, address11 Address
+		if db.First(&address0, "user_id = ? and address1 = ?", user.ID, "address_0").RecordNotFound() {
+			t.Errorf("Address 0 should be created successfully")
+		}
+
+		if db.First(&address1, "user_id = ? and address1 = ?", user.ID, "address_1").RecordNotFound() {
+			t.Errorf("Address 1 should be created successfully")
+		}
+
+		if db.First(&address2, "user_id = ? and address1 = ?", user.ID, "address_2").RecordNotFound() {
+			t.Errorf("Address 2 should be created successfully")
+		}
+
+		if db.First(&address11, "user_id = ? and address1 = ?", user.ID, "address_11").RecordNotFound() {
+			t.Errorf("Address 11 should be created successfully")
+		}
+
+		if address11.ID < address2.ID || address2.ID < address1.ID || address1.ID < address0.ID {
+			t.Errorf("Address should be created in order")
+		}
+
+		var addresses []Address
+		if db.Find(&addresses, "user_id = ?", user.ID); len(addresses) != 4 {
+			t.Errorf("There should be only %v addresses created", 4)
+		}
+	} else {
+		t.Errorf(err.Error())
+	}
+}
+
 func TestCreateManyToManyRecord(t *testing.T) {
 	name := "create_record_many_to_many"
 	var languageCN Language
