@@ -2,7 +2,7 @@ $(function () {
 
     'use strict';
 
-    var $body = $('body'),
+    let $body = $('body'),
         Slideout,
         BottomSheets,
 
@@ -22,17 +22,13 @@ $(function () {
     Slideout = $body.data('qor.slideout');
     BottomSheets = $body.data('qor.bottomsheets');
 
-    function clearSelectedCss() {
-        $('[data-url]').removeClass(CLASS_IS_SELECTED);
-    }
-
     function toggleSelectedCss(ele) {
         $('[data-url]').removeClass(CLASS_IS_SELECTED);
-        ele.addClass(CLASS_IS_SELECTED);
+        ele.length && ele.addClass(CLASS_IS_SELECTED);
     }
 
     function collectSelectID() {
-        var $checked = $('.qor-js-table tbody').find('.mdl-checkbox__input:checked'),
+        let $checked = $('.qor-js-table tbody').find('.mdl-checkbox__input:checked'),
             IDs = [];
 
         if (!$checked.length) {
@@ -47,7 +43,7 @@ $(function () {
     }
 
     $(document).on('click.qor.openUrl', '[data-url]', function (e) {
-        var $this = $(this),
+        let $this = $(this),
             $target = $(e.target),
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
@@ -85,7 +81,7 @@ $(function () {
                 if (hasSlideoutTheme || openType == 'slideout') {
                     if ($this.hasClass(CLASS_IS_SELECTED)) {
                         Slideout.hide();
-                        clearSelectedCss();
+                        toggleSelectedCss();
                         return false;
                     } else {
                         Slideout.open(openData);

@@ -30,7 +30,6 @@
         CLASS_SELECT_ICON = '.qor-select__select-icon',
         CLASS_SELECT_HINT = '.qor-selectmany__hint',
         CLASS_PARENT = '.qor-field__selectmany',
-        CLASS_BOTTOMSHEETS = '.qor-bottomsheets',
         CLASS_SELECTED = 'is_selected',
         CLASS_MANY = 'qor-bottomsheets__select-many';
 
@@ -127,7 +126,7 @@
         },
 
         initItems: function() {
-            var $tr = $(CLASS_BOTTOMSHEETS).find('tbody tr'),
+            var $tr = this.$bottomsheets.find('tbody tr'),
                 selectedIconTmpl = this.SELECT_MANY_SELECTED_ICON,
                 unSelectedIconTmpl = this.SELECT_MANY_UNSELECTED_ICON,
                 selectedIDs = [],
@@ -168,8 +167,8 @@
             $.extend(data, this.bottomsheetsData);
             template = this.renderHint(data);
 
-            $(CLASS_SELECT_HINT).remove();
-            $(CLASS_BOTTOMSHEETS).find('.qor-page__body').before(template);
+            this.$bottomsheets.find(CLASS_SELECT_HINT).remove();
+            this.$bottomsheets.find('.qor-page__body').before(template);
         },
 
         updateSelectInputData: function($selectFeild) {
@@ -236,21 +235,21 @@
                 $option = $(Mustache.render(QorSelectMany.SELECT_MANY_OPTION_TEMPLATE, data));
                 $option.appendTo(this.$selector);
                 $option.prop('selected', true);
-                this.BottomSheets.hide();
+                this.$bottomsheets.remove();
                 return;
             }
 
             this.changeIcon(data.$clickElement, this.SELECT_MANY_SELECTED_ICON);
         },
 
-        handleSelectMany: function() {
-            var $bottomsheets = $(CLASS_BOTTOMSHEETS),
-                options = {
+        handleSelectMany: function($bottomsheets) {
+            let options = {
                     onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
                     onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
                 };
 
             $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
+            this.$bottomsheets = $bottomsheets;
             this.initItems();
         },
 

@@ -13,24 +13,23 @@
 
   'use strict';
 
-  var $body = $('body');
-  var $document = $(document);
-  var Mustache = window.Mustache;
-  var NAMESPACE = 'qor.selectone';
-  var PARENT_NAMESPACE = 'qor.bottomsheets';
-  var EVENT_CLICK = 'click.' + NAMESPACE;
-  var EVENT_ENABLE = 'enable.' + NAMESPACE;
-  var EVENT_DISABLE = 'disable.' + NAMESPACE;
-  var EVENT_RELOAD = 'reload.' + PARENT_NAMESPACE;
-  var CLASS_CLEAR_SELECT = '.qor-selected__remove';
-  var CLASS_CHANGE_SELECT = '.qor-selected__change';
-  var CLASS_SELECT_FIELD = '.qor-field__selected';
-  var CLASS_SELECT_INPUT = '.qor-field__selectone-input';
-  var CLASS_SELECT_TRIGGER = '.qor-field__selectone-trigger';
-  var CLASS_PARENT = '.qor-field__selectone';
-  var CLASS_BOTTOMSHEETS = '.qor-bottomsheets';
-  var CLASS_SELECTED = 'is_selected';
-  var CLASS_ONE = 'qor-bottomsheets__select-one';
+  let $body = $('body'),
+      $document = $(document),
+      Mustache = window.Mustache,
+      NAMESPACE = 'qor.selectone',
+      PARENT_NAMESPACE = 'qor.bottomsheets',
+      EVENT_CLICK = 'click.' + NAMESPACE,
+      EVENT_ENABLE = 'enable.' + NAMESPACE,
+      EVENT_DISABLE = 'disable.' + NAMESPACE,
+      EVENT_RELOAD = 'reload.' + PARENT_NAMESPACE,
+      CLASS_CLEAR_SELECT = '.qor-selected__remove',
+      CLASS_CHANGE_SELECT = '.qor-selected__change',
+      CLASS_SELECT_FIELD = '.qor-field__selected',
+      CLASS_SELECT_INPUT = '.qor-field__selectone-input',
+      CLASS_SELECT_TRIGGER = '.qor-field__selectone-trigger',
+      CLASS_PARENT = '.qor-field__selectone',
+      CLASS_SELECTED = 'is_selected',
+      CLASS_ONE = 'qor-bottomsheets__select-one';
 
 
   function QorSelectOne(element, options) {
@@ -110,7 +109,7 @@
       selectedID = $selectFeild.data().primaryKey;
 
       if (selectedID) {
-        $(CLASS_BOTTOMSHEETS).find('tr[data-primary-key="' + selectedID + '"]').addClass(CLASS_SELECTED).find('td:first').append(this.SELECT_ONE_SELECTED_ICON);
+        this.$bottomsheets.find('tr[data-primary-key="' + selectedID + '"]').addClass(CLASS_SELECTED).find('td:first').append(this.SELECT_ONE_SELECTED_ICON);
       }
     },
 
@@ -122,13 +121,14 @@
       return Mustache.render($('[name="select-one-selected-template"]').html(), data);
     },
 
-    handleSelectOne: function () {
+    handleSelectOne: function ($bottomsheets) {
       var options = {
         onSelect: this.onSelectResults.bind(this), //render selected item after click item lists
         onSubmit: this.onSubmitResults.bind(this)  //render new items after new item form submitted
       };
 
-      $(CLASS_BOTTOMSHEETS).qorSelectCore(options).addClass(CLASS_ONE).data(this.bottomsheetsData);
+      $bottomsheets.qorSelectCore(options).addClass(CLASS_ONE).data(this.bottomsheetsData);
+      this.$bottomsheets = $bottomsheets;
       this.initItem();
     },
 
@@ -170,8 +170,7 @@
 
       $parent.trigger('qor.selectone.selected', [data]);
 
-      $(CLASS_BOTTOMSHEETS).qorSelectCore('destroy');
-      this.BottomSheets.hide();
+      this.$bottomsheets.qorSelectCore('destroy').remove();
     },
 
     destroy: function () {

@@ -31,7 +31,6 @@
         CLASS_MAIN_CONTENT = '.mdl-layout__content.qor-page',
         CLASS_BODY_CONTENT = '.qor-page__body',
         CLASS_BODY_HEAD = '.qor-page__header',
-        CLASS_BOTTOMSHEETS = '.qor-bottomsheets',
         CLASS_BOTTOMSHEETS_FILTER = '.qor-bottomsheet__filter',
         CLASS_BOTTOMSHEETS_BUTTON = '.qor-bottomsheets__search-button',
         CLASS_BOTTOMSHEETS_INPUT = '.qor-bottomsheets__search-input',
@@ -161,11 +160,7 @@
         },
 
         build: function() {
-            var $bottomsheets = $(CLASS_BOTTOMSHEETS);
-
-            if ($bottomsheets.length) {
-                $bottomsheets.remove();
-            }
+            let $bottomsheets;
 
             this.$bottomsheets = $bottomsheets = $(QorBottomSheets.TEMPLATE).appendTo('body');
             this.$body = $bottomsheets.find('.qor-bottomsheets__body');
@@ -175,15 +170,6 @@
             this.filterURL = '';
             this.searchParams = '';
 
-        },
-
-        initBottomsheet: function() {
-
-        },
-
-        unbuild: function() {
-            this.$body = null;
-            this.$bottomsheets.remove();
         },
 
         bind: function() {
@@ -377,6 +363,7 @@
                 ajaxType = resourseData.ajaxType,
                 url = $form.prop('action'),
                 formData = new FormData(form),
+                $bottomsheets = this.$bottomsheets,
                 $submit = $form.find(':submit');
 
             // will submit form as normal,
@@ -403,7 +390,7 @@
                 success: function(data, textStatus, jqXHR) {
 
                     if (resourseData.ajaxTakeover) {
-                        resourseData.$target.parent().trigger(EVENT_SUBMITED, [data]);
+                        resourseData.$target.parent().trigger(EVENT_SUBMITED, [data, $bottomsheets]);
                         return;
                     }
 
@@ -525,11 +512,11 @@
                             this.$title.html($response.find(options.title).html());
 
                             if (data.selectDefaultCreating) {
-                                this.$title.append(`<button class="mdl-button mdl-button--primary" type="button" data-select-nohint="${data.selectNohint}" data-select-modal="${data.selectModal}" data-select-listing-url="${data.selectListingUrl}">${data.selectBacktolistTitle}</button>`);
+                                this.$title.append(`<button class="mdl-button mdl-button--primary" type="button" data-load-inline="true" data-select-nohint="${data.selectNohint}" data-select-modal="${data.selectModal}" data-select-listing-url="${data.selectListingUrl}">${data.selectBacktolistTitle}</button>`);
                             }
 
                             if (selectModal) {
-                                $body.find('.qor-button--new').data('ingoreSubmit', true).data('selectId', resourseData.selectId);
+                                $body.find('.qor-button--new').data('ingoreSubmit', true).data('selectId', resourseData.selectId).data('loadInline', true);
                                 if (selectModal != 'one' && !data.selectNohint && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
                                     $body.addClass('has-hint');
                                 }
@@ -563,7 +550,7 @@
 
                             // handle after opened callback
                             if (callback && $.isFunction(callback)) {
-                                callback();
+                                callback(this.$bottomsheets);
                             }
 
                             // callback for after bottomSheets loaded HTML
@@ -602,6 +589,9 @@
         },
 
         open: function(options, callback) {
+            if (!options.loadInline) {
+                this.init();
+            }
             this.resourseData = options;
             this.load(options.url, options, callback);
         },
@@ -612,10 +602,10 @@
             $('body').addClass(CLASS_OPEN);
         },
 
-        hide: function() {
-            var $bottomsheets = this.$bottomsheets;
-            var hideEvent;
-            var $datePicker = $('.qor-datepicker').not('.hidden');
+        hide: function(e) {
+            let $bottomsheets = $(e.target).closest('.qor-bottomsheets'), hideEvent, $datePicker = $('.qor-datepicker').not('.hidden');
+
+
 
             if ($datePicker.length) {
                 $datePicker.addClass('hidden');
@@ -636,8 +626,7 @@
             $('body').removeClass(CLASS_OPEN);
             $bottomsheets.qorSelectCore('destroy');
 
-            $bottomsheets.trigger(EVENT_BOTTOMSHEET_CLOSED);
-            this.init();
+            $bottomsheets.trigger(EVENT_BOTTOMSHEET_CLOSED).remove();
             return false;
         },
 
@@ -651,7 +640,6 @@
 
         destroy: function() {
             this.unbind();
-            this.unbuild();
             this.$element.removeData(NAMESPACE);
         }
     };
