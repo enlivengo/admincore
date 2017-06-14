@@ -238,6 +238,7 @@
                 $.ajax(url, {
                     method: properties.method,
                     data: ajaxForm.formData,
+                    dataType: properties.datatype,
                     beforeSend: function() {
                         if (undoUrl) {
                             $actionButton.prop('disabled', true);
