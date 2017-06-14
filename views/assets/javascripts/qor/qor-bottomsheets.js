@@ -569,7 +569,7 @@
 
 
                     error: $.proxy(function() {
-                        this.hide();
+                        this.$bottomsheets.remove();
                         var errors;
                         if ($('.qor-error span').length > 0) {
                             errors = $('.qor-error span').map(function() {
@@ -605,8 +605,6 @@
         hide: function(e) {
             let $bottomsheets = $(e.target).closest('.qor-bottomsheets'), hideEvent, $datePicker = $('.qor-datepicker').not('.hidden');
 
-
-
             if ($datePicker.length) {
                 $datePicker.addClass('hidden');
             }
@@ -631,7 +629,7 @@
         },
 
         refresh: function() {
-            this.hide();
+            this.$bottomsheets.remove();
 
             setTimeout(function() {
                 window.location.reload();
