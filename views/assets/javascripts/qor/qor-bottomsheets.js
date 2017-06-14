@@ -22,7 +22,6 @@
         EVENT_RELOAD = 'reload.' + NAMESPACE,
         EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE,
         EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE,
-        EVENT_HIDE = 'hide.' + NAMESPACE,
         EVENT_HIDDEN = 'hidden.' + NAMESPACE,
         EVENT_KEYUP = 'keyup.' + NAMESPACE,
         CLASS_OPEN = 'qor-bottomsheets-open',
@@ -603,23 +602,11 @@
         },
 
         hide: function(e) {
-            let $bottomsheets = $(e.target).closest('.qor-bottomsheets'), hideEvent, $datePicker = $('.qor-datepicker').not('.hidden');
+            let $bottomsheets = $(e.target).closest('.qor-bottomsheets'), $datePicker = $('.qor-datepicker').not('.hidden');
 
             if ($datePicker.length) {
                 $datePicker.addClass('hidden');
             }
-
-            hideEvent = $.Event(EVENT_HIDE);
-            $bottomsheets.trigger(hideEvent);
-
-            if (hideEvent.isDefaultPrevented()) {
-                return;
-            }
-
-            $bottomsheets.
-            removeClass(CLASS_IS_SLIDED).
-            removeClass(CLASS_IS_SHOWN).
-            trigger(EVENT_HIDDEN);
 
             $('body').removeClass(CLASS_OPEN);
             $bottomsheets.qorSelectCore('destroy');
