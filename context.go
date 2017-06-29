@@ -10,13 +10,13 @@ import (
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
+	"github.com/qor/session"
 )
 
 // Context admin context, which is used for admin controller
 type Context struct {
 	*qor.Context
 	*Searcher
-	Flashes      []Flash
 	Resource     *Resource
 	Admin        *Admin
 	Content      template.HTML
@@ -45,11 +45,18 @@ func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
 	return context
 }
 
+// Flash set flash message
+func (context *Context) Flash(message string, typ string) {
+	context.Admin.SessionManager.Flash(context.Request, session.Message{
+		Message: message,
+		Type:    typ,
+	})
+}
+
 func (context *Context) clone() *Context {
 	return &Context{
 		Context:  context.Context,
 		Searcher: context.Searcher,
-		Flashes:  context.Flashes,
 		Resource: context.Resource,
 		Admin:    context.Admin,
 		Result:   context.Result,

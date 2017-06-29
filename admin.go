@@ -11,16 +11,19 @@ import (
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
+	"github.com/qor/session"
+	"github.com/qor/session/manager"
 	"github.com/theplant/cldr"
 )
 
 // Admin is a struct that used to generate admin/api interface
 type Admin struct {
-	SiteName string
-	Config   *qor.Config
-	I18n     I18n
-	AssetFS  AssetFSInterface
-	Auth     Auth
+	SiteName       string
+	Config         *qor.Config
+	I18n           I18n
+	AssetFS        AssetFSInterface
+	Auth           Auth
+	SessionManager session.ManagerInterface
 	*Transformer
 
 	menus            []*Menu
@@ -46,6 +49,7 @@ func New(config *qor.Config) *Admin {
 		Transformer:      DefaultTransformer,
 	}
 
+	admin.SessionManager = manager.SessionManager
 	admin.SetAssetFS(&AssetFileSystem{})
 	admin.registerCompositePrimaryKeyCallback()
 	return &admin

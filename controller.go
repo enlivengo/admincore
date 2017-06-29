@@ -171,7 +171,7 @@ func (ac *Controller) Update(context *Context) {
 		}).Respond(context.Request)
 	} else {
 		responder.With("html", func() {
-			context.FlashNow(string(context.t("qor_admin.form.successfully_updated", "{{.Name}} was successfully updated", res)), "success")
+			context.Flash(string(context.t("qor_admin.form.successfully_updated", "{{.Name}} was successfully updated", res)), "success")
 			context.Execute("show", result)
 		}).With([]string{"json", "xml"}, func() {
 			context.Encode("show", result)

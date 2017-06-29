@@ -22,6 +22,7 @@ import (
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
+	"github.com/qor/session"
 )
 
 // NewResourceContext new resource context
@@ -1018,7 +1019,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"raw_value_of":         context.RawValueOf,
 
 		"t":          context.t,
-		"flashes":    context.GetFlashes,
+		"flashes":    func() []session.Message { return context.Admin.SessionManager.Flashes(context.Request) },
 		"pagination": context.Pagination,
 		"escape":     html.EscapeString,
 		"raw":        func(str string) template.HTML { return template.HTML(utils.HTMLSanitizer.Sanitize(str)) },
