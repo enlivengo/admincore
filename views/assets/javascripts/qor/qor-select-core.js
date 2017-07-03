@@ -13,11 +13,13 @@
 
     'use strict';
 
-    var FormData = window.FormData;
-    var NAMESPACE = 'qor.selectcore';
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_SUBMIT = 'submit.' + NAMESPACE;
-    var CLASS_CLICK_TABLE = '.qor-table-container tbody tr';
+    let FormData = window.FormData,
+        NAMESPACE = 'qor.selectcore',
+        EVENT_ONSELECT = 'afterSelected.' + NAMESPACE,
+        EVENT_ONSUBMIT = 'afterSubmitted.' + NAMESPACE,
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_SUBMIT = 'submit.' + NAMESPACE,
+        CLASS_CLICK_TABLE = '.qor-table-container tbody tr';
 
     function QorSelectCore(element, options) {
         this.$element = $(element);
@@ -34,18 +36,18 @@
 
         bind: function() {
             this.$element.
-            on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this)).
-            on(EVENT_SUBMIT, 'form', this.submit.bind(this));
+                on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this)).
+                on(EVENT_SUBMIT, 'form', this.submit.bind(this));
         },
 
         unbind: function() {
             this.$element.
-            off(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
-            off(EVENT_SUBMIT, 'form', this.submit.bind(this));
+                off(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
+                off(EVENT_SUBMIT, 'form', this.submit.bind(this));
         },
 
         processingData: function(e) {
-            var $this = $(e.target).closest('tr'),
+            let $this = $(e.target).closest('tr'),
                 data = {},
                 url,
                 options = this.options,
@@ -62,18 +64,20 @@
                     data = $.extend({}, json, data);
                     if (onSelect && $.isFunction(onSelect)) {
                         onSelect(data, e);
+                        $(document).trigger(EVENT_ONSELECT);
                     }
                 });
             } else {
                 if (onSelect && $.isFunction(onSelect)) {
                     onSelect(data, e);
+                    $(document).trigger(EVENT_ONSELECT);
                 }
             }
             return false;
         },
 
         submit: function(e) {
-            var form = e.target,
+            let form = e.target,
                 $form = $(form),
                 _this = this,
                 $submit = $form.find(':submit'),
@@ -101,6 +105,7 @@
 
                         if (onSubmit && $.isFunction(onSubmit)) {
                             onSubmit(data, e);
+                            $(document).trigger(EVENT_ONSUBMIT);
                         } else {
                             _this.refresh();
                         }
@@ -145,9 +150,9 @@
 
     QorSelectCore.plugin = function(options) {
         return this.each(function() {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var fn;
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                fn;
 
             if (!data) {
                 if (/destroy/.test(options)) {
