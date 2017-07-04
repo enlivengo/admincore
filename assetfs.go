@@ -38,6 +38,7 @@ func RegisterViewPath(pth string) {
 
 type AssetFSInterface interface {
 	RegisterPath(path string) error
+	PrependPath(path string) error
 	Asset(name string) ([]byte, error)
 	Glob(pattern string) (matches []string, err error)
 	Compile() error
@@ -58,6 +59,23 @@ func (fs *AssetFileSystem) RegisterPath(pth string) error {
 		}
 		if !existing {
 			fs.Paths = append(fs.Paths, pth)
+		}
+		return nil
+	}
+	return errors.New("not found")
+}
+
+func (fs *AssetFileSystem) PrependPath(pth string) error {
+	if _, err := os.Stat(pth); !os.IsNotExist(err) {
+		var existing bool
+		for _, p := range fs.Paths {
+			if p == pth {
+				existing = true
+				break
+			}
+		}
+		if !existing {
+			fs.Paths = append([]string{pth}, fs.Paths...)
 		}
 		return nil
 	}
