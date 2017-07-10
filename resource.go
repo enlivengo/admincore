@@ -27,7 +27,6 @@ type Resource struct {
 	params         string
 	scopes         []*Scope
 	filters        []*Filter
-	searchAttrs    *[]string
 	sortableAttrs  *[]string
 	indexSections  []*Section
 	newSections    []*Section
@@ -363,13 +362,12 @@ func (res *Resource) SortableAttrs(columns ...string) []string {
 //     // Search products with its name, code, category's name, brand's name
 //	   product.SearchAttrs("Name", "Code", "Category.Name", "Brand.Name")
 func (res *Resource) SearchAttrs(columns ...string) []string {
-	if len(columns) != 0 || res.searchAttrs == nil {
+	if len(columns) != 0 || res.SearchHandler == nil {
 		if len(columns) == 0 {
 			columns = res.ConvertSectionToStrings(res.indexSections)
 		}
 
 		if len(columns) > 0 {
-			res.searchAttrs = &columns
 			res.SearchHandler = func(keyword string, context *qor.Context) *gorm.DB {
 				var filterFields []filterField
 				for _, column := range columns {
