@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/jinzhu/inflection"
+	"github.com/qor/assetfs"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
@@ -21,11 +22,11 @@ type Admin struct {
 	SiteName       string
 	Config         *qor.Config
 	I18n           I18n
-	AssetFS        AssetFSInterface
 	Auth           Auth
 	SessionManager session.ManagerInterface
 	*Transformer
 
+	AssetFS          assetfs.Interface
 	menus            []*Menu
 	resources        []*Resource
 	searchResources  []*Resource
@@ -50,7 +51,7 @@ func New(config *qor.Config) *Admin {
 	}
 
 	admin.SessionManager = manager.SessionManager
-	admin.SetAssetFS(&AssetFileSystem{})
+	admin.SetAssetFS(assetfs.AssetFS)
 	admin.registerCompositePrimaryKeyCallback()
 	return &admin
 }
@@ -67,7 +68,7 @@ func (admin *Admin) SetAuth(auth Auth) {
 }
 
 // SetAssetFS set AssetFS for admin
-func (admin *Admin) SetAssetFS(assetFS AssetFSInterface) {
+func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
 	admin.AssetFS = assetFS
 	globalAssetFSes = append(globalAssetFSes, assetFS)
 
