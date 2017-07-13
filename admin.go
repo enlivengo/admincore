@@ -51,7 +51,7 @@ func New(config *qor.Config) *Admin {
 	}
 
 	admin.SessionManager = manager.SessionManager
-	admin.SetAssetFS(assetfs.AssetFS)
+	admin.SetAssetFS(assetfs.AssetFS().NameSpace("admin"))
 	admin.registerCompositePrimaryKeyCallback()
 	return &admin
 }
