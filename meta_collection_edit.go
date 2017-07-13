@@ -9,6 +9,7 @@ import (
 // CollectionEditConfig meta configuration used for collection edit
 type CollectionEditConfig struct {
 	Template string
+	Max      uint
 	metaConfig
 }
 

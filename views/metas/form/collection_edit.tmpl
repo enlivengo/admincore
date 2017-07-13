@@ -1,6 +1,8 @@
+{{$metaConfig := .Meta.Config}}
 {{$current_values := (raw_value_of .ResourceValue .Meta)}}
+
 <div class="qor-field collection-edit qor-fieldset-container">
-  <label class="qor-field__label" for="{{.InputId}}">
+  <label class="qor-field__label" {{if $metaConfig.Max}}data-max-item="{{$metaConfig.Max}}"{{end}} for="{{.InputId}}">
     {{meta_label .Meta}}
   </label>
 
