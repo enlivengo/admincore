@@ -1,8 +1,8 @@
 {{$metaConfig := .Meta.Config}}
 {{$current_values := (raw_value_of .ResourceValue .Meta)}}
 
-<div class="qor-field collection-edit qor-fieldset-container">
-  <label class="qor-field__label" {{if $metaConfig.Max}}data-max-item="{{$metaConfig.Max}}"{{end}} for="{{.InputId}}">
+<div class="qor-field collection-edit qor-fieldset-container" {{if $metaConfig.Max}}data-max-item="{{$metaConfig.Max}}" data-max-item-hint="Up to {{$metaConfig.Max}} {{meta_label .Meta}}"{{end}}>
+  <label class="qor-field__label" for="{{.InputId}}">
     {{meta_label .Meta}}
   </label>
 
@@ -33,7 +33,7 @@
         {{end}}
       </fieldset>
 
-      <button class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-fieldset__add" type="button">
+      <button class="mdl-button mdl-button--primary qor-fieldset__add" type="button">
         {{t (printf "%v.attributes.add_%v" .BaseResource.ToParam (singular (meta_label .Meta))) (printf "Add %v" (singular (meta_label .Meta)))}}
       </button>
     {{end}}

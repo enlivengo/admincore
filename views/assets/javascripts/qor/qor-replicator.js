@@ -39,6 +39,7 @@
 
             this.isInSlideout = $this.closest('.qor-slideout').length;
             this.hasInlineReplicator = $this.parents(CLASS_CONTAINER).length || $this.find(CLASS_CONTAINER).length;
+            this.maxitems = $this.data('maxItem');
 
             if (!$template.length || $this.closest('.qor-fieldset--new').length) {
                 return;
@@ -72,7 +73,29 @@
 
             $template.hide();
             this.bind();
+            this.resetButton();
+        },
 
+        getCurrentItems: function() {
+            return this.$element.find('> .qor-field__block > .qor-fieldset').not('.qor-fieldset--new,.is-deleted').length;
+        },
+
+        toggleButton: function(isHide) {
+            let $button = this.$element.find(this.options.addClass);
+
+            if (isHide) {
+                $button.hide();
+            } else {
+                $button.show();
+            }
+        },
+
+        resetButton: function() {
+            if (this.maxitems <= this.getCurrentItems()) {
+                this.toggleButton(true);
+            } else {
+                this.toggleButton();
+            }
         },
 
         parse: function() {
@@ -155,6 +178,10 @@
             var options = this.options,
                 $item, template;
 
+            if (this.maxitems <= this.getCurrentItems()) {
+                return false;
+            }
+
             if (!isAutomatically) {
                 var $target = $(e.target).closest(options.addClass),
                     templateName = $target.data('template'),
@@ -206,6 +233,7 @@
                 e.stopPropagation();
             }
 
+            this.resetButton();
         },
 
         addMultiple: function(data) {
@@ -232,13 +260,19 @@
                 $item = $(e.target).closest(options.itemClass),
                 $alert;
 
-            $item.children(':visible').addClass('hidden').hide();
+            $item.addClass('is-deleted').children(':visible').addClass('hidden').hide();
             $alert = $(options.alertTemplate.replace('{{name}}', this.parseName($item)));
             $alert.find(options.undoClass).one(EVENT_CLICK, function() {
-                $item.find('> .qor-fieldset__alert').remove();
-                $item.children('.hidden').removeClass('hidden').show();
-            });
+                if (this.maxitems <= this.getCurrentItems()) {
+                    window.QOR.qorConfirm(this.$element.data('maxItemHint'));
+                    return false;
+                }
 
+                $item.find('> .qor-fieldset__alert').remove();
+                $item.removeClass('is-deleted').children('.hidden').removeClass('hidden').show();
+                this.resetButton();
+            }.bind(this));
+            this.resetButton();
             $item.append($alert);
         },
 
