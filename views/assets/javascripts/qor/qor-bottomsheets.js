@@ -388,6 +388,11 @@
                 },
                 success: function(data, textStatus, jqXHR) {
 
+                    if (resourseData.ajaxMute) {
+                        $form.closest('.qor-bottomsheets').remove();
+                        return;
+                    }
+
                     if (resourseData.ajaxTakeover) {
                         resourseData.$target.parent().trigger(EVENT_SUBMITED, [data, $bottomsheets]);
                         return;
@@ -536,6 +541,11 @@
                             if (actionData && actionData.length) {
                                 this.bindActionData(actionData);
                             }
+
+                            if (resourseData.bottomsheetClassname){
+                                $bottomsheets.addClass(resourseData.bottomsheetClassname);
+                            }
+
 
                             $bottomsheets.trigger('enable');
 
