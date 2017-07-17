@@ -15,6 +15,7 @@
 
     let FormData = window.FormData,
         NAMESPACE = 'qor.selectcore',
+        EVENT_SELECTCORE_BEFORESEND = 'selectcoreBeforeSend.' + NAMESPACE,
         EVENT_ONSELECT = 'afterSelected.' + NAMESPACE,
         EVENT_ONSUBMIT = 'afterSubmitted.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
@@ -83,6 +84,8 @@
                 $submit = $form.find(':submit'),
                 data,
                 onSubmit = this.options.onSubmit;
+
+            $(document).trigger(EVENT_SELECTCORE_BEFORESEND);
 
             if (FormData) {
                 e.preventDefault();

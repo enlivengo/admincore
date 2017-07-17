@@ -158,7 +158,9 @@
             on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
             !this.isInSlideout && $(document).on('submit', 'form', this.removeData.bind(this));
-            $(document).on('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this));
+            $(document)
+                .on('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this))
+                .on('selectcoreBeforeSend.qor.selectcore bottomsheetBeforeSend.qor.bottomsheets', this.removeData.bind(this));
         },
 
         unbind: function() {
@@ -167,7 +169,9 @@
             off(EVENT_CLICK, this.del);
 
             !this.isInSlideout && $(document).off('submit', 'form', this.removeData.bind(this));
-            $(document).off('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this));
+            $(document)
+                .off('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this))
+                .off('selectcoreBeforeSend.qor.selectcore bottomsheetBeforeSend.qor.bottomsheets', this.removeData.bind(this));
         },
 
         removeData: function() {

@@ -20,6 +20,7 @@
         EVENT_SUBMIT = 'submit.' + NAMESPACE,
         EVENT_SUBMITED = 'ajaxSuccessed.' + NAMESPACE,
         EVENT_RELOAD = 'reload.' + NAMESPACE,
+        EVENT_BOTTOMSHEET_BEFORESEND = 'bottomsheetBeforeSend.' + NAMESPACE,
         EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE,
         EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE,
         EVENT_HIDDEN = 'hidden.' + NAMESPACE,
@@ -350,6 +351,9 @@
 
         submit: function(e) {
             let resourseData = this.resourseData;
+
+            $(document).trigger(EVENT_BOTTOMSHEET_BEFORESEND);
+
             // will ingore submit event if need handle with other submit event: like select one, many...
             if (resourseData.ingoreSubmit) {
                 return;
