@@ -34,15 +34,15 @@ $(function() {
         }
     }).on('click.qor.confirm', '.dialog-button', function() {
         let value = $(this).data('type'),
-            callback = window.QOR.qorConfirmCallback;
+            callback = QOR.qorConfirmCallback;
 
         $.isFunction(callback) && callback(value);
         $dialog.hide();
-        window.QOR.qorConfirmCallback = undefined;
+        QOR.qorConfirmCallback = undefined;
         return false;
     });
 
-    window.QOR.qorConfirm = function(data, callback) {
+    QOR.qorConfirm = function(data, callback) {
         let okBtn = $dialog.find('.dialog-ok'),
             cancelBtn = $dialog.find('.dialog-cancel');
 
@@ -67,7 +67,7 @@ $(function() {
 
 
         $dialog.show();
-        window.QOR.qorConfirmCallback = callback;
+        QOR.qorConfirmCallback = callback;
         return false;
     };
 
@@ -101,7 +101,7 @@ $(function() {
 
     };
 
-    window.QOR.qorAjaxHandleFile = function(url, contentType, fileName, data) {
+    QOR.qorAjaxHandleFile = function(url, contentType, fileName, data) {
         let request = new XMLHttpRequest();
 
         request.responseType = "arraybuffer";
@@ -132,11 +132,29 @@ $(function() {
 
             request.send(data);
         }
-
-
     };
 
-    // *******************************************************************************
+    // ********************************convert video link********************
+    // linkyoutube: /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w.\-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig,
+    // linkvimeo: /https?:\/\/(www\.)?vimeo.com\/(\d+)($|\/)/,
 
+    let converVideoLinks = function() {
+        let $ele = $('.qor-linkify-object'),
+            linkyoutube = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w.\-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig;
+
+        if (!$ele.length) {
+            return;
+        }
+
+        $ele.each(function() {
+            let url = $(this).data('video-link');
+            if (url.match(linkyoutube)) {
+                $(this).html(`<iframe width="100%" height="100%" src="//www.youtube.com/embed/${url.replace(linkyoutube, '$1')}" frameborder="0" allowfullscreen></iframe>`);
+            }
+        });
+    }
+
+    $.fn.qorSliderAfterShow.converVideoLinks = converVideoLinks;
+    converVideoLinks();
 
 });
