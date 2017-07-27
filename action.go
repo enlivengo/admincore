@@ -78,7 +78,7 @@ func (res *Resource) Action(action *Action) *Action {
 	res.Actions = append(res.Actions, action)
 
 	// Register Actions into Router
-	if !res.Config.Invisible {
+	{
 		actionController := &Controller{Admin: res.GetAdmin(), action: action}
 		primaryKeyParams := res.ParamIDName()
 
