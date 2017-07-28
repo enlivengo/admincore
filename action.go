@@ -34,8 +34,8 @@ func (res *Resource) Action(action *Action) *Action {
 				a.Visible = action.Visible
 			}
 
-			if action.Handle != nil {
-				a.Handle = action.Handle
+			if action.Handler != nil {
+				a.Handler = action.Handler
 			}
 
 			if len(action.Modes) != 0 {
@@ -120,7 +120,7 @@ type Action struct {
 	URL         func(record interface{}, context *Context) string
 	URLOpenType string
 	Visible     func(record interface{}, context *Context) bool
-	Handle      func(argument *ActionArgument) error
+	Handler     func(argument *ActionArgument) error
 	Modes       []string
 	Resource    *Resource
 	Permission  *roles.Permission

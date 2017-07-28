@@ -217,7 +217,7 @@ func (ac *Controller) Action(context *Context) {
 			actionArgument.Argument = result
 		}
 
-		err := action.Handle(&actionArgument)
+		err := action.Handler(&actionArgument)
 
 		if !actionArgument.SkipDefaultResponse {
 			if err == nil {

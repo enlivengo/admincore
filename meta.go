@@ -88,10 +88,10 @@ func (meta *Meta) setBaseResource(base *Resource) {
 	res := meta.Resource
 	res.ParentResource = base
 
-	findOneHandle := res.FindOneHandler
+	findOneHandler := res.FindOneHandler
 	res.FindOneHandler = func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) (err error) {
 		if metaValues != nil {
-			return findOneHandle(value, metaValues, context)
+			return findOneHandler(value, metaValues, context)
 		}
 
 		if primaryKey := res.GetPrimaryValue(context.Request); primaryKey != "" {

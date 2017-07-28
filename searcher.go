@@ -118,13 +118,13 @@ func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
 	// call default scopes
 	for _, scope := range s.Resource.scopes {
 		if scope.Default {
-			db = scope.Handle(db, context)
+			db = scope.Handler(db, context)
 		}
 	}
 
 	// call scopes
 	for _, scope := range s.scopes {
-		db = scope.Handle(db, context)
+		db = scope.Handler(db, context)
 	}
 
 	// call filters
