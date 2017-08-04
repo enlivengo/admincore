@@ -1,5 +1,4 @@
 $(function() {
-
     let html = `<div id="dialog" style="display: none;">
                   <div class="mdl-dialog-bg"></div>
                   <div class="mdl-dialog">
@@ -19,41 +18,39 @@ $(function() {
                     </div>
                 </div>`,
         _ = window._,
+        QOR = window.QOR,
         $dialog = $(html).appendTo('body');
 
-
-
     // ************************************ Refactor window.confirm ************************************
-    $(document).on('keyup.qor.confirm', function(e) {
-        if (e.which === 27) {
-            if ($dialog.is(':visible')) {
-                setTimeout(function() {
-                    $dialog.hide();
-                }, 100);
+    $(document)
+        .on('keyup.qor.confirm', function(e) {
+            if (e.which === 27) {
+                if ($dialog.is(':visible')) {
+                    setTimeout(function() {
+                        $dialog.hide();
+                    }, 100);
+                }
             }
-        }
-    }).on('click.qor.confirm', '.dialog-button', function() {
-        let value = $(this).data('type'),
-            callback = QOR.qorConfirmCallback;
+        })
+        .on('click.qor.confirm', '.dialog-button', function() {
+            let value = $(this).data('type'),
+                callback = QOR.qorConfirmCallback;
 
-        $.isFunction(callback) && callback(value);
-        $dialog.hide();
-        QOR.qorConfirmCallback = undefined;
-        return false;
-    });
+            $.isFunction(callback) && callback(value);
+            $dialog.hide();
+            QOR.qorConfirmCallback = undefined;
+            return false;
+        });
 
     QOR.qorConfirm = function(data, callback) {
         let okBtn = $dialog.find('.dialog-ok'),
             cancelBtn = $dialog.find('.dialog-cancel');
 
         if (_.isString(data)) {
-
             $dialog.find('.dialog-message').text(data);
             okBtn.text('ok');
             cancelBtn.text('cancel');
-
         } else if (_.isObject(data)) {
-
             if (data.confirmOk && data.confirmCancel) {
                 okBtn.text(data.confirmOk);
                 cancelBtn.text(data.confirmCancel);
@@ -65,7 +62,6 @@ $(function() {
             $dialog.find('.dialog-message').text(data.confirm);
         }
 
-
         $dialog.show();
         QOR.qorConfirmCallback = callback;
         return false;
@@ -73,16 +69,12 @@ $(function() {
 
     // *******************************************************************************
 
-
-
-
     // ****************Handle download file from AJAX POST****************************
     let objectToFormData = function(obj, form) {
         let formdata = form || new FormData(),
             key;
 
         for (var variable in obj) {
-
             if (obj.hasOwnProperty(variable) && obj[variable]) {
                 key = variable;
             }
@@ -94,30 +86,27 @@ $(function() {
             } else {
                 formdata.append(key, obj[variable]);
             }
-
         }
 
         return formdata;
-
     };
 
     QOR.qorAjaxHandleFile = function(url, contentType, fileName, data) {
         let request = new XMLHttpRequest();
 
-        request.responseType = "arraybuffer";
-        request.open("POST", url, true);
+        request.responseType = 'arraybuffer';
+        request.open('POST', url, true);
         request.onload = function() {
-
             if (this.status === 200) {
                 let blob = new Blob([this.response], {
                         type: contentType
                     }),
                     url = window.URL.createObjectURL(blob),
-                    a = document.createElement("a");
+                    a = document.createElement('a');
 
                 document.body.appendChild(a);
                 a.href = url;
-                a.download = fileName || "download-" + $.now();
+                a.download = fileName || 'download-' + $.now();
                 a.click();
             } else {
                 window.alert('server error, please try again!');
@@ -125,7 +114,6 @@ $(function() {
         };
 
         if (_.isObject(data)) {
-
             if (Object.prototype.toString.call(data) != '[object FormData]') {
                 data = objectToFormData(data);
             }
@@ -140,7 +128,7 @@ $(function() {
 
     let converVideoLinks = function() {
         let $ele = $('.qor-linkify-object'),
-            linkyoutube = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w.\-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig;
+            linkyoutube = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w.\-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/gi;
 
         if (!$ele.length) {
             return;
@@ -152,9 +140,8 @@ $(function() {
                 $(this).html(`<iframe width="100%" height="100%" src="//www.youtube.com/embed/${url.replace(linkyoutube, '$1')}" frameborder="0" allowfullscreen></iframe>`);
             }
         });
-    }
+    };
 
     $.fn.qorSliderAfterShow.converVideoLinks = converVideoLinks;
     converVideoLinks();
-
 });

@@ -10,29 +10,26 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
-    var URL = window.URL || window.webkitURL;
-    var NAMESPACE = 'qor.cropper';
-
-    // Events
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_CHANGE = 'change.' + NAMESPACE;
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_SHOWN = 'shown.qor.modal';
-    var EVENT_HIDDEN = 'hidden.qor.modal';
-
-    // Classes
-    var CLASS_TOGGLE = '.qor-cropper__toggle';
-    var CLASS_CANVAS = '.qor-cropper__canvas';
-    var CLASS_WRAPPER = '.qor-cropper__wrapper';
-    var CLASS_OPTIONS = '.qor-cropper__options';
-    var CLASS_SAVE = '.qor-cropper__save';
-    var CLASS_DELETE = '.qor-cropper__toggle--delete';
-    var CLASS_CROP = '.qor-cropper__toggle--crop';
-    var CLASS_UNDO = '.qor-fieldset__undo';
+    let URL = window.URL || window.webkitURL,
+        NAMESPACE = 'qor.cropper',
+        // Events
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_CHANGE = 'change.' + NAMESPACE,
+        EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_SHOWN = 'shown.qor.modal',
+        EVENT_HIDDEN = 'hidden.qor.modal',
+        // Classes
+        CLASS_TOGGLE = '.qor-cropper__toggle',
+        CLASS_CANVAS = '.qor-cropper__canvas',
+        CLASS_WRAPPER = '.qor-cropper__wrapper',
+        CLASS_OPTIONS = '.qor-cropper__options',
+        CLASS_SAVE = '.qor-cropper__save',
+        CLASS_DELETE = '.qor-cropper__toggle--delete',
+        CLASS_CROP = '.qor-cropper__toggle--crop',
+        CLASS_UNDO = '.qor-fieldset__undo';
 
     function capitalize(str) {
         if (typeof str === 'string') {
@@ -43,8 +40,8 @@
     }
 
     function getLowerCaseKeyObject(obj) {
-        var newObj = {};
-        var key;
+        let newObj = {},
+            key;
 
         if ($.isPlainObject(obj)) {
             for (key in obj) {
@@ -58,20 +55,19 @@
     }
 
     function getValueByNoCaseKey(obj, key) {
-        var originalKey = String(key);
-        var lowerCaseKey = originalKey.toLowerCase();
-        var upperCaseKey = originalKey.toUpperCase();
-        var capitalizeKey = capitalize(originalKey);
+        let originalKey = String(key),
+            lowerCaseKey = originalKey.toLowerCase(),
+            upperCaseKey = originalKey.toUpperCase(),
+            capitalizeKey = capitalize(originalKey);
 
         if ($.isPlainObject(obj)) {
-            return (obj[lowerCaseKey] || obj[capitalizeKey] || obj[upperCaseKey]);
+            return obj[lowerCaseKey] || obj[capitalizeKey] || obj[upperCaseKey];
         }
     }
 
     function clearObject(obj) {
-        for (var prop in obj) {
-            if (obj.hasOwnProperty(prop))
-                obj[prop] = '';
+        for (let prop in obj) {
+            if (obj.hasOwnProperty(prop)) obj[prop] = '';
         }
         return obj;
     }
@@ -99,14 +95,14 @@
         constructor: QorCropper,
 
         init: function() {
-            var options = this.options;
-            var $this = this.$element;
-            var $parent = $this.closest(options.parent);
-            var data;
-            var outputValue;
-            var fetchUrl;
-            var _this = this;
-            var imageData;
+            let options = this.options,
+                $this = this.$element,
+                $parent = $this.closest(options.parent),
+                data,
+                outputValue,
+                fetchUrl,
+                _this = this,
+                imageData;
 
             if (!$parent.length) {
                 $parent = $this.parent();
@@ -139,7 +135,7 @@
         },
 
         build: function() {
-            var textData = this.$output.data(),
+            let textData = this.$output.data(),
                 text = {},
                 replaceTexts;
 
@@ -151,7 +147,6 @@
                 };
                 replaceTexts = this.options.text;
             }
-
 
             if (text.ok && text.title && text.cancel) {
                 replaceTexts = text;
@@ -167,8 +162,8 @@
         },
 
         wrap: function() {
-            var $list = this.$list;
-            var $img;
+            let $list = this.$list,
+                $img;
 
             $list.find('li').append(QorCropper.TOGGLE);
             $img = $list.find('img');
@@ -179,49 +174,36 @@
             } else {
                 $list.find(CLASS_CROP).remove();
             }
-
         },
 
         unwrap: function() {
-            var $list = this.$list;
+            let $list = this.$list;
 
             $list.find(CLASS_TOGGLE).remove();
             $list.find(CLASS_CANVAS).each(function() {
-                var $this = $(this);
+                let $this = $(this);
 
                 $this.before($this.html()).remove();
             });
         },
 
         bind: function() {
-            this.$element.
-            on(EVENT_CHANGE, $.proxy(this.read, this));
-
-            this.$list.
-            on(EVENT_CLICK, $.proxy(this.click, this));
-
-            this.$modal.
-            on(EVENT_SHOWN, $.proxy(this.start, this)).
-            on(EVENT_HIDDEN, $.proxy(this.stop, this));
+            this.$element.on(EVENT_CHANGE, $.proxy(this.read, this));
+            this.$list.on(EVENT_CLICK, $.proxy(this.click, this));
+            this.$modal.on(EVENT_SHOWN, $.proxy(this.start, this)).on(EVENT_HIDDEN, $.proxy(this.stop, this));
         },
 
         unbind: function() {
-            this.$element.
-            off(EVENT_CHANGE, this.read);
-
-            this.$list.
-            off(EVENT_CLICK, this.click);
-
-            this.$modal.
-            off(EVENT_SHOWN, this.start).
-            off(EVENT_HIDDEN, this.stop);
+            this.$element.off(EVENT_CHANGE, this.read);
+            this.$list.off(EVENT_CLICK, this.click);
+            this.$modal.off(EVENT_SHOWN, this.start).off(EVENT_HIDDEN, this.stop);
         },
 
         click: function(e) {
-            var target = e.target;
-            var $target;
-            var data = this.data;
-            var $alert;
+            let target = e.target,
+                $target,
+                data = this.data,
+                $alert;
 
             if (target === this.$list[0]) {
                 return;
@@ -236,12 +218,15 @@
                 this.$list.hide();
 
                 $alert = $(QorCropper.ALERT);
-                $alert.find(CLASS_UNDO).one(EVENT_CLICK, function() {
-                    $alert.remove();
-                    this.$list.show();
-                    delete data.Delete;
-                    this.$output.val(JSON.stringify(data));
-                }.bind(this));
+                $alert.find(CLASS_UNDO).one(
+                    EVENT_CLICK,
+                    function() {
+                        $alert.remove();
+                        this.$list.show();
+                        delete data.Delete;
+                        this.$output.val(JSON.stringify(data));
+                    }.bind(this)
+                );
                 this.$parent.find('.qor-fieldset').append($alert);
             }
 
@@ -253,7 +238,7 @@
         },
 
         read: function(e) {
-            var files = e.target.files,
+            let files = e.target.files,
                 file,
                 $alert = this.$parent.find('.qor-fieldset__alert');
 
@@ -275,13 +260,13 @@
         },
 
         load: function(url, callback) {
-            var options = this.options;
-            var _this = this;
-            var $list = this.$list;
-            var $ul = $list.find('ul');
-            var data = this.data || {};
-            var $image;
-            var imageLength;
+            let options = this.options,
+                _this = this,
+                $list = this.$list,
+                $ul = $list.find('ul'),
+                data = this.data || {},
+                $image,
+                imageLength;
 
             if (!$ul.length || !$ul.find('li').length) {
                 $ul = $(QorCropper.LIST);
@@ -293,88 +278,91 @@
 
             $image = $list.find('img');
             imageLength = $image.length;
-            $image.one('load', function() {
-                var $this = $(this);
-                var naturalWidth = this.naturalWidth;
-                var naturalHeight = this.naturalHeight;
-                var sizeData = $this.data();
-                var sizeResolution = sizeData.sizeResolution;
-                var sizeName = sizeData.sizeName;
-                var emulateImageData = {};
-                var emulateCropData = {};
-                var aspectRatio;
-                var width = sizeData.sizeResolutionWidth;
-                var height = sizeData.sizeResolutionHeight;
+            $image
+                .one('load', function() {
+                    let $this = $(this),
+                        naturalWidth = this.naturalWidth,
+                        naturalHeight = this.naturalHeight,
+                        sizeData = $this.data(),
+                        sizeResolution = sizeData.sizeResolution,
+                        sizeName = sizeData.sizeName,
+                        emulateImageData = {},
+                        emulateCropData = {},
+                        aspectRatio,
+                        width = sizeData.sizeResolutionWidth,
+                        height = sizeData.sizeResolutionHeight;
 
-                if (sizeResolution) {
-                    if (!width && !height) {
-                        width = getValueByNoCaseKey(sizeResolution, 'width');
-                        height = getValueByNoCaseKey(sizeResolution, 'height');
-                    }
-                    aspectRatio = width / height;
+                    if (sizeResolution) {
+                        if (!width && !height) {
+                            width = getValueByNoCaseKey(sizeResolution, 'width');
+                            height = getValueByNoCaseKey(sizeResolution, 'height');
+                        }
+                        aspectRatio = width / height;
 
-                    if (naturalHeight * aspectRatio > naturalWidth) {
-                        width = naturalWidth;
-                        height = width / aspectRatio;
-                    } else {
-                        height = naturalHeight;
-                        width = height * aspectRatio;
-                    }
-
-                    emulateImageData = {
-                        naturalWidth: naturalWidth,
-                        naturalHeight: naturalHeight
-                    };
-
-                    emulateCropData = {
-                        x: Math.round((naturalWidth - width) / 2),
-                        y: Math.round((naturalHeight - height) / 2),
-                        width: Math.round(width),
-                        height: Math.round(height)
-                    };
-
-                    _this.preview($this, emulateImageData, emulateCropData);
-
-                    if (sizeName) {
-                        data.crop = true;
-
-                        if (!data[options.key]) {
-                            data[options.key] = {};
+                        if (naturalHeight * aspectRatio > naturalWidth) {
+                            width = naturalWidth;
+                            height = width / aspectRatio;
+                        } else {
+                            height = naturalHeight;
+                            width = height * aspectRatio;
                         }
 
-                        data[options.key][sizeName] = emulateCropData;
-                    }
-                } else {
-                    _this.center($this);
-                }
+                        emulateImageData = {
+                            naturalWidth: naturalWidth,
+                            naturalHeight: naturalHeight
+                        };
 
-                _this.$output.val(JSON.stringify(data));
+                        emulateCropData = {
+                            x: Math.round((naturalWidth - width) / 2),
+                            y: Math.round((naturalHeight - height) / 2),
+                            width: Math.round(width),
+                            height: Math.round(height)
+                        };
 
-                // callback after load complete
-                if (sizeName && data[options.key] && Object.keys(data[options.key]).length >= imageLength) {
-                    if (callback && $.isFunction(callback)) {
-                        callback();
+                        _this.preview($this, emulateImageData, emulateCropData);
+
+                        if (sizeName) {
+                            data.Crop = true;
+
+                            if (!data[options.key]) {
+                                data[options.key] = {};
+                            }
+
+                            data[options.key][sizeName] = emulateCropData;
+                        }
+                    } else {
+                        _this.center($this);
                     }
-                }
-            }).attr('src', url).data('originalUrl', url);
+
+                    _this.$output.val(JSON.stringify(data));
+
+                    // callback after load complete
+                    if (sizeName && data[options.key] && Object.keys(data[options.key]).length >= imageLength) {
+                        if (callback && $.isFunction(callback)) {
+                            callback();
+                        }
+                    }
+                })
+                .attr('src', url)
+                .data('originalUrl', url);
 
             $list.show();
         },
 
         start: function() {
-            var options = this.options;
-            var $modal = this.$modal;
-            var $target = this.$target;
-            var sizeData = $target.data();
-            var sizeName = sizeData.sizeName || 'original';
-            var sizeResolution = sizeData.sizeResolution;
-            var $clone = $('<img>').attr('src', sizeData.originalUrl);
-            var data = this.data || {};
-            var _this = this;
-            var sizeAspectRatio = NaN;
-            var sizeWidth = sizeData.sizeResolutionWidth;
-            var sizeHeight = sizeData.sizeResolutionHeight;
-            var list;
+            let options = this.options,
+                $modal = this.$modal,
+                $target = this.$target,
+                sizeData = $target.data(),
+                sizeName = sizeData.sizeName || 'original',
+                sizeResolution = sizeData.sizeResolution,
+                $clone = $('<img>').attr('src', sizeData.originalUrl),
+                data = this.data || {},
+                _this = this,
+                sizeAspectRatio = NaN,
+                sizeWidth = sizeData.sizeResolutionWidth,
+                sizeHeight = sizeData.sizeResolutionHeight,
+                list;
 
             if (sizeResolution) {
                 if (!sizeWidth && !sizeHeight) {
@@ -408,9 +396,12 @@
                 autoCropArea: 1,
 
                 built: function() {
-                    $modal.find('.qor-cropper__options-toggle').on(EVENT_CLICK, function() {
-                        $modal.find('.qor-cropper__options-input').prop('checked', $(this).prop('checked'));
-                    }).prop('checked', true);
+                    $modal
+                        .find('.qor-cropper__options-toggle')
+                        .on(EVENT_CLICK, function() {
+                            $modal.find('.qor-cropper__options-input').prop('checked', $(this).prop('checked'));
+                        })
+                        .prop('checked', true);
 
                     $modal.find(CLASS_SAVE).one(EVENT_CLICK, function() {
                         let cropData = $clone.cropper('getData', true),
@@ -418,7 +409,7 @@
                             syncData = [],
                             url;
 
-                        data.crop = true;
+                        data.Crop = true;
                         data[options.key][sizeName] = cropData;
                         _this.imageData = $clone.cropper('getImageData');
                         _this.cropData = cropData;
@@ -428,7 +419,7 @@
                         }
 
                         $modal.find(CLASS_OPTIONS + ' input').each(function() {
-                            var $this = $(this);
+                            let $this = $(this);
 
                             if ($this.prop('checked')) {
                                 syncData.push($this.attr('name'));
@@ -443,27 +434,18 @@
         },
 
         stop: function() {
-            this.$modal.
-            trigger('disable.qor.material').
-            find(CLASS_WRAPPER + ' > img').
-            cropper('destroy').
-            remove().
-            end().
-            find(CLASS_OPTIONS).
-            hide().
-            find('ul').
-            remove();
+            this.$modal.trigger('disable.qor.material').find(CLASS_WRAPPER + ' > img').cropper('destroy').remove().end().find(CLASS_OPTIONS).hide().find('ul').remove();
         },
 
         getList: function(aspectRatio) {
-            var list = [];
+            let list = [];
 
             this.$list.find('img').not(this.$target).each(function() {
-                var data = $(this).data();
-                var resolution = data.sizeResolution;
-                var name = data.sizeName;
-                var width = data.sizeResolutionWidth;
-                var height = data.sizeResolutionHeight;
+                let data = $(this).data(),
+                    resolution = data.sizeResolution,
+                    name = data.sizeName,
+                    width = data.sizeResolutionWidth,
+                    height = data.sizeResolutionHeight;
 
                 if (resolution) {
                     if (!width && !height) {
@@ -474,21 +456,28 @@
                     if (width / height === aspectRatio) {
                         list.push(
                             '<label>' +
-                            '<input class="qor-cropper__options-input" type="checkbox" name="' + name + '" checked> ' +
-                            '<span>' + name +
-                            '<small>(' + width + '&times;' + height + ' px)</small>' +
-                            '</span>' +
-                            '</label>'
+                                '<input class="qor-cropper__options-input" type="checkbox" name="' +
+                                name +
+                                '" checked> ' +
+                                '<span>' +
+                                name +
+                                '<small>(' +
+                                width +
+                                '&times;' +
+                                height +
+                                ' px)</small>' +
+                                '</span>' +
+                                '</label>'
                         );
                     }
                 }
             });
 
-            return list.length ? ('<ul><li>' + list.join('</li><li>') + '</li></ul>') : '';
+            return list.length ? '<ul><li>' + list.join('</li><li>') + '</li></ul>' : '';
         },
 
         output: function(url, data) {
-            var $target = this.$target;
+            let $target = this.$target;
 
             if (url) {
                 this.center($target.attr('src', url), true);
@@ -504,15 +493,15 @@
         },
 
         preview: function($target, emulateImageData, emulateCropData) {
-            var $canvas = $target.parent();
-            var $container = $canvas.parent();
-            var containerWidth = $container.width();
-            var containerHeight = $container.height();
-            var imageData = emulateImageData || this.imageData;
-            var cropData = $.extend({}, emulateCropData || this.cropData); // Clone one to avoid changing it
-            var aspectRatio = cropData.width / cropData.height;
-            var canvasWidth = containerWidth;
-            var scaledRatio;
+            let $canvas = $target.parent(),
+                $container = $canvas.parent(),
+                containerWidth = $container.width(),
+                containerHeight = $container.height(),
+                imageData = emulateImageData || this.imageData,
+                cropData = $.extend({}, emulateCropData || this.cropData), // Clone one to avoid changing it
+                aspectRatio = cropData.width / cropData.height,
+                canvasWidth = containerWidth,
+                scaledRatio;
 
             if (canvasWidth == 0 || imageData.naturalWidth == 0 || imageData.naturalHeight == 0) {
                 return;
@@ -534,14 +523,14 @@
 
         center: function($target, reset) {
             $target.each(function() {
-                var $this = $(this);
-                var $canvas = $this.parent();
-                var $container = $canvas.parent();
+                let $this = $(this),
+                    $canvas = $this.parent(),
+                    $container = $canvas.parent();
 
                 function center() {
-                    var containerHeight = $container.height();
-                    var canvasHeight = $canvas.height();
-                    var marginTop = 'auto';
+                    let containerHeight = $container.height(),
+                        canvasHeight = $canvas.height(),
+                        marginTop = 'auto';
 
                     if (canvasHeight < containerHeight) {
                         marginTop = (containerHeight - canvasHeight) / 2;
@@ -563,13 +552,13 @@
         },
 
         autoCrop: function(url, data) {
-            var cropData = this.cropData;
-            var cropOptions = this.data[this.options.key];
-            var _this = this;
+            let cropData = this.cropData,
+                cropOptions = this.data[this.options.key],
+                _this = this;
 
             this.$list.find('img').not(this.$target).each(function() {
-                var $this = $(this);
-                var sizeName = $this.data('sizeName');
+                let $this = $(this),
+                    sizeName = $this.data('sizeName');
 
                 if ($.inArray(sizeName, data) > -1) {
                     cropOptions[sizeName] = $.extend({}, cropData);
@@ -603,24 +592,19 @@
         }
     };
 
-    QorCropper.TOGGLE = (
-        `<div class="qor-cropper__toggle">
+    QorCropper.TOGGLE = `<div class="qor-cropper__toggle">
             <div class="qor-cropper__toggle--crop"><i class="material-icons">crop</i></div>
             <div class="qor-cropper__toggle--delete"><i class="material-icons">delete</i></div>
-        </div>`
-    );
+        </div>`;
 
-    QorCropper.ALERT = (
-        `<div class="qor-fieldset__alert">
+    QorCropper.ALERT = `<div class="qor-fieldset__alert">
             <button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>
-        </div>`
-    );
+        </div>`;
 
     QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
     QorCropper.LIST = '<ul><li><img></li></ul>';
     QorCropper.FILE_LIST = '<div class="qor-file__list-item"><span><span>{{filename}}</span></span>';
-    QorCropper.MODAL = (
-        `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    QorCropper.MODAL = `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="mdl-card mdl-shadow--2dp" role="document">
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">$[title]</h2>
@@ -641,15 +625,14 @@
                     </button>
                 </div>
             </div>
-        </div>`
-    );
+        </div>`;
 
     QorCropper.plugin = function(option) {
         return this.each(function() {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var options;
-            var fn;
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                options,
+                fn;
 
             if (!data) {
                 if (!$.fn.cropper) {
@@ -664,31 +647,30 @@
                 $this.data(NAMESPACE, (data = new QorCropper(this, options)));
             }
 
-            if (typeof option === 'string' && $.isFunction(fn = data[option])) {
+            if (typeof option === 'string' && $.isFunction((fn = data[option]))) {
                 fn.apply(data);
             }
         });
     };
 
     $(function() {
-        var selector = '.qor-file__input';
-        var options = {
-            parent: '.qor-file',
-            output: '.qor-file__options',
-            list: '.qor-file__list',
-            key: 'CropOptions'
-        };
+        let selector = '.qor-file__input',
+            options = {
+                parent: '.qor-file',
+                output: '.qor-file__options',
+                list: '.qor-file__list',
+                key: 'CropOptions'
+            };
 
-        $(document).
-        on(EVENT_ENABLE, function(e) {
-            QorCropper.plugin.call($(selector, e.target), options);
-        }).
-        on(EVENT_DISABLE, function(e) {
-            QorCropper.plugin.call($(selector, e.target), 'destroy');
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_ENABLE, function(e) {
+                QorCropper.plugin.call($(selector, e.target), options);
+            })
+            .on(EVENT_DISABLE, function(e) {
+                QorCropper.plugin.call($(selector, e.target), 'destroy');
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorCropper;
-
 });
