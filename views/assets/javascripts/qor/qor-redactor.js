@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     let NAMESPACE = 'qor.redactor',
@@ -23,14 +22,12 @@
         EVENT_SHOWN = 'shown.qor.modal',
         EVENT_HIDDEN = 'hidden.qor.modal',
         EVENT_SCROLL = 'scroll.' + NAMESPACE,
-
         CLASS_WRAPPER = '.qor-cropper__wrapper',
         CLASS_SAVE = '.qor-cropper__save',
         CLASS_CROPPER_TOGGLE = '.qor-cropper__toggle--redactor',
         ID_REDACTOR_LINK_TITLE = '#redactor-link-title',
         ID_REDACTOR_LINK_TEXT = '#redactor-link-url-text',
         ID_REDACTOR_MODAL_BUTTON_CANCEL = '#redactor-modal-button-cancel';
-
 
     function encodeCropData(data) {
         var nums = [];
@@ -97,13 +94,7 @@
     }
 
     function escapeHTML(unsafe_str) {
-        return unsafe_str
-            .replace(/&/g, ' ')
-            .replace(/</g, ' ')
-            .replace(/>/g, ' ')
-            .replace(/\"/g, ' ')
-            .replace(/\'/g, ' ')
-            .replace(/\`/g, ' ');
+        return unsafe_str.replace(/&/g, ' ').replace(/</g, ' ').replace(/>/g, ' ').replace(/\"/g, ' ').replace(/\'/g, ' ').replace(/\`/g, ' ');
     }
 
     function redactorToolbarSrcoll($editor, toolbarFixedTopOffset) {
@@ -127,17 +118,15 @@
             editorHeight = $editor.height() - 50;
         }
 
-        if ((offsetTop < toolbarFixedTopOffset)) {
-            if (((editorHeight - 50 - toolbarFixedTopOffset) < Math.abs(offsetTop))) {
+        if (offsetTop < toolbarFixedTopOffset) {
+            if (editorHeight - 50 - toolbarFixedTopOffset < Math.abs(offsetTop)) {
                 $toolbar.css(normallCSS);
             } else {
                 $toolbar.css(fixedCSS);
             }
-
         } else {
             $toolbar.css(normallCSS);
         }
-
     }
 
     function QorRedactor(element, options) {
@@ -165,25 +154,17 @@
         },
 
         bind: function() {
-            this.$element.
-            on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).
-            on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
+            this.$element.on(EVENT_ADD_CROP, $.proxy(this.addButton, this)).on(EVENT_REMOVE_CROP, $.proxy(this.removeButton, this));
         },
 
         unbind: function() {
-            this.$element.
-            off(EVENT_ADD_CROP).
-            off(EVENT_REMOVE_CROP).
-            off(EVENT_SCROLL);
+            this.$element.off(EVENT_ADD_CROP).off(EVENT_REMOVE_CROP).off(EVENT_SCROLL);
         },
 
         addButton: function(e, image) {
             var $image = $(image);
 
-            this.$button.css('left', $(image).width() / 2).
-            prependTo($image.parent()).
-            find(CLASS_CROPPER_TOGGLE).
-            one(EVENT_CLICK, $.proxy(this.crop, this, $image));
+            this.$button.css('left', $(image).width() / 2).prependTo($image.parent()).find(CLASS_CROPPER_TOGGLE).one(EVENT_CLICK, $.proxy(this.crop, this, $image));
         },
 
         removeButton: function() {
@@ -203,49 +184,54 @@
             }
 
             $clone.attr('src', originalUrl);
-            $modal.one(EVENT_SHOWN, function() {
-                $clone.cropper({
-                    data: decodeCropData($image.attr('data-crop-options')),
-                    background: false,
-                    movable: false,
-                    zoomable: false,
-                    scalable: false,
-                    rotatable: false,
-                    checkImageOrigin: false,
+            $modal
+                .one(EVENT_SHOWN, function() {
+                    $clone.cropper({
+                        data: decodeCropData($image.attr('data-crop-options')),
+                        background: false,
+                        movable: false,
+                        zoomable: false,
+                        scalable: false,
+                        rotatable: false,
+                        checkImageOrigin: false,
 
-                    built: function() {
-                        $modal.find(CLASS_SAVE).one(EVENT_CLICK, function() {
-                            var cropData = $clone.cropper('getData', true);
+                        built: function() {
+                            $modal.find(CLASS_SAVE).one(EVENT_CLICK, function() {
+                                var cropData = $clone.cropper('getData', true);
 
-                            $.ajax(options.remote, {
-                                type: 'POST',
-                                contentType: 'application/json',
-                                data: JSON.stringify({
-                                    Url: url,
-                                    CropOptions: {
-                                        original: getCapitalizeKeyObject(cropData)
-                                    },
-                                    Crop: true
-                                }),
-                                dataType: 'json',
+                                $.ajax(options.remote, {
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({
+                                        Url: url,
+                                        CropOptions: {
+                                            original: getCapitalizeKeyObject(cropData)
+                                        },
+                                        Crop: true
+                                    }),
+                                    dataType: 'json',
 
-                                success: function(response) {
-                                    if ($.isPlainObject(response) && response.url) {
-                                        $image.attr('src', response.url).attr('data-crop-options', encodeCropData(cropData)).removeAttr('style').removeAttr('rel');
+                                    success: function(response) {
+                                        if ($.isPlainObject(response) && response.url) {
+                                            $image.attr('src', response.url).attr('data-crop-options', encodeCropData(cropData)).removeAttr('style').removeAttr('rel');
 
-                                        if ($.isFunction(options.complete)) {
-                                            options.complete();
+                                            if ($.isFunction(options.complete)) {
+                                                options.complete();
+                                            }
+                                            $modal.qorModal('hide');
                                         }
-                                        $modal.qorModal('hide');
                                     }
-                                }
+                                });
                             });
-                        });
-                    }
-                });
-            }).one(EVENT_HIDDEN, function() {
-                $clone.cropper('destroy').remove();
-            }).qorModal('show').find(CLASS_WRAPPER).append($clone);
+                        }
+                    });
+                })
+                .one(EVENT_HIDDEN, function() {
+                    $clone.cropper('destroy').remove();
+                })
+                .qorModal('show')
+                .find(CLASS_WRAPPER)
+                .append($clone);
         },
 
         destroy: function() {
@@ -268,16 +254,12 @@
         }
     };
 
-    QorRedactor.BUTTON = (
-        `<div class="qor-redactor__image--buttons">
+    QorRedactor.BUTTON = `<div class="qor-redactor__image--buttons">
             <span class="qor-redactor__image--edit" contenteditable="false">Edit</span>
             <span class="qor-cropper__toggle--redactor" contenteditable="false">Crop</span>
-        </div>`
+        </div>`;
 
-    );
-
-    QorRedactor.MODAL = (
-        `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    QorRedactor.MODAL = `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="mdl-card mdl-shadow--2dp" role="document">
               <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text">$[title]</h2>
@@ -295,8 +277,7 @@
                   </button>
               </div>
             </div>
-        </div>`
-    );
+        </div>`;
 
     QorRedactor.plugin = function(option) {
         return this.each(function() {
@@ -316,21 +297,25 @@
 
                 $this.data(NAMESPACE, (data = {}));
 
+                let editorButtons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'table'];
+
                 config = {
-                    imageUpload: $this.data("uploadUrl"),
-                    fileUpload: $this.data("uploadUrl"),
+                    imageUpload: $this.data('uploadUrl'),
+                    fileUpload: $this.data('uploadUrl'),
                     imageResizable: true,
                     imagePosition: true,
                     toolbarFixed: false,
+                    buttons: editorButtons,
 
                     callbacks: {
                         init: function() {
-                            let button, $editor = this.core.box(),
+                            let button,
+                                $editor = this.core.box(),
                                 isInSlideout = $('.qor-slideout').is(':visible'),
-                                toolbarFixedTarget, toolbarFixedTopOffset = 64,
-                                buttons = ['html', 'format', 'bold', 'italic', 'deleted', 'lists', 'image', 'file', 'link', 'horizontalrule', 'table'];
+                                toolbarFixedTarget,
+                                toolbarFixedTopOffset = 64;
 
-                            buttons.forEach(function(item) {
+                            editorButtons.forEach(function(item) {
                                 button = this.button.get(item);
                                 this.button.setIcon(button, '<i class="material-icons ' + item + '"></i>');
                             }, this);
@@ -347,24 +332,27 @@
                                 redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
                             });
 
-                            if (!$this.data("cropUrl")) {
+                            if (!$this.data('cropUrl')) {
                                 return;
                             }
 
-                            $this.data(NAMESPACE, (data = new QorRedactor($this, {
-                                remote: $this.data("cropUrl"),
-                                text: $this.data("text"),
-                                parent: '.qor-field',
-                                toggle: '.qor-cropper__toggle--redactor',
-                                replace: function(url) {
-                                    return url.replace(/\.\w+$/, function(extension) {
-                                        return '.original' + extension;
-                                    });
-                                },
-                                complete: $.proxy(function() {
-                                    this.code.sync();
-                                }, this)
-                            })));
+                            $this.data(
+                                NAMESPACE,
+                                (data = new QorRedactor($this, {
+                                    remote: $this.data('cropUrl'),
+                                    text: $this.data('text'),
+                                    parent: '.qor-field',
+                                    toggle: '.qor-cropper__toggle--redactor',
+                                    replace: function(url) {
+                                        return url.replace(/\.\w+$/, function(extension) {
+                                            return '.original' + extension;
+                                        });
+                                    },
+                                    complete: $.proxy(function() {
+                                        this.code.sync();
+                                    }, this)
+                                }))
+                            );
                         },
 
                         imageUpload: function(image, json) {
@@ -387,13 +375,19 @@
                                 this.link.linkDescription = this.link.get().prop('title');
                                 this.link.$linkHtml = $(e.target);
                             }
-
                         },
 
                         modalOpened: function(name, modal) {
                             var _this = this;
                             if (name == 'link') {
-                                $(modal).find('#redactor-link-url-text').closest('section').after('<section><label>Description for Accessibility</label><input value="' + this.link.linkDescription + '" type="text" id="redactor-link-title" placeholder="If blank, will use Text value above" /></section>');
+                                $(modal)
+                                    .find('#redactor-link-url-text')
+                                    .closest('section')
+                                    .after(
+                                        '<section><label>Description for Accessibility</label><input value="' +
+                                            this.link.linkDescription +
+                                            '" type="text" id="redactor-link-title" placeholder="If blank, will use Text value above" /></section>'
+                                    );
 
                                 this.link.linkUrlText = $(ID_REDACTOR_LINK_TEXT).val();
                                 this.link.description = $(ID_REDACTOR_LINK_TITLE).val();
@@ -401,7 +395,6 @@
                                 $(ID_REDACTOR_LINK_TITLE).off(EVENT_KEYUP);
                                 $(ID_REDACTOR_LINK_TEXT).off(EVENT_KEYUP);
                                 $(ID_REDACTOR_MODAL_BUTTON_CANCEL).off(EVENT_CLICK);
-
 
                                 $(ID_REDACTOR_MODAL_BUTTON_CANCEL).on(EVENT_CLICK, function() {
                                     _this.link.clickCancel = true;
@@ -416,7 +409,6 @@
                                     _this.link.valueChanged = true;
                                     _this.link.linkUrlText = escapeHTML($(this).val());
                                 });
-
                             }
                         },
 
@@ -452,11 +444,10 @@
                         fileUpload: function(link, json) {
                             $(link).prop('href', json.filelink).html(json.filename);
                         }
-
                     }
                 };
 
-                $.extend(config, $this.data("redactorSettings"));
+                $.extend(config, $this.data('redactorSettings'));
                 $this.redactor(config);
             } else {
                 if (/destroy/.test(option)) {
@@ -464,7 +455,7 @@
                 }
             }
 
-            if (typeof option === 'string' && $.isFunction(fn = data[option])) {
+            if (typeof option === 'string' && $.isFunction((fn = data[option]))) {
                 fn.apply(data);
             }
         });
@@ -473,16 +464,15 @@
     $(function() {
         var selector = 'textarea[data-toggle="qor.redactor"]';
 
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorRedactor.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorRedactor.plugin.call($(selector, e.target));
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorRedactor.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorRedactor.plugin.call($(selector, e.target));
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorRedactor;
-
 });
