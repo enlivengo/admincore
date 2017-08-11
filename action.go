@@ -170,6 +170,10 @@ func (actionArgument *ActionArgument) FindSelectedRecords() []interface{} {
 		sqlParams []interface{}
 	)
 
+	if len(actionArgument.PrimaryValues) == 0 {
+		return records
+	}
+
 	clone := context.clone()
 	for _, primaryValue := range actionArgument.PrimaryValues {
 		primaryQuerySQL, primaryParams := resource.ToPrimaryQueryParams(primaryValue, context.Context)
