@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
     let Mustache = window.Mustache,
         NAMESPACE = 'qor.action',
@@ -32,7 +31,6 @@
         QOR_SEARCH = '.qor-search-container',
         CLASS_IS_UNDO = 'is_undo',
         QOR_SLIDEOUT = '.qor-slideout',
-
         ACTION_FORM_DATA = 'primary_values[]';
 
     function QorAction(element, options) {
@@ -53,18 +51,13 @@
 
         bind: function() {
             this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
-            $(document)
-                .on(EVENT_CLICK, '.qor-table--bulking tr', this.click)
-                .on(EVENT_CLICK, ACTION_LINK, this.actionLink);
+            $(document).on(EVENT_CLICK, '.qor-table--bulking tr', this.click).on(EVENT_CLICK, ACTION_LINK, this.actionLink);
         },
 
         unbind: function() {
             this.$element.off(EVENT_CLICK, this.click);
 
-            $(document)
-                .off(EVENT_CLICK, '.qor-table--bulking tr', this.click)
-                .off(EVENT_CLICK, ACTION_LINK, this.actionLink);
-
+            $(document).off(EVENT_CLICK, '.qor-table--bulking tr', this.click).off(EVENT_CLICK, ACTION_LINK, this.actionLink);
         },
 
         initActions: function() {
@@ -88,7 +81,6 @@
 
                     tempObj = {};
                     if (id) {
-
                         formData.push({
                             name: ACTION_FORM_DATA,
                             value: id.toString()
@@ -121,7 +113,10 @@
         },
 
         click: function(e) {
-            let $target = $(e.target);
+            let $target = $(e.target),
+                $pageHeader = $('.qor-page > .qor-page__header'),
+                $pageBody = $('.qor-page > .qor-page__body');
+
             this.$actionButton = $target;
 
             if ($target.data().ajaxForm) {
@@ -131,7 +126,6 @@
                 return false;
             }
 
-
             if ($target.is('.qor-action--bulk')) {
                 this.$wrap.removeClass('hidden');
                 $(BUTTON_BULKS).find('button').toggleClass('hidden');
@@ -139,6 +133,9 @@
                 $(QOR_TABLE).addClass('qor-table--bulking');
                 $(ACTION_HEADER).find(ACTION_SELECTORS).addClass('hidden');
                 $(ACTION_HEADER).find(QOR_SEARCH).addClass('hidden');
+                if ($pageHeader.height() > 48) {
+                    $pageBody.css('padding-top', $pageHeader.height());
+                }
             }
 
             if ($target.is('.qor-action--exit-bulk')) {
@@ -148,11 +145,12 @@
                 $(QOR_TABLE).removeClass('qor-table--bulking');
                 $(ACTION_HEADER).find(ACTION_SELECTORS).removeClass('hidden');
                 $(ACTION_HEADER).find(QOR_SEARCH).removeClass('hidden');
+                if (parseInt($pageBody.css('padding-top')) > 48) {
+                    $pageBody.css('padding-top', '');
+                }
             }
 
-
             if ($(this).is('tr') && !$target.is('a')) {
-
                 let $firstTd = $(this).find('td').first();
 
                 // Manual make checkbox checked or not
@@ -173,7 +171,6 @@
                     $firstTd.find('input').prop('checked', isChecked);
 
                     if (slideroutActionForm.length && hasPopoverForm) {
-
                         if (isChecked && !$alreadyHaveValue.length) {
                             slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
                         }
@@ -181,12 +178,10 @@
                         if (!isChecked && $alreadyHaveValue.length) {
                             $alreadyHaveValue.remove();
                         }
-
                     }
 
                     return false;
                 }
-
             }
         },
 
@@ -228,9 +223,7 @@
                         return;
                     }
                 });
-
             } else {
-
                 if (isUndo) {
                     url = properties.undoUrl;
                 }
@@ -247,7 +240,7 @@
                         }
                     },
                     success: function(data, status, response) {
-                        let contentType = response.getResponseHeader("content-type"),
+                        let contentType = response.getResponseHeader('content-type'),
                             // handle file download from form submit
                             disposition = response.getResponseHeader('Content-Disposition');
 
@@ -290,7 +283,7 @@
                             // render notification
                             $('.qor-alert').remove();
                             needDisableButtons && _this.switchButtons($element);
-                            isInSlideout ? $parent = $(QOR_SLIDEOUT) : $parent = $(MDL_BODY);
+                            isInSlideout ? ($parent = $(QOR_SLIDEOUT)) : ($parent = $(MDL_BODY));
                             $parent.find(ACTION_BODY).prepend(_this.renderFlashMessage(data));
                         } else {
                             // properties.fromIndex || properties.fromMenu
@@ -306,7 +299,6 @@
                         window.alert([textStatus, errorThrown].join(': '));
                     }
                 });
-
             }
         },
 
@@ -355,7 +347,6 @@
             isMediaLibrary && ($fixedHeadCheckBox = $('thead .mdl-checkbox__input'));
 
             $fixedHeadCheckBox.on('click', function() {
-
                 if (!isMediaLibrary) {
                     $('thead.is-fixed tr th').eq(0).find('label').click();
                     $(this).closest('label').toggleClass('is-checked');
@@ -365,7 +356,6 @@
                     slideroutActionFormPrimaryValues = slideroutActionForm.find('.js-primary-value');
 
                 if (slideroutActionForm.length && hasPopoverForm) {
-
                     if ($(this).is(':checked')) {
                         let allPrimaryValues = $('.qor-table--bulking tbody tr');
                         allPrimaryValues.each(function() {
@@ -378,13 +368,10 @@
                         slideroutActionFormPrimaryValues.remove();
                     }
                 }
-
             });
         }
-
     };
-    QorAction.FLASHMESSAGETMPL = (
-        `<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">
+    QorAction.FLASHMESSAGETMPL = `<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">
           <button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">
             <i class="material-icons">close</i>
           </button>
@@ -396,8 +383,7 @@
               [[error]]
             [[/error]]
           </span>
-        </div>`
-    );
+        </div>`;
 
     QorAction.DEFAULTS = {};
 
@@ -415,7 +401,6 @@
                 }
             });
         }
-
     };
 
     QorAction.plugin = function(options) {
@@ -428,7 +413,7 @@
                 $this.data(NAMESPACE, (data = new QorAction(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.call(data);
             }
         });
@@ -438,20 +423,19 @@
         let options = {},
             selector = '[data-toggle="qor.action.bulk"]';
 
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorAction.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorAction.plugin.call($(selector, e.target), options);
-        }).
-        on(EVENT_CLICK, MENU_ACTIONS, function() {
-            (new QorAction()).actionSubmit(this);
-            return false;
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorAction.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorAction.plugin.call($(selector, e.target), options);
+            })
+            .on(EVENT_CLICK, MENU_ACTIONS, function() {
+                new QorAction().actionSubmit(this);
+                return false;
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorAction;
-
 });

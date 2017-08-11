@@ -1,3 +1,6 @@
+.mdl-button {
+  font-size: 12px;
+}
 .qor-actions {
   float: left;
   min-height: 32px;
@@ -74,7 +77,8 @@
     margin-left: 8px;
   }
 }
-.qor-action-bulk-buttons,.qor-action-forms{
+.qor-action-bulk-buttons,
+.qor-action-forms {
   display: inline-block;
   vertical-align: middle;
   padding: 8px 0;
@@ -88,25 +92,30 @@
   }
 }
 
-.qor-action-bulk-edit{
+.qor-action-bulk-edit {
   float: left;
+  margin-right: 16px;
 }
-.qor-action-forms{
-  .qor-form__actions{
+.qor-action-forms {
+  padding-bottom: 0;
+  .qor-form__actions {
     margin-top: 0;
   }
-  > .qor-action-button{
+  > .qor-action-button {
+    margin-right: 24px;
+    margin-bottom: 8px;
+  }
+  > .action-form {
     margin-right: 24px;
   }
-  > .action-form{
-    margin-right: 24px;
-  }
-  > .action-form, .qor-form-section, .qor-form__actions{
+  > .action-form,
+  .qor-form-section,
+  .qor-form__actions {
     display: inline-block;
     vertical-align: baseline;
   }
-  .qor-form__actions{
-    .mdl-button{
+  .qor-form__actions {
+    .mdl-button {
       float: none;
     }
   }
