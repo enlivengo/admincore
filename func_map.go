@@ -830,12 +830,15 @@ func (context *Context) loadActions(action string) template.HTML {
 		}
 	}
 
-	for _, actionFile := range actionFiles {
+	// later files have higher priority
+	for i := len(actionFiles); i > 0; i-- {
+		actionFile := actionFiles[i-1]
 		base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(path.Base(actionFile), "")
+
 		if _, ok := actions[base]; !ok {
 			actionKeys = append(actionKeys, path.Base(actionFile))
+			actions[base] = actionFile
 		}
-		actions[base] = actionFile
 	}
 
 	sort.Strings(actionKeys)
