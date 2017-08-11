@@ -44,10 +44,11 @@ $(function() {
     });
 
   let $pageHeader = $('.qor-page > .qor-page__header'),
-    $pageBody = $('.qor-page > .qor-page__body');
+    $pageBody = $('.qor-page > .qor-page__body'),
+    triggerHeight = $pageHeader.find('.qor-page-subnav__header').length ? 96 : 48;
 
   if ($pageHeader.length) {
-    if ($pageHeader.height() > 48) {
+    if ($pageHeader.height() > triggerHeight) {
       $pageBody.css('padding-top', $pageHeader.height());
     }
 

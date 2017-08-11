@@ -17,14 +17,13 @@
         width: 100% !important;
         max-width: 260px;
         .select2-dropdown--below {
-            width: auto !important;
             max-width: 260px;
         }
     }
 }
 
 [chooser-selected="true"][data-allow-clear="true"] {
-    &+.select2-container--default {
+    & + .select2-container--default {
         .select2-selection--single {
             border-color: unquote("rgb(#{$color-primary})");
             .select2-selection__rendered {
@@ -50,9 +49,6 @@
                 border-width: 0 4px 4px;
             }
         }
-    }
-    .select2-results>.select2-results__options {
-        overflow-y: scroll;
     }
     .select2-selection--multiple {
         border-radius: 2px;

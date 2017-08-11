@@ -115,7 +115,8 @@
         click: function(e) {
             let $target = $(e.target),
                 $pageHeader = $('.qor-page > .qor-page__header'),
-                $pageBody = $('.qor-page > .qor-page__body');
+                $pageBody = $('.qor-page > .qor-page__body'),
+                triggerHeight = $pageHeader.find('.qor-page-subnav__header').length ? 96 : 48;
 
             this.$actionButton = $target;
 
@@ -133,7 +134,7 @@
                 $(QOR_TABLE).addClass('qor-table--bulking');
                 $(ACTION_HEADER).find(ACTION_SELECTORS).addClass('hidden');
                 $(ACTION_HEADER).find(QOR_SEARCH).addClass('hidden');
-                if ($pageHeader.height() > 48) {
+                if ($pageHeader.height() > triggerHeight) {
                     $pageBody.css('padding-top', $pageHeader.height());
                 }
             }
@@ -145,7 +146,7 @@
                 $(QOR_TABLE).removeClass('qor-table--bulking');
                 $(ACTION_HEADER).find(ACTION_SELECTORS).removeClass('hidden');
                 $(ACTION_HEADER).find(QOR_SEARCH).removeClass('hidden');
-                if (parseInt($pageBody.css('padding-top')) > 48) {
+                if (parseInt($pageBody.css('padding-top')) > triggerHeight) {
                     $pageBody.css('padding-top', '');
                 }
             }
