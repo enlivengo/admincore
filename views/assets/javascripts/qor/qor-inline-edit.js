@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     const NAMESPACE = 'qor.inlineEdit',
@@ -81,8 +80,13 @@
                 .off(EVENT_CLICK, CLASS_EDIT, this.showEdit);
         },
 
-        showEditButton: function() {
+        showEditButton: function(e) {
             let $edit = $(QorInlineEdit.TEMPLATE_EDIT);
+
+            if ($(e.target).closest(CLASS_FIELD).find('input:disabled, textarea:disabled,select:disabled').length) {
+                return false;
+            }
+
             $edit.appendTo($(this));
         },
 
@@ -116,7 +120,6 @@
             }
 
             if (names.length) {
-
                 $.ajax($form.prop('action'), {
                     method: $form.prop('method'),
                     data: inputData,
@@ -165,7 +168,7 @@
                 $this.data(NAMESPACE, (data = new QorInlineEdit(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.call(data);
             }
         });
@@ -175,16 +178,15 @@
         let selector = '[data-toggle="qor.inlineEdit"]',
             options = {};
 
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorInlineEdit.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorInlineEdit.plugin.call($(selector, e.target), options);
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorInlineEdit.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorInlineEdit.plugin.call($(selector, e.target), options);
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorInlineEdit;
-
 });

@@ -47,7 +47,6 @@ $(function() {
     $pageBody = $('.qor-page > .qor-page__body');
 
   if ($pageHeader.length) {
-    console.log($pageHeader.height());
     if ($pageHeader.height() > 48) {
       $pageBody.css('padding-top', $pageHeader.height());
     }
