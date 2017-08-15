@@ -113,7 +113,7 @@
         background-color: unquote("rgb(#{$color-primary})");
     }
     .select2-search--inline {
-        float: none;
+        float: left !important;
         .select2-search__field {
             width: 90% !important;
         }
