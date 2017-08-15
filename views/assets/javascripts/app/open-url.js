@@ -1,20 +1,16 @@
-$(function () {
-
+$(function() {
     'use strict';
 
     let $body = $('body'),
         Slideout,
         BottomSheets,
-
         CLASS_IS_SELECTED = 'is-selected',
-
-        isSlideoutOpened = function () {
+        isSlideoutOpened = function() {
             return $body.hasClass('qor-slideout-open');
         },
-        isBottomsheetsOpened = function () {
+        isBottomsheetsOpened = function() {
             return $body.hasClass('qor-bottomsheets-open');
         };
-
 
     $body.qorBottomSheets();
     $body.qorSlideout();
@@ -32,17 +28,17 @@ $(function () {
             IDs = [];
 
         if (!$checked.length) {
-            return;
+            return false;
         }
 
-        $checked.each(function () {
+        $checked.each(function() {
             IDs.push($(this).closest('tr').data('primary-key'));
         });
 
         return IDs;
     }
 
-    $(document).on('click.qor.openUrl', '[data-url]', function (e) {
+    $(document).on('click.qor.openUrl', '[data-url]', function(e) {
         let $this = $(this),
             $target = $(e.target),
             isNewButton = $this.hasClass('qor-button--new'),
@@ -54,7 +50,6 @@ $(function () {
             hasSlideoutTheme = $this.parents('.qor-theme-slideout').length,
             isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
 
-
         // if clicking item's menu actions
         if ($target.closest('.qor-button--actions').length || (!$target.data('url') && $target.is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
@@ -62,16 +57,23 @@ $(function () {
 
         if (isActionButton) {
             actionData = collectSelectID();
-            openData = $.extend({}, openData, {
-                actionData: actionData
-            });
+            if (actionData) {
+                openData = $.extend({}, openData, {
+                    actionData: actionData
+                });
+            }
         }
 
         openData.$target = $target;
 
-        if (!openData.method || openData.method.toUpperCase() == "GET") {
+        if (!openData.method || openData.method.toUpperCase() == 'GET') {
             // Open in BottmSheet: is action button, open type is bottom-sheet
             if (isActionButton || openType == 'bottomsheet') {
+                if (isActionButton && !actionData) {
+                    window.QOR.qorConfirm(openData.errorNoItem);
+                    return false;
+                }
+
                 BottomSheets.open(openData);
                 return false;
             }
