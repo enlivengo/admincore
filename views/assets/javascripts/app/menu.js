@@ -1,17 +1,28 @@
 $(function() {
   'use strict';
 
+  let menuDatas = [],
+    storageName = 'qoradmin_menu_status',
+    lastMenuStatus = localStorage.getItem(storageName);
+
+  if (lastMenuStatus.length) {
+    menuDatas = lastMenuStatus.split(',');
+  }
+
   $('.qor-menu-container')
     .on('click', '> ul > li > a', function() {
       let $this = $(this),
         $li = $this.parent(),
-        $ul = $this.next('ul');
+        $ul = $this.next('ul'),
+        menuName = $li.attr('qor-icon-name');
 
       if (!$ul.length) {
         return;
       }
 
       if ($ul.hasClass('in')) {
+        menuDatas.push(menuName);
+
         $li.removeClass('is-expanded');
         $ul
           .one('transitionend', function() {
@@ -20,6 +31,8 @@ $(function() {
           .addClass('collapsing')
           .height(0);
       } else {
+        menuDatas = _.without(menuDatas, menuName);
+
         $li.addClass('is-expanded');
         $ul
           .one('transitionend', function() {
@@ -28,19 +41,28 @@ $(function() {
           .addClass('collapsing in')
           .height($ul.prop('scrollHeight'));
       }
+      localStorage.setItem(storageName, menuDatas);
     })
     .find('> ul > li > a')
     .each(function() {
       let $this = $(this),
         $li = $this.parent(),
-        $ul = $this.next('ul');
+        $ul = $this.next('ul'),
+        menuName = $li.attr('qor-icon-name');
 
       if (!$ul.length) {
         return;
       }
 
-      $li.addClass('has-menu is-expanded');
-      $ul.addClass('collapse in').height($ul.prop('scrollHeight'));
+      $ul.addClass('collapse');
+      $li.addClass('has-menu');
+
+      if (menuDatas.indexOf(menuName) != -1) {
+        $ul.height(0);
+      } else {
+        $li.addClass('is-expanded');
+        $ul.addClass('in').height($ul.prop('scrollHeight'));
+      }
     });
 
   let $pageHeader = $('.qor-page > .qor-page__header'),
