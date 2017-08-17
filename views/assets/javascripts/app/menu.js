@@ -5,7 +5,7 @@ $(function() {
     storageName = 'qoradmin_menu_status',
     lastMenuStatus = localStorage.getItem(storageName);
 
-  if (lastMenuStatus.length) {
+  if (lastMenuStatus && lastMenuStatus.length) {
     menuDatas = lastMenuStatus.split(',');
   }
 
