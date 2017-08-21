@@ -616,13 +616,12 @@
                 $datePicker.addClass('hidden');
             }
 
-            if (!$('.qor-bottomsheets').is(':visible')) {
-                $('body').removeClass(CLASS_OPEN);
-            }
-
             $bottomsheets.qorSelectCore('destroy');
 
             $bottomsheets.trigger(EVENT_BOTTOMSHEET_CLOSED).remove();
+            if (!$('.qor-bottomsheets').is(':visible')) {
+                $('body').removeClass(CLASS_OPEN);
+            }
             return false;
         },
 
