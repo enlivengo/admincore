@@ -159,6 +159,7 @@
       $parent.trigger('qor.selectone.selected', [data]);
 
       this.$bottomsheets.qorSelectCore('destroy').remove();
+      $('body').removeClass('qor-bottomsheets-open');
     },
 
     destroy: function() {

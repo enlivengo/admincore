@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     let _ = window._,
@@ -108,7 +107,6 @@
             script.src = srcs[i];
             document.body.appendChild(script);
         }
-
     }
 
     function loadStyles(srcs) {
@@ -169,7 +167,6 @@
             this.$bodyClass = $('body').prop('class');
             this.filterURL = '';
             this.searchParams = '';
-
         },
 
         bind: function() {
@@ -280,7 +277,7 @@
                     _this.reload(url);
                 }
             }).fail(function() {
-                window.alert("server error, please try again later!");
+                window.alert('server error, please try again later!');
             });
         },
 
@@ -329,7 +326,6 @@
             if (scriptDiff.length) {
                 loadScripts(scriptDiff, data);
             }
-
         },
 
         loadMedialibraryJS: function($response) {
@@ -391,7 +387,6 @@
                     $submit.prop('disabled', true);
                 },
                 success: function(data, textStatus, jqXHR) {
-
                     if (resourseData.ajaxMute) {
                         $form.closest('.qor-bottomsheets').remove();
                         return;
@@ -448,7 +443,6 @@
                         $body.find('.qor-error').remove();
                         $error = $(xhr.responseText).find('.qor-error');
                         $form.before($error);
-
                     } else {
                         window.alert([textStatus, errorThrown].join(': '));
                     }
@@ -457,7 +451,6 @@
                     $submit.prop('disabled', false);
                 }
             });
-
         },
 
         load: function(url, data, callback) {
@@ -497,8 +490,8 @@
                             let $response = $(response),
                                 $content,
                                 loadExtraResourceData = {
-                                    '$scripts': $response.filter('script'),
-                                    '$links': $response.filter('link')
+                                    $scripts: $response.filter('script'),
+                                    $links: $response.filter('link')
                                 },
                                 hasSearch = selectModal && $response.find('.qor-search-container').length;
 
@@ -520,7 +513,9 @@
                             this.$title.html($response.find(options.title).html());
 
                             if (data.selectDefaultCreating) {
-                                this.$title.append(`<button class="mdl-button mdl-button--primary" type="button" data-load-inline="true" data-select-nohint="${data.selectNohint}" data-select-modal="${data.selectModal}" data-select-listing-url="${data.selectListingUrl}">${data.selectBacktolistTitle}</button>`);
+                                this.$title.append(
+                                    `<button class="mdl-button mdl-button--primary" type="button" data-load-inline="true" data-select-nohint="${data.selectNohint}" data-select-modal="${data.selectModal}" data-select-listing-url="${data.selectListingUrl}">${data.selectBacktolistTitle}</button>`
+                                );
                             }
 
                             if (selectModal) {
@@ -537,7 +532,7 @@
                             this.$title.after($body.find('.qor-button--new'));
 
                             if (hasSearch) {
-                                $bottomsheets.addClass("has-search");
+                                $bottomsheets.addClass('has-search');
                                 $header.find('.qor-bottomsheets__search').remove();
                                 $header.prepend(QorBottomSheets.TEMPLATE_SEARCH);
                             }
@@ -546,17 +541,15 @@
                                 this.bindActionData(actionData);
                             }
 
-                            if (resourseData.bottomsheetClassname){
+                            if (resourseData.bottomsheetClassname) {
                                 $bottomsheets.addClass(resourseData.bottomsheetClassname);
                             }
-
 
                             $bottomsheets.trigger('enable');
 
                             $bottomsheets.one(EVENT_HIDDEN, function() {
                                 $(this).trigger('disable');
                             });
-
 
                             this.addHeaderClass();
                             $bottomsheets.data(data);
@@ -568,7 +561,6 @@
 
                             // callback for after bottomSheets loaded HTML
                             $bottomsheets.trigger(EVENT_BOTTOMSHEET_LOADED, [url, response]);
-
                         } else {
                             if (data.returnUrl) {
                                 this.load(data.returnUrl);
@@ -576,29 +568,28 @@
                                 this.refresh();
                             }
                         }
-
-
                     }, this),
-
 
                     error: $.proxy(function() {
                         this.$bottomsheets.remove();
+                        $('body').removeClass('qor-bottomsheets-open');
                         var errors;
                         if ($('.qor-error span').length > 0) {
-                            errors = $('.qor-error span').map(function() {
-                                return $(this).text();
-                            }).get().join(', ');
+                            errors = $('.qor-error span')
+                                .map(function() {
+                                    return $(this).text();
+                                })
+                                .get()
+                                .join(', ');
                         } else {
                             errors = 'Server error, please try again later!';
                         }
                         window.alert(errors);
                     }, this)
-
                 });
             }, this);
 
             load();
-
         },
 
         open: function(options, callback) {
@@ -616,7 +607,8 @@
         },
 
         hide: function(e) {
-            let $bottomsheets = $(e.target).closest('.qor-bottomsheets'), $datePicker = $('.qor-datepicker').not('.hidden');
+            let $bottomsheets = $(e.target).closest('.qor-bottomsheets'),
+                $datePicker = $('.qor-datepicker').not('.hidden');
 
             if ($datePicker.length) {
                 $datePicker.addClass('hidden');
@@ -631,6 +623,7 @@
 
         refresh: function() {
             this.$bottomsheets.remove();
+            $('body').removeClass(CLASS_OPEN);
 
             setTimeout(function() {
                 window.location.reload();
@@ -648,26 +641,22 @@
         content: false
     };
 
-    QorBottomSheets.TEMPLATE_ERROR = '<ul class="qor-error"><li><label><i class="material-icons">error</i><span>[[error]]</span></label></li></ul>';
-    QorBottomSheets.TEMPLATE_LOADING = '<div style="text-align: center; margin-top: 30px;"><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>';
-    QorBottomSheets.TEMPLATE_SEARCH = (
-        '<div class="qor-bottomsheets__search">' +
-        '<input autocomplete="off" type="text" class="mdl-textfield__input qor-bottomsheets__search-input" placeholder="Search" />' +
-        '<button class="mdl-button mdl-js-button mdl-button--icon qor-bottomsheets__search-button" type="button"><i class="material-icons">search</i></button>' +
-        '</div>'
-    );
+    QorBottomSheets.TEMPLATE_ERROR = `<ul class="qor-error"><li><label><i class="material-icons">error</i><span>[[error]]</span></label></li></ul>`;
+    QorBottomSheets.TEMPLATE_LOADING = `<div style="text-align: center; margin-top: 30px;"><div class="mdl-spinner mdl-js-spinner is-active qor-layout__bottomsheet-spinner"></div></div>`;
+    QorBottomSheets.TEMPLATE_SEARCH = `<div class="qor-bottomsheets__search">
+            <input autocomplete="off" type="text" class="mdl-textfield__input qor-bottomsheets__search-input" placeholder="Search" />
+            <button class="mdl-button mdl-js-button mdl-button--icon qor-bottomsheets__search-button" type="button"><i class="material-icons">search</i></button>
+        </div>`;
 
-    QorBottomSheets.TEMPLATE = (
-        '<div class="qor-bottomsheets">' +
-        '<div class="qor-bottomsheets__header">' +
-        '<h3 class="qor-bottomsheets__title"></h3>' +
-        '<button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-bottomsheets__close" data-dismiss="bottomsheets">' +
-        '<span class="material-icons">close</span>' +
-        '</button>' +
-        '</div>' +
-        '<div class="qor-bottomsheets__body"></div>' +
-        '</div>'
-    );
+    QorBottomSheets.TEMPLATE = `<div class="qor-bottomsheets">
+            <div class="qor-bottomsheets__header">
+            <h3 class="qor-bottomsheets__title"></h3>
+            <button type="button" class="mdl-button mdl-button--icon mdl-js-button mdl-js-repple-effect qor-bottomsheets__close" data-dismiss="bottomsheets">
+            <span class="material-icons">close</span>
+            </button>
+            </div>
+            <div class="qor-bottomsheets__body"></div>
+        </div>`;
 
     QorBottomSheets.plugin = function(options) {
         return this.each(function() {
@@ -683,7 +672,7 @@
                 $this.data(NAMESPACE, (data = new QorBottomSheets(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.apply(data);
             }
         });
@@ -692,5 +681,4 @@
     $.fn.qorBottomSheets = QorBottomSheets.plugin;
 
     return QorBottomSheets;
-
 });

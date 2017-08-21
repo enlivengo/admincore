@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     let $body = $('body'),
@@ -33,7 +32,6 @@
         CLASS_SELECTED = 'is_selected',
         CLASS_MANY = 'qor-bottomsheets__select-many';
 
-
     function QorSelectMany(element, options) {
         this.$element = $(element);
         this.options = $.extend({}, QorSelectMany.DEFAULTS, $.isPlainObject(options) && options);
@@ -48,23 +46,15 @@
         },
 
         bind: function() {
-            $document.on(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this)).
-            on(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
+            $document.on(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this)).on(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
 
-            this.$element
-                .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
-                .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
-
+            this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
         },
 
         unbind: function() {
-            $document.off(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this)).
-            off(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
+            $document.off(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this)).off(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
 
-            this.$element
-                .off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
-                .off(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
-
+            this.$element.off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).off(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
         },
 
         clearSelect: function(e) {
@@ -110,7 +100,6 @@
             }
 
             this.BottomSheets.open(data, this.handleSelectMany.bind(this));
-
         },
 
         reloadData: function() {
@@ -196,7 +185,6 @@
                 }
 
                 $option.prop('selected', true);
-
             });
         },
 
@@ -228,7 +216,6 @@
                 }
             }
 
-
             this.$selectFeild.append(template);
 
             if (isNewData) {
@@ -236,6 +223,7 @@
                 $option.appendTo(this.$selector);
                 $option.prop('selected', true);
                 this.$bottomsheets.remove();
+                $('body').removeClass('qor-bottomsheets-open');
                 return;
             }
 
@@ -244,9 +232,9 @@
 
         handleSelectMany: function($bottomsheets) {
             let options = {
-                    onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
-                    onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
-                };
+                onSelect: this.onSelectResults.bind(this), // render selected item after click item lists
+                onSubmit: this.onSubmitResults.bind(this) // render new items after new item form submitted
+            };
 
             $bottomsheets.qorSelectCore(options).addClass(CLASS_MANY);
             this.$bottomsheets = $bottomsheets;
@@ -283,14 +271,12 @@
 
             this.updateHint(this.getSelectedItemData());
             this.updateSelectInputData();
-
         },
 
         destroy: function() {
             this.unbind();
             this.$element.removeData(NAMESPACE);
         }
-
     };
 
     QorSelectMany.SELECT_MANY_OPTION_TEMPLATE = '<option value="[[ primaryKey ]]" >[[ displayName ]]</option>';
@@ -309,7 +295,7 @@
                 $this.data(NAMESPACE, (data = new QorSelectMany(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.apply(data);
             }
         });
@@ -317,16 +303,15 @@
 
     $(function() {
         var selector = '[data-toggle="qor.selectmany"]';
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorSelectMany.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorSelectMany.plugin.call($(selector, e.target));
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorSelectMany.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorSelectMany.plugin.call($(selector, e.target));
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorSelectMany;
-
 });
