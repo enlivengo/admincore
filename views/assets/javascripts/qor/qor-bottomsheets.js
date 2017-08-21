@@ -572,7 +572,9 @@
 
                     error: $.proxy(function() {
                         this.$bottomsheets.remove();
-                        $('body').removeClass('qor-bottomsheets-open');
+                        if (!$('.qor-bottomsheets').is(':visible')) {
+                            $('body').removeClass(CLASS_OPEN);
+                        }
                         var errors;
                         if ($('.qor-error span').length > 0) {
                             errors = $('.qor-error span')
@@ -614,7 +616,10 @@
                 $datePicker.addClass('hidden');
             }
 
-            $('body').removeClass(CLASS_OPEN);
+            if (!$('.qor-bottomsheets').is(':visible')) {
+                $('body').removeClass(CLASS_OPEN);
+            }
+
             $bottomsheets.qorSelectCore('destroy');
 
             $bottomsheets.trigger(EVENT_BOTTOMSHEET_CLOSED).remove();
