@@ -213,11 +213,7 @@
             if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
                 window.QOR.qorConfirm(properties, function(confirm) {
                     if (confirm) {
-                        properties = $.extend({}, properties, {
-                            _method: properties.method
-                        });
-
-                        $.post(properties.url, properties, function() {
+                        $.post(properties.url, { _method: properties.method }, function() {
                             window.location.reload();
                         });
                     } else {
