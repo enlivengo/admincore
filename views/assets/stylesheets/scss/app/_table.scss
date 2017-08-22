@@ -62,7 +62,7 @@ table {
     max-height: 24px !important;
     max-width: 54px !important;
   }
-  &.is-sortable>thead>tr>th {
+  &.is-sortable > thead > tr > th {
     &[data-order-by] {
       text-decoration: underline;
       cursor: pointer;
@@ -109,7 +109,7 @@ table {
   }
   .mdl-button {
     margin: -4px 0;
-    +.mdl-button {
+    + .mdl-button {
       margin-left: 8px;
     }
   }
@@ -164,7 +164,7 @@ table {
   .mdl-card__supporting-text {
     width: auto;
     padding: 0;
-    >p {
+    > p {
       margin-bottom: 8px;
       padding: 0 16px;
       line-height: 1.2;
@@ -184,12 +184,10 @@ table {
       &.qor-table--video {
         padding: 0;
         height: 200px;
+        overflow: hidden;
         line-height: 200px;
         text-align: center;
         background-color: unquote("rgba(#{$color-black}, 0.05)");
-        img {
-          max-height: 200px;
-        }
       }
       .qor-table--medialibrary-file {
         display: flex;
@@ -206,8 +204,8 @@ table {
       }
     }
   }
-  >tbody {
-    >tr {
+  > tbody {
+    > tr {
       vertical-align: top;
       display: inline-flex;
       td {
