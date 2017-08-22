@@ -25,10 +25,13 @@
     }
 
     .mdl-card__actions {
+      padding: 16px;
       @include clearfix();
 
       > .mdl-button {
         float: right;
+        margin-left: 16px;
+        min-width: 32px;
       }
     }
   }
@@ -50,14 +53,13 @@
   }
 }
 
-.qor-modal-mini{
-  .mdl-card{
+.qor-modal-mini {
+  .mdl-card {
     width: 400px;
   }
 }
 
 .qor-modal-open {
-
   // Kill the scroll on the body
   overflow: hidden;
 
@@ -67,8 +69,7 @@
   }
 }
 
-
-.qor-dialog{
+.qor-dialog {
   position: fixed;
   z-index: 9999;
   top: 0;
@@ -76,7 +77,7 @@
   right: 0;
   bottom: 0;
   background-color: unquote("rgba(#{$color-black}, 0.54)");
-  .qor-dialog-content{
+  .qor-dialog-content {
     position: absolute;
     width: 50%;
     top: 100px;
@@ -87,7 +88,7 @@
     padding: 24px 48px;
     @include shadow-4dp();
     border-radius: 2px;
-    .mdl-textfield{
+    .mdl-textfield {
       width: 100%;
     }
   }

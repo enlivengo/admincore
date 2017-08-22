@@ -101,23 +101,23 @@
     left: auto;
 }
 
-.datepicker-panel>ul:before,
-.datepicker-panel>ul:after {
+.datepicker-panel > ul:before,
+.datepicker-panel > ul:after {
     display: table;
     content: ' ';
 }
 
-.datepicker-panel>ul:after {
+.datepicker-panel > ul:after {
     clear: both;
 }
 
-.datepicker-panel>ul {
+.datepicker-panel > ul {
     width: 102%;
     margin: 0;
     padding: 0;
 }
 
-.datepicker-panel>ul>li {
+.datepicker-panel > ul > li {
     float: left;
     width: 30px;
     height: 30px;
@@ -130,52 +130,52 @@
     color: rgba(0, 0, 0, .75);
 }
 
-.datepicker-panel>ul>li:hover {
+.datepicker-panel > ul > li:hover {
     background-color: #eee;
 }
 
-.datepicker-panel>ul>li.muted,
-.datepicker-panel>ul>li.muted:hover {
-    color: rgba(0, 0, 0, .2);
+.datepicker-panel > ul > li.muted,
+.datepicker-panel > ul > li.muted:hover {
+    color: rgba(0, 0, 0, .4);
 }
 
-.datepicker-panel>ul>li.picked,
-.datepicker-panel>ul>li.picked:hover {
+.datepicker-panel > ul > li.picked,
+.datepicker-panel > ul > li.picked:hover {
     color: #39f;
 }
 
-.datepicker-panel>ul>li.disabled,
-.datepicker-panel>ul>li.disabled:hover {
+.datepicker-panel > ul > li.disabled,
+.datepicker-panel > ul > li.disabled:hover {
     cursor: default;
-    color: #ccc;
+    color: rgba(0, 0, 0, .1);
     background-color: #fff;
 }
 
-.datepicker-panel>ul>li[data-view='years prev'],
-.datepicker-panel>ul>li[data-view='year prev'],
-.datepicker-panel>ul>li[data-view='month prev'],
-.datepicker-panel>ul>li[data-view='years next'],
-.datepicker-panel>ul>li[data-view='year next'],
-.datepicker-panel>ul>li[data-view='month next'],
-.datepicker-panel>ul>li[data-view='next'] {
+.datepicker-panel > ul > li[data-view='years prev'],
+.datepicker-panel > ul > li[data-view='year prev'],
+.datepicker-panel > ul > li[data-view='month prev'],
+.datepicker-panel > ul > li[data-view='years next'],
+.datepicker-panel > ul > li[data-view='year next'],
+.datepicker-panel > ul > li[data-view='month next'],
+.datepicker-panel > ul > li[data-view='next'] {
     font-size: 18px;
 }
 
-.datepicker-panel>ul>li[data-view='years current'],
-.datepicker-panel>ul>li[data-view='year current'],
-.datepicker-panel>ul>li[data-view='month current'] {
+.datepicker-panel > ul > li[data-view='years current'],
+.datepicker-panel > ul > li[data-view='year current'],
+.datepicker-panel > ul > li[data-view='month current'] {
     width: 150px;
 }
 
-.datepicker-panel>ul[data-view='years']>li,
-.datepicker-panel>ul[data-view='months']>li {
+.datepicker-panel > ul[data-view='years'] > li,
+.datepicker-panel > ul[data-view='months'] > li {
     line-height: 52.5px;
     width: 52.5px;
     height: 52.5px;
 }
 
-.datepicker-panel>ul[data-view='week']>li,
-.datepicker-panel>ul[data-view='week']>li:hover {
+.datepicker-panel > ul[data-view='week'] > li,
+.datepicker-panel > ul[data-view='week'] > li:hover {
     cursor: default;
     background-color: #fff;
 }
@@ -183,7 +183,6 @@
 .datepicker-hide {
     display: none;
 }
-
 
 /* Time picker */
 

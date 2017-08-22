@@ -598,7 +598,7 @@
         </div>`;
 
     QorCropper.ALERT = `<div class="qor-fieldset__alert">
-            <button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>
+            <button class="mdl-button mdl-button--accent qor-fieldset__undo" type="button">Undo delete</button>
         </div>`;
 
     QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
@@ -616,11 +616,11 @@
                     </div>
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
-                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect qor-cropper__save">$[ok]</a>
-                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" data-dismiss="modal">$[cancel]</a>
+                    <a class="mdl-button mdl-button--colored mdl-button--raised qor-cropper__save">$[ok]</a>
+                    <a class="mdl-button mdl-button--colored" data-dismiss="modal">$[cancel]</a>
                 </div>
                 <div class="mdl-card__menu">
-                    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-dismiss="modal" aria-label="close">
+                    <button class="mdl-button mdl-button--icon" data-dismiss="modal" aria-label="close">
                         <i class="material-icons">close</i>
                     </button>
                 </div>
