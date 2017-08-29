@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     const NAMESPACE = 'qor.replicator',
@@ -65,7 +64,6 @@
                 });
 
                 this.parseMultiple();
-
             } else {
                 this.template = $template.prop('outerHTML');
                 this.parse();
@@ -110,12 +108,12 @@
         },
 
         initTemplate: function(template) {
-            let i, hasInlineReplicator = this.hasInlineReplicator;
+            let i,
+                hasInlineReplicator = this.hasInlineReplicator;
 
             template = template.replace(/(\w+)\="(\S*\[\d+\]\S*)"/g, function(attribute, name, value) {
                 value = value.replace(/^(\S*)\[(\d+)\]([^\[\]]*)$/, function(input, prefix, index, suffix) {
                     if (input === value) {
-
                         if (name === 'name' && !i) {
                             i = index;
                         }
@@ -123,23 +121,24 @@
                         if (!hasInlineReplicator && /\[\d+\]/.test(prefix)) {
                             return input.replace(/\[\d+\]/, '[{{index}}]');
                         } else {
-                            return (prefix + '[{{index}}]' + suffix);
+                            return prefix + '[{{index}}]' + suffix;
                         }
-
                     }
                 });
 
-                return (name + '="' + value + '"');
+                return name + '="' + value + '"';
             });
 
             return {
-                'template': template,
-                'index': parseFloat(i)
+                template: template,
+                index: parseFloat(i)
             };
         },
 
         parseMultiple: function() {
-            let template, name, fieldsetName = this.fieldsetName;
+            let template,
+                name,
+                fieldsetName = this.fieldsetName;
 
             for (let i = 0, len = fieldsetName.length; i < len; i++) {
                 name = fieldsetName[i];
@@ -147,15 +146,14 @@
                 this.template[name] = template.template;
                 this.index[name] = template.index;
             }
-
         },
 
         bind: function() {
             let options = this.options;
 
-            this.$element.
-            on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).
-            on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
+            this.$element
+                .on(EVENT_CLICK, options.addClass, $.proxy(this.add, this))
+                .on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
             !this.isInSlideout && $(document).on('submit', 'form', this.removeData.bind(this));
             $(document)
@@ -164,9 +162,7 @@
         },
 
         unbind: function() {
-            this.$element.
-            off(EVENT_CLICK, this.add).
-            off(EVENT_CLICK, this.del);
+            this.$element.off(EVENT_CLICK, this.add).off(EVENT_CLICK, this.del);
 
             !this.isInSlideout && $(document).off('submit', 'form', this.removeData.bind(this));
             $(document)
@@ -180,7 +176,8 @@
 
         add: function(e, data, isAutomatically) {
             var options = this.options,
-                $item, template;
+                $item,
+                template;
 
             if (this.maxitems <= this.getCurrentItems()) {
                 return false;
@@ -203,7 +200,7 @@
                 for (var dataKey in $target.data()) {
                     if (dataKey.match(/^sync/)) {
                         var k = dataKey.replace(/^sync/, '');
-                        $item.find('input[name*=\'.' + k + '\']').val($target.data(dataKey));
+                        $item.find("input[name*='." + k + "']").val($target.data(dataKey));
                     }
                 }
 
@@ -214,21 +211,17 @@
                 }
                 $item.data('itemIndex', this.index[templateName]).removeClass('qor-fieldset--new');
                 this.index[templateName]++;
-
             } else {
                 if (!isAutomatically) {
-
                     $item = this.addSingle();
                     $target.before($item.show());
                     this.index++;
-
                 } else {
                     if (data && data.length) {
                         this.addMultiple(data);
                         $(document).trigger(EVENT_REPLICATORS_ADDED_DONE);
                     }
                 }
-
             }
 
             if (!isAutomatically) {
@@ -266,16 +259,19 @@
 
             $item.addClass('is-deleted').children(':visible').addClass('hidden').hide();
             $alert = $(options.alertTemplate.replace('{{name}}', this.parseName($item)));
-            $alert.find(options.undoClass).one(EVENT_CLICK, function() {
-                if (this.maxitems <= this.getCurrentItems()) {
-                    window.QOR.qorConfirm(this.$element.data('maxItemHint'));
-                    return false;
-                }
+            $alert.find(options.undoClass).one(
+                EVENT_CLICK,
+                function() {
+                    if (this.maxitems <= this.getCurrentItems()) {
+                        window.QOR.qorConfirm(this.$element.data('maxItemHint'));
+                        return false;
+                    }
 
-                $item.find('> .qor-fieldset__alert').remove();
-                $item.removeClass('is-deleted').children('.hidden').removeClass('hidden').show();
-                this.resetButton();
-            }.bind(this));
+                    $item.find('> .qor-fieldset__alert').remove();
+                    $item.removeClass('is-deleted').children('.hidden').removeClass('hidden').show();
+                    this.resetButton();
+                }.bind(this)
+            );
             this.resetButton();
             $item.append($alert);
         },
@@ -293,14 +289,12 @@
                     } else {
                         this.template = this.template.replace(/\[\d+\]/g, '[' + index + ']');
                     }
-
                 }
-
             }
         },
 
         parseName: function($item) {
-            let name = $item.find('input[name]').attr('name');
+            let name = $item.find('input[name]').attr('name') || $item.find('textarea[name]').attr('name');
 
             if (name) {
                 return name.replace(/[^\[\]]+$/, '');
@@ -320,12 +314,11 @@
         delClass: '.qor-fieldset__delete',
         childrenClass: '.qor-field__block',
         undoClass: '.qor-fieldset__undo',
-        alertTemplate: (
+        alertTemplate:
             '<div class="qor-fieldset__alert">' +
             '<input type="hidden" name="{{name}}._destroy" value="1">' +
             '<button class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect qor-fieldset__undo" type="button">Undo delete</button>' +
             '</div>'
-        )
     };
 
     QorReplicator.plugin = function(options) {
@@ -338,7 +331,7 @@
                 $this.data(NAMESPACE, (data = new QorReplicator(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.call(data);
             }
         });
@@ -348,16 +341,15 @@
         let selector = CLASS_CONTAINER;
         let options = {};
 
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorReplicator.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorReplicator.plugin.call($(selector, e.target), options);
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorReplicator.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorReplicator.plugin.call($(selector, e.target), options);
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorReplicator;
-
 });
