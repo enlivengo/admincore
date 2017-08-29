@@ -807,16 +807,8 @@ func (context *Context) loadActions(action string) template.HTML {
 	}
 
 	for _, pattern := range actionPatterns {
-		for _, theme := range context.getThemes() {
-			if resourcePath := context.resourcePath(); resourcePath != "" {
-				if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme.GetName(), resourcePath, pattern)); err == nil {
-					actionFiles = append(actionFiles, matches...)
-				}
-			}
-
-			if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme.GetName(), pattern)); err == nil {
-				actionFiles = append(actionFiles, matches...)
-			}
+		if matches, err := context.Admin.AssetFS.Glob(pattern); err == nil {
+			actionFiles = append(actionFiles, matches...)
 		}
 
 		if resourcePath := context.resourcePath(); resourcePath != "" {
@@ -825,13 +817,22 @@ func (context *Context) loadActions(action string) template.HTML {
 			}
 		}
 
-		if matches, err := context.Admin.AssetFS.Glob(pattern); err == nil {
-			actionFiles = append(actionFiles, matches...)
+		for _, theme := range context.getThemes() {
+			if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme.GetName(), pattern)); err == nil {
+				actionFiles = append(actionFiles, matches...)
+			}
+
+			if resourcePath := context.resourcePath(); resourcePath != "" {
+				if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme.GetName(), resourcePath, pattern)); err == nil {
+					actionFiles = append(actionFiles, matches...)
+				}
+			}
 		}
 	}
 
-	// before files have higher priority
-	for _, actionFile := range actionFiles {
+	// later files have higher priority
+	for i := len(actionFiles); i > 0; i-- {
+		actionFile := actionFiles[i-1]
 		base := regexp.MustCompile("^\\d+\\.").ReplaceAllString(path.Base(actionFile), "")
 
 		if _, ok := actions[base]; !ok {
