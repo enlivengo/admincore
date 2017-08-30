@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     let FormData = window.FormData,
@@ -36,15 +35,13 @@
         },
 
         bind: function() {
-            this.$element.
-                on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this)).
-                on(EVENT_SUBMIT, 'form', this.submit.bind(this));
+            this.$element
+                .on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this))
+                .on(EVENT_SUBMIT, 'form', this.submit.bind(this));
         },
 
         unbind: function() {
-            this.$element.
-                off(EVENT_CLICK, '.qor-table tbody tr', this.processingData.bind(this)).
-                off(EVENT_SUBMIT, 'form', this.submit.bind(this));
+            this.$element.off(EVENT_CLICK, '.qor-table tbody tr').off(EVENT_SUBMIT, 'form');
         },
 
         processingData: function(e) {
@@ -112,13 +109,13 @@
                         } else {
                             _this.refresh();
                         }
-
                     },
                     error: function(xhr, textStatus, errorThrown) {
                         let error;
 
                         if (xhr.responseJSON) {
-                            error = `<ul class="qor-error"><li><label><i class="material-icons">error</i><span>${xhr.responseJSON.errors[0]}</span></label></li></ul>`;
+                            error = `<ul class="qor-error"><li><label><i class="material-icons">error</i><span>${xhr.responseJSON
+                                .errors[0]}</span></label></li></ul>`;
                         } else {
                             error = `<ul class="qor-error">${$(xhr.responseText).find('#errors').html()}</ul>`;
                         }
@@ -147,9 +144,7 @@
         destroy: function() {
             this.unbind();
         }
-
     };
-
 
     QorSelectCore.plugin = function(options) {
         return this.each(function() {
@@ -164,7 +159,7 @@
                 $this.data(NAMESPACE, (data = new QorSelectCore(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.apply(data);
             }
         });
@@ -173,5 +168,4 @@
     $.fn.qorSelectCore = QorSelectCore.plugin;
 
     return QorSelectCore;
-
 });
