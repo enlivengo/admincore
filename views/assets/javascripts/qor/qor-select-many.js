@@ -46,15 +46,18 @@
         },
 
         bind: function() {
-            $document.on(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this)).on(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
+            $document
+                .on(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this))
+                .on(EVENT_RELOAD, `.${CLASS_MANY}`, this.reloadData.bind(this));
 
-            this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
+            this.$element
+                .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
+                .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
         },
 
         unbind: function() {
-            $document.off(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this)).off(EVENT_RELOAD, '.' + CLASS_MANY, this.reloadData.bind(this));
-
-            this.$element.off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).off(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
+            $document.off(EVENT_CLICK, '[data-select-modal="many"]').off(EVENT_RELOAD, `.${CLASS_MANY}`);
+            this.$element.off(EVENT_CLICK, CLASS_CLEAR_SELECT).off(EVENT_CLICK, CLASS_UNDO_DELETE);
         },
 
         clearSelect: function(e) {

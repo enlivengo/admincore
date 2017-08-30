@@ -44,15 +44,17 @@
     },
 
     bind: function() {
-      $document.on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this)).on(EVENT_RELOAD, '.' + CLASS_ONE, this.reloadData.bind(this));
-
-      this.$element.on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).on(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
+      $document
+        .on(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this))
+        .on(EVENT_RELOAD, `.${CLASS_ONE}`, this.reloadData.bind(this));
+      this.$element
+        .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
+        .on(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
     },
 
     unbind: function() {
-      $document.off(EVENT_CLICK, '[data-selectone-url]', this.openBottomSheets.bind(this)).off(EVENT_RELOAD, '.' + CLASS_ONE, this.reloadData.bind(this));
-
-      this.$element.off(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this)).off(EVENT_CLICK, CLASS_CHANGE_SELECT, this.changeSelect);
+      $document.off(EVENT_CLICK, '[data-selectone-url]').off(EVENT_RELOAD, `.${CLASS_ONE}`);
+      this.$element.off(EVENT_CLICK, CLASS_CLEAR_SELECT).off(EVENT_CLICK, CLASS_CHANGE_SELECT);
     },
 
     clearSelect: function(e) {
@@ -85,7 +87,6 @@
       data.url = data.selectoneUrl;
 
       this.SELECT_ONE_SELECTED_ICON = $('[name="select-one-selected-icon"]').html();
-
       this.BottomSheets.open(data, this.handleSelectOne.bind(this));
     },
 
@@ -100,7 +101,11 @@
       selectedID = $selectFeild.data().primaryKey;
 
       if (selectedID) {
-        this.$bottomsheets.find('tr[data-primary-key="' + selectedID + '"]').addClass(CLASS_SELECTED).find('td:first').append(this.SELECT_ONE_SELECTED_ICON);
+        this.$bottomsheets
+          .find('tr[data-primary-key="' + selectedID + '"]')
+          .addClass(CLASS_SELECTED)
+          .find('td:first')
+          .append(this.SELECT_ONE_SELECTED_ICON);
       }
     },
 
