@@ -16,10 +16,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Stylesheets -->
-    {{stylesheet_tag "vendors" "qor" "app"}}
+    {{stylesheet_tag "qor-admin"}}
     {{load_admin_stylesheets}}
     {{load_theme_stylesheets}}
-    {{javascript_tag "vendors/jquery.min" "vendors"}}
+    {{javascript_tag "vendors"}}
   </head>
 
   <body class="{{if qor_theme_class}}{{qor_theme_class}}{{end}}">
@@ -48,7 +48,7 @@
     </div>
 
     <!-- JavaScripts -->
-    {{javascript_tag "qor" "app"}}
+    {{javascript_tag "qor-admin"}}
     {{load_admin_javascripts}}
     {{load_theme_javascripts}}
   </body>
