@@ -795,10 +795,10 @@ func (context *Context) loadActions(action string) template.HTML {
 
 	switch action {
 	case "index", "show", "edit", "new":
-		actionPatterns = []string{"actions/*.tmpl", filepath.Join("actions", action, "*.tmpl")}
+		actionPatterns = []string{filepath.Join("actions", action, "*.tmpl"), "actions/*.tmpl"}
 
 		if !context.Resource.isSetShowAttrs && action == "edit" {
-			actionPatterns = []string{"actions/*.tmpl", filepath.Join("actions", "show", "*.tmpl")}
+			actionPatterns = []string{filepath.Join("actions", "show", "*.tmpl"), "actions/*.tmpl"}
 		}
 	case "global":
 		actionPatterns = []string{"actions/*.tmpl"}
