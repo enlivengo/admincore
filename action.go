@@ -154,7 +154,11 @@ func (action Action) IsAllowed(mode roles.PermissionMode, context *Context, reco
 // HasPermission check if current user has permission for the action
 func (action Action) HasPermission(mode roles.PermissionMode, context *qor.Context) bool {
 	if action.Permission != nil {
-		return action.Permission.HasPermission(mode, context.Roles...)
+		var roles = []interface{}{}
+		for _, role := range context.Roles {
+			roles = append(roles, role)
+		}
+		return action.Permission.HasPermission(mode, roles...)
 	}
 
 	return true
