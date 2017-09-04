@@ -244,9 +244,16 @@
         },
 
         addSingle: function() {
-            let $item;
+            let $item,
+                $element = this.$element;
 
             $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
+            // add order property for sortable fieldset
+            if ($element.hasClass('qor-fieldset-sortable')) {
+                let order = $element.find('> .qor-field__block > .qor-sortable__item').not('.qor-fieldset--new').length;
+                $item.attr('order-index', order).css('order', order);
+            }
+
             $item.data('itemIndex', this.index).removeClass('qor-fieldset--new');
 
             return $item;
