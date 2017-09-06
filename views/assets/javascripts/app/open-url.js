@@ -51,7 +51,11 @@ $(function() {
             isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
 
         // if clicking item's menu actions
-        if ($target.closest('.qor-button--actions').length || (!$target.data('url') && $target.is('a')) || (isInTable && isBottomsheetsOpened())) {
+        if (
+            $target.closest('.qor-button--actions').length ||
+            (!$target.data('url') && $target.is('a')) ||
+            (isInTable && isBottomsheetsOpened())
+        ) {
             return;
         }
 
@@ -69,7 +73,8 @@ $(function() {
         if (!openData.method || openData.method.toUpperCase() == 'GET') {
             // Open in BottmSheet: is action button, open type is bottom-sheet
             if (isActionButton || openType == 'bottomsheet') {
-                if (isActionButton && !actionData) {
+                // if is bulk action and no item selected
+                if (isActionButton && !actionData && $this.closest('[data-toggle="qor.action.bulk"]').length) {
                     window.QOR.qorConfirm(openData.errorNoItem);
                     return false;
                 }
