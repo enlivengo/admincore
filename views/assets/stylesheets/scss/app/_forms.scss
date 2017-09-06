@@ -201,7 +201,8 @@ button.qor-fieldset__add,
     .mdl-textfield__input {
         font-size: 14px;
     }
-    .mdl-textfield.is-dirty .mdl-textfield__label, .mdl-textfield.has-placeholder .mdl-textfield__label {
+    .mdl-textfield.is-dirty .mdl-textfield__label,
+    .mdl-textfield.has-placeholder .mdl-textfield__label {
         visibility: visible;
     }
 }
