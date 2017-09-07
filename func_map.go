@@ -1021,7 +1021,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"raw_value_of":         context.RawValueOf,
 
 		"t":          context.t,
-		"flashes":    func() []session.Message { return context.Admin.SessionManager.Flashes(context.Request) },
+		"flashes":    func() []session.Message { return context.Admin.SessionManager.Flashes(context.Writer, context.Request) },
 		"pagination": context.Pagination,
 		"escape":     html.EscapeString,
 		"raw":        func(str string) template.HTML { return template.HTML(utils.HTMLSanitizer.Sanitize(str)) },

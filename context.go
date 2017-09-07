@@ -47,7 +47,7 @@ func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
 
 // Flash set flash message
 func (context *Context) Flash(message string, typ string) {
-	context.Admin.SessionManager.Flash(context.Request, session.Message{
+	context.Admin.SessionManager.Flash(context.Writer, context.Request, session.Message{
 		Message: template.HTML(message),
 		Type:    typ,
 	})
