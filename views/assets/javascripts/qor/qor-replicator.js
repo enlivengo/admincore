@@ -37,7 +37,7 @@
                 fieldsetName;
 
             this.isInSlideout = $this.closest('.qor-slideout').length;
-            this.hasInlineReplicator = $this.parents(CLASS_CONTAINER).length || $this.find(CLASS_CONTAINER).length;
+            this.hasInlineReplicator = $this.find(CLASS_CONTAINER).length;
             this.maxitems = $this.data('maxItem');
 
             if (!$template.length || $this.closest('.qor-fieldset--new').length) {
@@ -118,7 +118,7 @@
                             i = index;
                         }
 
-                        if (!hasInlineReplicator && /\[\d+\]/.test(prefix)) {
+                        if (hasInlineReplicator && /\[\d+\]/.test(prefix)) {
                             return input.replace(/\[\d+\]/, '[{{index}}]');
                         } else {
                             return prefix + '[{{index}}]' + suffix;

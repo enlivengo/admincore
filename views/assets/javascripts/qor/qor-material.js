@@ -1,4 +1,4 @@
-(function (factory) {
+(function(factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as anonymous module.
         define(['jquery'], factory);
@@ -9,8 +9,7 @@
         // Browser globals.
         factory(jQuery);
     }
-})(function ($) {
-
+})(function($) {
     'use strict';
 
     var componentHandler = window.componentHandler;
@@ -18,27 +17,27 @@
     var EVENT_ENABLE = 'enable.' + NAMESPACE;
     var EVENT_DISABLE = 'disable.' + NAMESPACE;
     var EVENT_UPDATE = 'update.' + NAMESPACE;
-    var SELECTOR_COMPONENT = '[class*="mdl-js"]';
+    var SELECTOR_COMPONENT = '[class*="mdl-js"],[class*="mdl-tooltip"]';
 
     function enable(target) {
-
         /*jshint undef:false */
         if (componentHandler) {
-
             // Enable all MDL (Material Design Lite) components within the target element
             if ($(target).is(SELECTOR_COMPONENT)) {
+                console.log('target');
+                console.log(target);
+
                 componentHandler.upgradeElements(target);
             } else {
+                console.log($(SELECTOR_COMPONENT, target));
                 componentHandler.upgradeElements($(SELECTOR_COMPONENT, target).toArray());
             }
         }
     }
 
     function disable(target) {
-
         /*jshint undef:false */
         if (componentHandler) {
-
             // Destroy all MDL (Material Design Lite) components within the target element
             if ($(target).is(SELECTOR_COMPONENT)) {
                 componentHandler.downgradeElements(target);
@@ -48,18 +47,17 @@
         }
     }
 
-    $(function () {
-        $(document).
-        on(EVENT_ENABLE, function (e) {
-            enable(e.target);
-        }).
-        on(EVENT_DISABLE, function (e) {
-            disable(e.target);
-        }).
-        on(EVENT_UPDATE, function (e) {
-            disable(e.target);
-            enable(e.target);
-        });
+    $(function() {
+        $(document)
+            .on(EVENT_ENABLE, function(e) {
+                enable(e.target);
+            })
+            .on(EVENT_DISABLE, function(e) {
+                disable(e.target);
+            })
+            .on(EVENT_UPDATE, function(e) {
+                disable(e.target);
+                enable(e.target);
+            });
     });
-
 });
