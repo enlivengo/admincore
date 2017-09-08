@@ -24,12 +24,8 @@
         if (componentHandler) {
             // Enable all MDL (Material Design Lite) components within the target element
             if ($(target).is(SELECTOR_COMPONENT)) {
-                console.log('target');
-                console.log(target);
-
                 componentHandler.upgradeElements(target);
             } else {
-                console.log($(SELECTOR_COMPONENT, target));
                 componentHandler.upgradeElements($(SELECTOR_COMPONENT, target).toArray());
             }
         }
