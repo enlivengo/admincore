@@ -114,8 +114,12 @@
                         let error;
 
                         if (xhr.responseJSON) {
-                            error = `<ul class="qor-error"><li><label><i class="material-icons">error</i><span>${xhr.responseJSON
-                                .errors[0]}</span></label></li></ul>`;
+                            error = `<ul class="qor-error">
+                                        <li><label>
+                                            <i class="material-icons">error</i>
+                                            <span>${xhr.responseJSON.errors[0]}</span>
+                                        </label></li>
+                                    </ul>`;
                         } else {
                             error = `<ul class="qor-error">${$(xhr.responseText).find('#errors').html()}</ul>`;
                         }

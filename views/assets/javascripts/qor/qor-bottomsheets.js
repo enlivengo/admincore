@@ -443,6 +443,7 @@
                         $body.find('.qor-error').remove();
                         $error = $(xhr.responseText).find('.qor-error');
                         $form.before($error);
+                        $('.qor-bottomsheets .qor-page__body').scrollTop(0);
                     } else {
                         window.alert([textStatus, errorThrown].join(': '));
                     }
@@ -519,8 +520,16 @@
                             }
 
                             if (selectModal) {
-                                $body.find('.qor-button--new').data('ingoreSubmit', true).data('selectId', resourseData.selectId).data('loadInline', true);
-                                if (selectModal != 'one' && !data.selectNohint && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
+                                $body
+                                    .find('.qor-button--new')
+                                    .data('ingoreSubmit', true)
+                                    .data('selectId', resourseData.selectId)
+                                    .data('loadInline', true);
+                                if (
+                                    selectModal != 'one' &&
+                                    !data.selectNohint &&
+                                    (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')
+                                ) {
                                     $body.addClass('has-hint');
                                 }
                                 if (selectModal == 'mediabox' && !this.scriptAdded) {
