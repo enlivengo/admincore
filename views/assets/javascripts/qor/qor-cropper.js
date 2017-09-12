@@ -84,6 +84,10 @@
         return str;
     }
 
+    function isSVG(url) {
+        return /.svg$/.test(url);
+    }
+
     function QorCropper(element, options) {
         this.$element = $(element);
         this.options = $.extend(true, {}, QorCropper.DEFAULTS, $.isPlainObject(options) && options);
@@ -119,6 +123,10 @@
                     imageData = JSON.parse(data.MediaOption);
                     _this.$output.val(JSON.stringify(data));
                     _this.data = imageData || {};
+                    if (isSVG(imageData.URL || imageData.Url)) {
+                        _this.resetImage();
+                        return;
+                    }
                     _this.build();
                     _this.bind();
                 });
@@ -129,9 +137,20 @@
                 }
 
                 this.data = data || {};
+
+                if (isSVG(data.URL || data.Url)) {
+                    this.resetImage();
+                    return;
+                }
+
                 this.build();
                 this.bind();
             }
+        },
+
+        resetImage: function() {
+            this.$parent.addClass('is-svg');
+            this.$list.find(' li > img').attr('src', this.data.URL || this.data.Url);
         },
 
         build: function() {
@@ -434,7 +453,16 @@
         },
 
         stop: function() {
-            this.$modal.trigger('disable.qor.material').find(CLASS_WRAPPER + ' > img').cropper('destroy').remove().end().find(CLASS_OPTIONS).hide().find('ul').remove();
+            this.$modal
+                .trigger('disable.qor.material')
+                .find(CLASS_WRAPPER + ' > img')
+                .cropper('destroy')
+                .remove()
+                .end()
+                .find(CLASS_OPTIONS)
+                .hide()
+                .find('ul')
+                .remove();
         },
 
         getList: function(aspectRatio) {
@@ -573,8 +601,10 @@
         },
 
         destroy: function() {
-            this.unbind();
-            this.unbuild();
+            if (!isSVG) {
+                this.unbind();
+                this.unbuild();
+            }
             this.$element.removeData(NAMESPACE);
         }
     };
