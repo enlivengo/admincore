@@ -269,7 +269,8 @@
             if (files && files.length) {
                 file = files[0];
 
-                if (/^image\/\w+$/.test(file.type) && URL) {
+                if (/^image\//.test(file.type) && URL) {
+                    this.fileType = file.type;
                     this.load(URL.createObjectURL(file));
                     this.$parent.find('.qor-medialibrary__image-desc').show();
                 } else {
@@ -284,6 +285,7 @@
                 $list = this.$list,
                 $ul = $list.find('ul'),
                 data = this.data || {},
+                fileType = this.fileType,
                 $image,
                 imageLength;
 
@@ -299,6 +301,11 @@
             imageLength = $image.length;
             $image
                 .one('load', function() {
+                    if (fileType === 'image/svg+xml') {
+                        $list.find(CLASS_TOGGLE).remove();
+                        return false;
+                    }
+
                     let $this = $(this),
                         naturalWidth = this.naturalWidth,
                         naturalHeight = this.naturalHeight,
@@ -633,7 +640,7 @@
 
     QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
     QorCropper.LIST = '<ul><li><img></li></ul>';
-    QorCropper.FILE_LIST = '<div class="qor-file__list-item"><span><span>{{filename}}</span></span>';
+    QorCropper.FILE_LIST = '<div class="qor-file__list-item"><span><span>{{filename}}</span></span></div>';
     QorCropper.MODAL = `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="mdl-card mdl-shadow--2dp" role="document">
                 <div class="mdl-card__title">
