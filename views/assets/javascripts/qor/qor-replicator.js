@@ -36,15 +36,16 @@
         constructor: QorReplicator,
 
         init: function() {
-            let $this = this.$element,
-                $template = $this.find('> .qor-field__block > .qor-fieldset--new'),
+            let $element = this.$element,
+                $template = $element.find('> .qor-field__block > .qor-fieldset--new'),
                 fieldsetName;
 
-            this.isInSlideout = $this.closest('.qor-slideout').length;
-            this.hasInlineReplicator = $this.find(CLASS_CONTAINER).length;
-            this.maxitems = $this.data('maxItem');
+            this.isInSlideout = $element.closest('.qor-slideout').length;
+            this.hasInlineReplicator = $element.find(CLASS_CONTAINER).length;
+            this.maxitems = $element.data('maxItem');
+            this.isSortable = $element.hasClass('qor-fieldset-sortable');
 
-            if (!$template.length || $this.closest('.qor-fieldset--new').length) {
+            if (!$template.length || $element.closest('.qor-fieldset--new').length) {
                 return;
             }
 
@@ -52,7 +53,7 @@
             $template.trigger('disable');
 
             // if have isMultiple data value or template length large than 1
-            this.isMultipleTemplate = $this.data('isMultiple');
+            this.isMultipleTemplate = $element.data('isMultiple');
 
             if (this.isMultipleTemplate) {
                 this.fieldsetName = [];
@@ -76,6 +77,19 @@
             $template.hide();
             this.bind();
             this.resetButton();
+            this.resetPositionButton();
+        },
+
+        resetPositionButton: function() {
+            let sortableButton = this.$element.find('> .qor-sortable__button');
+
+            if (this.isSortable) {
+                if (this.getCurrentItems() > 1) {
+                    sortableButton.show();
+                } else {
+                    sortableButton.hide();
+                }
+            }
         },
 
         getCurrentItems: function() {
@@ -234,6 +248,7 @@
                 e.stopPropagation();
             }
 
+            this.resetPositionButton();
             this.resetButton();
         },
 
@@ -253,7 +268,7 @@
 
             $item = $(this.template.replace(/\{\{index\}\}/g, this.index));
             // add order property for sortable fieldset
-            if ($element.hasClass('qor-fieldset-sortable')) {
+            if (this.isSortable) {
                 let order = $element.find('> .qor-field__block > .qor-sortable__item').not('.qor-fieldset--new').length;
                 $item.attr('order-index', order).css('order', order);
             }
@@ -281,9 +296,11 @@
                     $item.find('> .qor-fieldset__alert').remove();
                     $item.removeClass('is-deleted').children('.hidden').removeClass('hidden').show();
                     this.resetButton();
+                    this.resetPositionButton();
                 }.bind(this)
             );
             this.resetButton();
+            this.resetPositionButton();
             $item.append($alert);
         },
 
