@@ -12,10 +12,14 @@
 })(function($) {
     'use strict';
 
-    const NAMESPACE = 'qor.replicator',
+    let _ = window._,
+        NAMESPACE = 'qor.replicator',
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_SUBMIT = 'submit.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_SLIDEOUTBEFORESEND = 'slideoutBeforeSend.qor.slideout.replicator',
+        EVENT_SELECTCOREBEFORESEND = 'selectcoreBeforeSend.qor.selectcore.replicator bottomsheetBeforeSend.qor.bottomsheets.replicator',
         EVENT_REPLICATOR_ADDED = 'added.' + NAMESPACE,
         EVENT_REPLICATORS_ADDED = 'addedMultiple.' + NAMESPACE,
         EVENT_REPLICATORS_ADDED_DONE = 'addedMultipleDone.' + NAMESPACE,
@@ -53,7 +57,7 @@
             if (this.isMultipleTemplate) {
                 this.fieldsetName = [];
                 this.template = {};
-                this.index = {};
+                this.index = [];
 
                 $template.each((i, ele) => {
                     fieldsetName = $(ele).data('fieldsetName');
@@ -107,6 +111,21 @@
             this.index = template.index;
         },
 
+        parseMultiple: function() {
+            let template,
+                name,
+                fieldsetName = this.fieldsetName;
+
+            for (let i = 0, len = fieldsetName.length; i < len; i++) {
+                name = fieldsetName[i];
+                template = this.initTemplate(this.template[name]);
+                this.template[name] = template.template;
+                this.index.push(template.index);
+            }
+
+            this.multipleIndex = _.max(this.index);
+        },
+
         initTemplate: function(template) {
             let i,
                 hasInlineReplicator = this.hasInlineReplicator;
@@ -135,19 +154,6 @@
             };
         },
 
-        parseMultiple: function() {
-            let template,
-                name,
-                fieldsetName = this.fieldsetName;
-
-            for (let i = 0, len = fieldsetName.length; i < len; i++) {
-                name = fieldsetName[i];
-                template = this.initTemplate(this.template[name]);
-                this.template[name] = template.template;
-                this.index[name] = template.index;
-            }
-        },
-
         bind: function() {
             let options = this.options;
 
@@ -155,19 +161,17 @@
                 .on(EVENT_CLICK, options.addClass, $.proxy(this.add, this))
                 .on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
-            !this.isInSlideout && $(document).on('submit', 'form', this.removeData.bind(this));
+            !this.isInSlideout && $(document).on(EVENT_SUBMIT, 'form', this.removeData.bind(this));
             $(document)
-                .on('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this))
-                .on('selectcoreBeforeSend.qor.selectcore bottomsheetBeforeSend.qor.bottomsheets', this.removeData.bind(this));
+                .on(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout', this.removeData.bind(this))
+                .on(EVENT_SELECTCOREBEFORESEND, this.removeData.bind(this));
         },
 
         unbind: function() {
-            this.$element.off(EVENT_CLICK, this.add).off(EVENT_CLICK, this.del);
+            this.$element.off(EVENT_CLICK);
 
-            !this.isInSlideout && $(document).off('submit', 'form', this.removeData.bind(this));
-            $(document)
-                .off('slideoutBeforeSend.qor.slideout', '.qor-slideout', this.removeData.bind(this))
-                .off('selectcoreBeforeSend.qor.selectcore bottomsheetBeforeSend.qor.bottomsheets', this.removeData.bind(this));
+            !this.isInSlideout && $(document).off(EVENT_SUBMIT, 'form');
+            $(document).off(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout').off(EVENT_SELECTCOREBEFORESEND);
         },
 
         removeData: function() {
@@ -195,7 +199,7 @@
                 this.parseNestTemplate(templateName);
                 template = this.template[templateName];
 
-                $item = $(template.replace(/\{\{index\}\}/g, this.index[templateName]));
+                $item = $(template.replace(/\{\{index\}\}/g, this.multipleIndex));
 
                 for (var dataKey in $target.data()) {
                     if (dataKey.match(/^sync/)) {
@@ -209,8 +213,8 @@
                 } else {
                     parentsChildren.prepend($item.show());
                 }
-                $item.data('itemIndex', this.index[templateName]).removeClass('qor-fieldset--new');
-                this.index[templateName]++;
+                $item.data('itemIndex', this.multipleIndex).removeClass('qor-fieldset--new');
+                this.multipleIndex++;
             } else {
                 if (!isAutomatically) {
                     $item = this.addSingle();
