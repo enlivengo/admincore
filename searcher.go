@@ -15,9 +15,8 @@ import (
 	"github.com/qor/qor/utils"
 )
 
-var (
-	PaginationPageCount = 20
-)
+// PaginationPageCount default pagination page count
+var PaginationPageCount = 20
 
 type scopeFunc func(db *gorm.DB, context *qor.Context) *gorm.DB
 
@@ -87,10 +86,9 @@ func (s *Searcher) FindMany() (interface{}, error) {
 
 	if context.HasError() {
 		return result, context.Errors
-	} else {
-		err = s.Resource.CallFindMany(result, context)
 	}
 
+	err = s.Resource.CallFindMany(result, context)
 	return result, err
 }
 
@@ -104,9 +102,9 @@ func (s *Searcher) FindOne() (interface{}, error) {
 
 	if context.HasError() {
 		return result, context.Errors
-	} else {
-		err = s.Resource.CallFindOne(result, nil, context)
 	}
+
+	err = s.Resource.CallFindOne(result, nil, context)
 	return result, err
 }
 
@@ -182,7 +180,7 @@ func (s *Searcher) parseContext() *qor.Context {
 		searcher = searcher.Scope(scopes...)
 
 		// parse filters
-		for key, _ := range context.Request.Form {
+		for key := range context.Request.Form {
 			if matches := filterRegexp.FindStringSubmatch(key); len(matches) > 0 {
 				var prefix = fmt.Sprintf("filters[%v].", matches[1])
 				for _, filter := range s.Resource.filters {
