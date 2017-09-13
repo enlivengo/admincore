@@ -15,7 +15,7 @@
 
       {{if has_create_permission .Resource}}
         <div class="qor-form__actions">
-          <button class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect qor-button--save" type="submit">{{t "qor_admin.form.add_resource" "Add {{$1}}" (t (printf "%v.name" .Resource.ToParam) .Resource.Name) }}</button>
+          <button class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect qor-button--save" type="submit">{{t "qor_admin.form.add" "Add" }}</button>
           </button>
           <a class="mdl-button mdl-button--primary mdl-js-button mdl-js-ripple-effect qor-button--cancel" href="javascript:history.back();">{{t "qor_admin.form.cancel" "Cancel"}}</a>
         </div>
