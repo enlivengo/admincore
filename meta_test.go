@@ -1,4 +1,4 @@
-package admin_test
+package admincore_test
 
 import (
 	"reflect"

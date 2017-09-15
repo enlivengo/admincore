@@ -1,4 +1,4 @@
-package admin
+package admincore
 
 // ThemeInterface theme interface
 type ThemeInterface interface {
