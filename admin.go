@@ -77,9 +77,6 @@ func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
 	admin.AssetFS = assetFS
 	globalAssetFSes = append(globalAssetFSes, assetFS)
 
-	admin.AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
-	admin.RegisterViewPath("github.com/qor/admin/views")
-
 	for _, viewPath := range globalViewPaths {
 		admin.RegisterViewPath(viewPath)
 	}
