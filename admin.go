@@ -1,5 +1,7 @@
 package admincore
 
+//go:generate go-bindata -ignore \.go -o templates/templates.go -pkg templates -prefix views/ views/...
+
 import (
 	"html/template"
 	"os"
@@ -7,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/enlivengo/enliven"
 	"github.com/jinzhu/inflection"
 	"github.com/qor/assetfs"
 	"github.com/qor/qor"
@@ -33,6 +36,8 @@ type Admin struct {
 	router           *Router
 	funcMaps         template.FuncMap
 	metaConfigorMaps map[string]func(*Meta)
+
+	Enliven *enliven.Enliven
 }
 
 // ResourceNamer is an interface for models that defined method `ResourceName`

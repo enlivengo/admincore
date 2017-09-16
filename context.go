@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/enlivengo/admincore/templates"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
@@ -94,6 +95,12 @@ func (context *Context) setResource(res *Resource) *Context {
 }
 
 func (context *Context) Asset(layouts ...string) ([]byte, error) {
+	for _, layout := range layouts {
+		if content, err := templates.Asset(layout); err == nil {
+			return content, nil
+		}
+	}
+
 	var prefixes, themes []string
 
 	if context.Request != nil {

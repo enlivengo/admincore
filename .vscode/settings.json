@@ -1,0 +1,14 @@
+{
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".go|.html|.css|.js|.json",
+                "cmd": "cd ${workspaceRoot} && go get"
+            },
+            {
+                "match": ".go|.html|.css|.js|.json",
+                "cmd": "cd ${workspaceRoot} && go generate ./..."
+            }
+        ]
+    }
+}

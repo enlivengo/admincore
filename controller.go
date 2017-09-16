@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/enlivengo/admincore/templates"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/responder"
 )
@@ -249,6 +250,7 @@ var (
 // Asset handle asset requests
 func (ac *Controller) Asset(context *Context) {
 	file := strings.TrimPrefix(context.Request.URL.Path, ac.GetRouter().Prefix)
+	file = strings.TrimPrefix(file, "/")
 
 	if context.Request.Header.Get("If-Modified-Since") == cacheSince {
 		context.Writer.WriteHeader(http.StatusNotModified)
@@ -256,7 +258,7 @@ func (ac *Controller) Asset(context *Context) {
 	}
 	context.Writer.Header().Set("Last-Modified", cacheSince)
 
-	if content, err := context.Asset(file); err == nil {
+	if content, err := templates.Asset(file); err == nil {
 		etag := fmt.Sprintf("%x", md5.Sum(content))
 		if context.Request.Header.Get("If-None-Match") == etag {
 			context.Writer.WriteHeader(http.StatusNotModified)

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/enlivengo/enliven"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/roles"
@@ -126,15 +127,14 @@ func (r *Router) Delete(path string, handle requestHandler, config ...*RouteConf
 }
 
 // MountTo mount the service into mux (HTTP request multiplexer) with given path
-func (admin *Admin) MountTo(mountTo string, mux *http.ServeMux) {
+func (admin *Admin) MountTo(mountTo string) {
 	prefix := "/" + strings.Trim(mountTo, "/")
 	serveMux := admin.NewServeMux(prefix)
-	mux.Handle(prefix, serveMux)     // /:prefix
-	mux.Handle(prefix+"/", serveMux) // /:prefix/:xxx
+	admin.Enliven.AddRoute(prefix+"...", serveMux.ServeHTTP)
 }
 
 // NewServeMux generate http.Handler for admin
-func (admin *Admin) NewServeMux(prefix string) http.Handler {
+func (admin *Admin) NewServeMux(prefix string) *ServeMux {
 	// Register default routes & middlewares
 	router := admin.router
 	router.Prefix = prefix
@@ -180,7 +180,7 @@ func (admin *Admin) NewServeMux(prefix string) http.Handler {
 		},
 	})
 
-	return &serveMux{admin: admin}
+	return &ServeMux{admin: admin}
 }
 
 // RegisterResourceRouters register resource to router
@@ -320,27 +320,33 @@ func (res *Resource) RegisterRoute(method string, relativePath string, handler r
 	}
 }
 
-type serveMux struct {
+// ServeMux is used to serve the admin pages
+type ServeMux struct {
 	admin *Admin
 }
 
 // ServeHTTP dispatches the handler registered in the matched route
-func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (serveMux *ServeMux) ServeHTTP(ctx *enliven.Context) {
+	if !ctx.Enliven.Auth.HasPermission("admin-app", ctx) {
+		ctx.Forbidden()
+		return
+	} // w req
+
 	var (
 		admin        = serveMux.admin
-		RelativePath = "/" + strings.Trim(strings.TrimPrefix(req.URL.Path, admin.router.Prefix), "/")
-		context      = admin.NewContext(w, req)
+		RelativePath = "/" + strings.Trim(strings.TrimPrefix(ctx.Request.URL.Path, admin.router.Prefix), "/")
+		context      = admin.NewContext(ctx.Response, ctx.Request)
 	)
 
 	// Parse Request Form
-	req.ParseMultipartForm(2 * 1024 * 1024)
+	ctx.Request.ParseMultipartForm(2 * 1024 * 1024)
 
 	// Set Request Method
-	if method := req.Form.Get("_method"); method != "" {
-		req.Method = strings.ToUpper(method)
+	if method := ctx.Request.Form.Get("_method"); method != "" {
+		ctx.Request.Method = strings.ToUpper(method)
 	}
 
-	if regexp.MustCompile("^/assets/.*$").MatchString(RelativePath) && strings.ToUpper(req.Method) == "GET" {
+	if regexp.MustCompile("^/assets/.*$").MatchString(RelativePath) && strings.ToUpper(ctx.Request.Method) == "GET" {
 		(&Controller{Admin: admin}).Asset(context)
 		return
 	}
@@ -348,7 +354,7 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer func() func() {
 		begin := time.Now()
 		return func() {
-			log.Printf("Finish [%s] %s Took %.2fms\n", req.Method, req.RequestURI, time.Now().Sub(begin).Seconds()*1000)
+			log.Printf("Finish [%s] %s Took %.2fms\n", ctx.Request.Method, ctx.Request.RequestURI, time.Now().Sub(begin).Seconds()*1000)
 		}
 	}()()
 
@@ -357,15 +363,15 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var permissionMode roles.PermissionMode
 	if admin.Auth != nil {
 		if currentUser = admin.Auth.GetCurrentUser(context); currentUser == nil {
-			http.Redirect(w, req, admin.Auth.LoginURL(context), http.StatusSeeOther)
+			http.Redirect(ctx.Response, ctx.Request, admin.Auth.LoginURL(context), http.StatusSeeOther)
 			return
 		}
 		context.CurrentUser = currentUser
 		context.SetDB(context.GetDB().Set("qor:current_user", context.CurrentUser))
 	}
-	context.Roles = roles.MatchedRoles(req, currentUser)
+	context.Roles = roles.MatchedRoles(ctx.Request, currentUser)
 
-	switch req.Method {
+	switch ctx.Request.Method {
 	case "GET":
 		permissionMode = roles.Read
 	case "PUT":
@@ -376,17 +382,17 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		permissionMode = roles.Delete
 	}
 
-	handlers := admin.router.routers[strings.ToUpper(req.Method)]
+	handlers := admin.router.routers[strings.ToUpper(ctx.Request.Method)]
 	for _, handler := range handlers {
 		if params, _, ok := utils.ParamsMatch(handler.Path, RelativePath); ok && handler.HasPermission(permissionMode, context.Context) {
 			if len(params) > 0 {
-				req.URL.RawQuery = url.Values(params).Encode() + "&" + req.URL.RawQuery
+				ctx.Request.URL.RawQuery = url.Values(params).Encode() + "&" + ctx.Request.URL.RawQuery
 			}
 			context.RouteHandler = handler
 
 			context.setResource(handler.Config.Resource)
 			if context.Resource == nil {
-				if matches := regexp.MustCompile(path.Join(admin.router.Prefix, `([^/]+)`)).FindStringSubmatch(req.URL.Path); len(matches) > 1 {
+				if matches := regexp.MustCompile(path.Join(admin.router.Prefix, `([^/]+)`)).FindStringSubmatch(ctx.Request.URL.Path); len(matches) > 1 {
 					context.setResource(admin.GetResource(matches[1]))
 				}
 			}
